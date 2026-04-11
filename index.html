@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PERM Status Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --yellow: #d29922;
+      --orange: #db6d28;
+      --purple: #bc8cff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+    header {
+      text-align: center;
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+    header p { color: var(--text-muted); font-size: 14px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .stat-card.total .value { color: var(--accent); }
+    .stat-card.certified .value { color: var(--green); }
+    .stat-card.review .value { color: var(--yellow); }
+    .stat-card.denied .value { color: var(--red); }
+    .stat-card.rfi .value { color: var(--orange); }
+    .stat-card.withdrawn .value { color: var(--purple); }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .section h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tr:hover { background: rgba(88, 166, 255, 0.04); }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-CERTIFIED { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+    .status-DENIED { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+    .status-ANALYST_REVIEW { background: rgba(210, 153, 34, 0.15); color: var(--yellow); }
+    .status-RFI_ISSUED { background: rgba(219, 109, 40, 0.15); color: var(--orange); }
+    .status-WITHDRAWN { background: rgba(188, 140, 255, 0.15); color: var(--purple); }
+
+    .meta { text-align: center; color: var(--text-muted); font-size: 12px; padding: 24px 0; }
+    .meta a { color: var(--accent); text-decoration: none; }
+
+    .rate-bar {
+      display: flex;
+      height: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .rate-bar div { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .rate-bar .certified-bar { background: var(--green); }
+    .rate-bar .review-bar { background: var(--yellow); color: #000; }
+    .rate-bar .denied-bar { background: var(--red); }
+    .rate-bar .rfi-bar { background: var(--orange); }
+    .rate-bar .withdrawn-bar { background: var(--purple); }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-card .value { font-size: 24px; }
+      table { font-size: 12px; }
+      th, td { padding: 8px 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PERM Status Tracker</h1>
+      <p>Real-time DOL PERM case tracking &middot; Data from FLAG.DOL.GOV</p>
+    </header>
+
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="section">
+      <h2>Processing Rate</h2>
+      <div id="rate-bar-container"></div>
+    </div>
+
+    <div class="section">
+      <h2>Status Distribution</h2>
+      <div class="chart-container">
+        <canvas id="statusChart"></canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Monthly Breakdown</h2>
+      <div class="chart-container">
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Recent Certifications</h2>
+      <div style="overflow-x: auto;">
+        <table id="certTable">
+          <thead>
+            <tr>
+              <th>Case Number</th>
+              <th>Employer</th>
+              <th>Job Title</th>
+              <th>Filed</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="meta" id="meta"></div>
+  </div>
+
+  <script>
+    const STATUS_COLORS = {
+      'CERTIFIED': '#3fb950',
+      'ANALYST REVIEW': '#d29922',
+      'DENIED': '#f85149',
+      'RFI ISSUED': '#db6d28',
+      'WITHDRAWN': '#bc8cff'
+    };
+
+    const STATUS_ORDER = ['CERTIFIED', 'ANALYST REVIEW', 'RFI ISSUED', 'DENIED', 'WITHDRAWN'];
+
+    function statusClass(s) { return 'status-' + s.replace(/\s+/g, '_'); }
+    function fmtNum(n) { return n.toLocaleString(); }
+    function fmtDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    async function init() {
+      const resp = await fetch('data/perm_data.json');
+      const data = await resp.json();
+      renderStats(data);
+      renderRateBar(data);
+      renderStatusChart(data);
+      renderMonthlyChart(data);
+      renderTable(data);
+      renderMeta(data);
+    }
+
+    function renderStats(data) {
+      const grid = document.getElementById('stats-grid');
+      const cards = [
+        { label: 'Total Cases', value: data.total_cases, cls: 'total' },
+        { label: 'Certified', value: data.status_summary['CERTIFIED'] || 0, cls: 'certified' },
+        { label: 'Analyst Review', value: data.status_summary['ANALYST REVIEW'] || 0, cls: 'review' },
+        { label: 'Denied', value: data.status_summary['DENIED'] || 0, cls: 'denied' },
+        { label: 'RFI Issued', value: data.status_summary['RFI ISSUED'] || 0, cls: 'rfi' },
+        { label: 'Withdrawn', value: data.status_summary['WITHDRAWN'] || 0, cls: 'withdrawn' },
+      ];
+      grid.innerHTML = cards.map(c => `
+        <div class="stat-card ${c.cls}">
+          <div class="value">${fmtNum(c.value)}</div>
+          <div class="label">${c.label}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRateBar(data) {
+      const container = document.getElementById('rate-bar-container');
+      const total = data.total_cases;
+      const segments = STATUS_ORDER.map(s => {
+        const count = data.status_summary[s] || 0;
+        const pct = ((count / total) * 100).toFixed(1);
+        const cls = s.toLowerCase().replace(/\s+/g, '-') + '-bar';
+        return { s, count, pct, cls };
+      }).filter(x => x.count > 0);
+
+      container.innerHTML = `
+        <div class="rate-bar">
+          ${segments.map(x => `<div class="${x.cls}" style="width:${x.pct}%" title="${x.s}: ${fmtNum(x.count)} (${x.pct}%)">${x.pct > 5 ? x.pct + '%' : ''}</div>`).join('')}
+        </div>
+        <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
+          ${segments.map(x => `<span style="font-size:12px;color:${STATUS_COLORS[x.s]}">● ${x.s}: ${fmtNum(x.count)} (${x.pct}%)</span>`).join('')}
+        </div>
+      `;
+    }
+
+    function renderStatusChart(data) {
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      const labels = STATUS_ORDER.filter(s => data.status_summary[s]);
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: labels.map(s => data.status_summary[s]),
+            backgroundColor: labels.map(s => STATUS_COLORS[s]),
+            borderColor: '#161b22',
+            borderWidth: 3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#e6edf3', padding: 16, font: { size: 13 } } }
+          }
+        }
+      });
+    }
+
+    function renderMonthlyChart(data) {
+      const ctx = document.getElementById('monthlyChart').getContext('2d');
+      const months = Object.keys(data.monthly_breakdown).sort();
+      const statuses = STATUS_ORDER;
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: statuses.map(s => ({
+            label: s,
+            data: months.map(m => data.monthly_breakdown[m]?.[s] || 0),
+            backgroundColor: STATUS_COLORS[s],
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+            y: { stacked: true, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+          },
+          plugins: {
+            legend: { labels: { color: '#e6edf3', font: { size: 12 } } }
+          }
+        }
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.querySelector('#certTable tbody');
+      tbody.innerHTML = data.recent_certified.slice(0, 25).map(c => `
+        <tr>
+          <td style="font-family:monospace;font-size:12px;">${c.case_number}</td>
+          <td>${c.employer_name || '—'}</td>
+          <td>${c.job_title || '—'}</td>
+          <td>${fmtDate(c.submitted_date)}</td>
+          <td><span class="status-badge ${statusClass(c.current_status)}">${c.current_status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderMeta(data) {
+      const meta = document.getElementById('meta');
+      meta.innerHTML = `
+        Data last updated: ${fmtDate(data.generated_at)}<br>
+        Source: <a href="https://flag.dol.gov/programs/lca" target="_blank">FLAG.DOL.GOV</a> &middot;
+        Tracking ${fmtNum(data.total_cases)} PERM cases
+      `;
+    }
+
+    init();
+  </script>
+</body>
+</html>
