@@ -1,337 +1,735 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PERM Status Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-  <style>
-    :root {
-      --bg: #0d1117;
-      --surface: #161b22;
-      --border: #30363d;
-      --text: #e6edf3;
-      --text-muted: #8b949e;
-      --accent: #58a6ff;
-      --green: #3fb950;
-      --red: #f85149;
-      --yellow: #d29922;
-      --orange: #db6d28;
-      --purple: #bc8cff;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
-    header {
-      text-align: center;
-      padding: 32px 0 24px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 32px;
-    }
-    header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-    header p { color: var(--text-muted); font-size: 14px; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-    }
-    .stat-card .value {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .stat-card .label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-    }
-    .stat-card.total .value { color: var(--accent); }
-    .stat-card.certified .value { color: var(--green); }
-    .stat-card.review .value { color: var(--yellow); }
-    .stat-card.denied .value { color: var(--red); }
-    .stat-card.rfi .value { color: var(--orange); }
-    .stat-card.withdrawn .value { color: var(--purple); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PERM Tracker — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #0a0a12; color: #f0f0f8; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(139,92,246,0.06) 0%, transparent 50%); z-index: 0; }
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; backdrop-filter: blur(20px); background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a.active, .nav-links a:hover { color: #f0f0f8; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .hero { padding: 40px 0 20px; }
+  .hero h1 { font-size: 14px; font-weight: 500; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .hero h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, #f0f0f8, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .update-time { font-size: 12px; color: #475569; margin-top: 4px; }
+  .update-time .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-right: 6px; animation: pulse 2s infinite; }
+  @keyframes pulse    { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  @keyframes dotpulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.6),0 0 12px rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0),0 0 20px rgba(245,158,11,0.6)} }
+  @keyframes spin     { to { transform: rotate(360deg); } }
+  @keyframes radar1   { 0%{transform:scale(1);opacity:0.7} 100%{transform:scale(3.5);opacity:0} }
+  @keyframes radar2   { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(2.8);opacity:0} }
 
-    .section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-    .section h2 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .chart-container {
-      position: relative;
-      height: 300px;
-      width: 100%;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    th, td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    th {
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    tr:hover { background: rgba(88, 166, 255, 0.04); }
-    .status-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .status-CERTIFIED { background: rgba(63, 185, 80, 0.15); color: var(--green); }
-    .status-DENIED { background: rgba(248, 81, 73, 0.15); color: var(--red); }
-    .status-ANALYST_REVIEW { background: rgba(210, 153, 34, 0.15); color: var(--yellow); }
-    .status-RFI_ISSUED { background: rgba(219, 109, 40, 0.15); color: var(--orange); }
-    .status-WITHDRAWN { background: rgba(188, 140, 255, 0.15); color: var(--purple); }
+  /* ── STAT CARDS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0; }
+  .stat-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 24px 24px; transition: all 0.3s; position: relative; min-height: 220px; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.6; }
+  .stat-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); transform: translateY(-2px); }
+  .stat-label { font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .stat-value { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
+  .stat-trend { font-size: 12px; font-weight: 600; }
+  .stat-details { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 6px; }
+  .stat-detail-row { display: flex; justify-content: space-between; font-size: 12px; }
+  .stat-detail-label { color: #64748b; } .stat-detail-value { color: #94a3b8; font-weight: 600; }
+  .trend-up { color: #22c55e; } .trend-down { color: #ef4444; } .trend-neutral { color: #64748b; }
+  .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #475569; font-size: 9px; color: #475569; cursor: help; position: relative; }
+  .info-icon:hover .tooltip { display: block; }
+  .tooltip { display: none; position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #e2e8f0; font-size: 11px; padding: 10px 14px; border-radius: 8px; z-index: 200; border: 1px solid rgba(255,255,255,0.1); line-height: 1.5; max-width: 300px; min-width: 200px; white-space: normal; box-shadow: 0 8px 24px rgba(0,0,0,0.5); pointer-events: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
+  .tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:#1e293b; }
+  .tooltip .tt-row { display:flex; justify-content:space-between; gap:12px; }
+  .tooltip .tt-label { color:#94a3b8; } .tooltip .tt-val { font-weight:600; color:#f0f0f8; }
+  .tooltip .tt-section { font-weight:600; color:#f0f0f8; margin:4px 0 2px; font-size:11px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:3px; }
 
-    .meta { text-align: center; color: var(--text-muted); font-size: 12px; padding: 24px 0; }
-    .meta a { color: var(--accent); text-decoration: none; }
+  /* ── CARD / TABS ── */
+  .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; position: relative; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .card-title { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+  .card-subtitle { font-size: 11px; color: #64748b; }
+  .card-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 3px; }
+  .card-tab { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: #64748b; cursor: pointer; border: none; background: none; transition: all 0.2s; }
+  .card-tab:hover { color: #94a3b8; }
+  .card-tab.active { background: rgba(255,255,255,0.1); color: #f0f0f8; }
+  .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin: 16px 0; }
 
-    .rate-bar {
-      display: flex;
-      height: 24px;
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .rate-bar div { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
-    .rate-bar .certified-bar { background: var(--green); }
-    .rate-bar .review-bar { background: var(--yellow); color: #000; }
-    .rate-bar .denied-bar { background: var(--red); }
-    .rate-bar .rfi-bar { background: var(--orange); }
-    .rate-bar .withdrawn-bar { background: var(--purple); }
+  /* ── GLOBAL FIXED TOOLTIP ── */
+  #gtip { display: none; position: fixed; background: #1a2540; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 12px 16px; z-index: 9999; white-space: nowrap; font-size: 11px; line-height: 1.8; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.7); pointer-events: none; }
+  #gtip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:#1a2540; }
+  #gtip .gt-title { font-weight: 700; color: #f0f0f8; font-size: 12px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  #gtip .gt-row { display: flex; justify-content: space-between; gap: 24px; }
+  #gtip .gt-label { color: #64748b; } #gtip .gt-val { font-weight: 700; }
+  #gtip .gt-sep { border-top: 1px solid rgba(255,255,255,0.07); margin: 5px 0; }
 
-    @media (max-width: 600px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .stat-card .value { font-size: 24px; }
-      table { font-size: 12px; }
-      th, td { padding: 8px 6px; }
-    }
-  </style>
+  /* ── RATE CHART ── */
+  .rate-chart-wrap { position: relative; height: 220px; display: flex; }
+  .y-axis { width: 38px; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 26px; padding-top: 4px; flex-shrink: 0; }
+  .y-tick { font-size: 9px; color: #475569; text-align: right; padding-right: 6px; font-weight: 500; }
+  .chart-area { flex: 1; position: relative; padding-bottom: 26px; }
+  .grid-lines { position: absolute; inset: 0 0 26px 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; z-index: 0; }
+  .grid-line { border-top: 1px dashed rgba(255,255,255,0.05); }
+  .grid-line:last-child { border-top: 1px solid rgba(255,255,255,0.09); }
+  .avg-line { position: absolute; left: 0; right: 0; border-top: 2px dashed rgba(99,102,241,0.5); z-index: 3; pointer-events: none; }
+  .avg-label { position: absolute; right: 4px; font-size: 9px; color: rgba(99,102,241,0.8); font-weight: 700; transform: translateY(-13px); }
+  .bars-container { position: absolute; inset: 0 0 26px 0; display: flex; align-items: flex-end; gap: 3px; z-index: 1; padding: 0 2px; }
+  .bar-group { flex: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
+  .bar { width: 100%; max-width: 26px; border-radius: 4px 4px 0 0; cursor: pointer; transition: opacity 0.18s, box-shadow 0.18s, transform 0.12s; background: linear-gradient(180deg, #6366f1, #3b82f6); }
+  .bar.weekend { background: linear-gradient(180deg, rgba(99,102,241,0.3), rgba(59,130,246,0.3)); }
+  .bar.dimmed  { opacity: 0.22; }
+  .bar.hovered { opacity: 1 !important; box-shadow: 0 0 16px rgba(99,102,241,0.5); transform: scaleX(1.08); }
+  .bar-labels { position: absolute; bottom: 0; left: 0; right: 0; height: 26px; display: flex; padding: 0 2px; }
+  .bar-label-slot { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .bar-label { font-size: 8px; color: #475569; font-weight: 500; text-align: center; line-height: 1.3; }
+
+  /* ── DONUT ── */
+  .donut-container { display: flex; align-items: center; gap: 24px; }
+  .donut-wrap { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
+  .donut-svg { width: 180px; height: 180px; transform: rotate(-90deg); }
+  .donut-seg { cursor: pointer; transition: opacity 0.2s; }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+  .donut-number { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #f0f0f8; }
+  .donut-label  { font-size: 10px; color: #64748b; font-weight: 500; }
+  .donut-pct    { font-size: 10px; font-weight: 600; margin-top: 1px; }
+  .legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-dot   { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-value { margin-left: auto; font-weight: 600; color: #94a3b8; font-size: 12px; }
+
+  /* ── TIMELINE + BACKLOG ── */
+  .combo-section { margin: 16px 0; overflow: visible; }
+  .combo-scroll  { overflow-x: auto; overflow-y: visible; padding-bottom: 8px; }
+  .combo-grid    { display: flex; gap: 0; min-width: max-content; padding: 56px 8px 0; position: relative; }
+  .combo-col     { display: flex; flex-direction: column; align-items: center; min-width: 68px; flex: 1; position: relative; }
+
+  .tl-row  { height: 52px; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; }
+  .tl-dot  { width: 16px; height: 16px; border-radius: 50%; border: 3px solid; z-index: 4; position: relative; flex-shrink: 0; }
+  .tl-dot.done    { border-color: #22c55e; background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+  .tl-dot.active  { border-color: #f59e0b; background: #0a0a12; animation: dotpulse 2s infinite; }
+  .tl-dot.pending { border-color: #2d3748; background: #0a0a12; }
+  .tl-dot-wrap { position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .tl-spin-ring { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid transparent; border-top-color: #22c55e; border-right-color: #f59e0b; animation: spin 1.2s linear infinite; }
+  .tl-left  { position: absolute; top: 50%; left: 0;   right: 50%; height: 3px; transform: translateY(-50%); border-radius: 2px; z-index: 1; }
+  .tl-right { position: absolute; top: 50%; left: 50%; right: 0;   height: 3px; transform: translateY(-50%); border-radius: 2px; z-index: 1; }
+
+  .bl-row { height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .bl-bar { width: 36px; border-radius: 5px 5px 0 0; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; cursor: pointer; transition: opacity 0.18s, box-shadow 0.18s; }
+  .bl-bar.dimmed  { opacity: 0.2; }
+  .bl-bar.hovered { opacity: 1 !important; box-shadow: 0 0 16px rgba(255,255,255,0.15); }
+  .bl-seg { width: 100%; }
+  .bl-pct { font-size: 9px; font-weight: 700; color: #94a3b8; margin-bottom: 3px; }
+  .ml-row { padding-top: 5px; }
+  .ml-label { font-size: 9px; color: #475569; font-weight: 500; white-space: nowrap; }
+  .combo-col.active-month .ml-label { color: #f59e0b; font-weight: 700; }
+  .combo-col.active-month .bl-bar  { box-shadow: 0 0 14px rgba(245,158,11,0.25); }
+  .backlog-legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; }
+  .backlog-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
+  .backlog-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* ── DOL MARKER ── */
+  #dol-marker { position: absolute; z-index: 20; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
+  .dol-pill { min-width: 118px; padding: 7px 12px 8px; border-radius: 16px; background: linear-gradient(135deg, rgba(245,158,11,0.92), rgba(251,191,36,0.88)); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(245,158,11,0.28), inset 0 1px 0 rgba(255,255,255,0.18); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; }
+  .dol-pill-top { color: #fff7ed; font-size: 10px; font-weight: 800; letter-spacing: 0.45px; line-height: 1.1; }
+  .dol-pill-bottom { color: #1f2937; font-size: 11px; font-weight: 800; letter-spacing: 0.15px; line-height: 1.1; }
+  .dol-stem { width: 2px; height: 10px; background: linear-gradient(180deg, #f59e0b, rgba(245,158,11,0.4)); }
+  .dol-radar-wrap  { position: relative; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+  .dol-radar-ring  { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #f59e0b; animation: radar1 1.8s ease-out infinite; }
+  .dol-radar-ring2 { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #f59e0b; animation: radar2 1.8s ease-out infinite 0.6s; }
+  .dol-dot { width: 10px; height: 10px; background: #f59e0b; border-radius: 50%; box-shadow: 0 0 10px rgba(245,158,11,0.9); position: relative; z-index: 2; }
+
+  /* ── EMPLOYERS ── */
+  .employer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+  .employer-row { display: grid; grid-template-columns: 24px 1fr 60px 80px; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .employer-rank  { font-size: 12px; font-weight: 700; color: #475569; text-align: center; }
+  .employer-name  { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .employer-count { font-size: 12px; font-weight: 700; color: #94a3b8; text-align: right; }
+  .employer-bar   { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .employer-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>PERM Status Tracker</h1>
-      <p>Real-time DOL PERM case tracking &middot; Data from FLAG.DOL.GOV</p>
-    </header>
 
-    <div class="stats-grid" id="stats-grid"></div>
+<div id="gtip"></div>
 
-    <div class="section">
-      <h2>Processing Rate</h2>
-      <div id="rate-bar-container"></div>
-    </div>
+<nav>
+  <div class="logo"><div class="logo-icon">🏛️</div>PERM Tracker</div>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Dashboard</a></li>
+    <li><a href="#">Estimate</a></li>
+    <li><a href="#">Case Lookup</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="nav-right"></div>
+</nav>
 
-    <div class="section">
-      <h2>Status Distribution</h2>
-      <div class="chart-container">
-        <canvas id="statusChart"></canvas>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Monthly Breakdown</h2>
-      <div class="chart-container">
-        <canvas id="monthlyChart"></canvas>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Recent Certifications</h2>
-      <div style="overflow-x: auto;">
-        <table id="certTable">
-          <thead>
-            <tr>
-              <th>Case Number</th>
-              <th>Employer</th>
-              <th>Job Title</th>
-              <th>Filed</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="meta" id="meta"></div>
+<div class="container">
+  <div class="hero">
+    <h1>PERM Processing Dashboard</h1>
+    <h2>Real-time DOL Labor Certification Tracking</h2>
+    <p class="update-time"><span class="dot"></span><span id="updated-text">Loading…</span></p>
   </div>
 
-  <script>
-    const STATUS_COLORS = {
-      'CERTIFIED': '#3fb950',
-      'ANALYST REVIEW': '#d29922',
-      'DENIED': '#f85149',
-      'RFI ISSUED': '#db6d28',
-      'WITHDRAWN': '#bc8cff'
-    };
+  <div class="card combo-section">
+    <div class="card-header">
+      <span class="card-title">DOL Processing Timeline &amp; Monthly Backlog</span>
+      <span class="card-subtitle">Filing months · hover bars for details</span>
+    </div>
+    <div class="combo-scroll">
+      <div class="combo-grid" id="combo-chart"></div>
+    </div>
+    <div class="backlog-legend">
+      <div class="backlog-legend-item"><div class="backlog-legend-dot" style="background:#22c55e;"></div>Certified</div>
+      <div class="backlog-legend-item"><div class="backlog-legend-dot" style="background:#f59e0b;"></div>Analyst Review</div>
+      <div class="backlog-legend-item"><div class="backlog-legend-dot" style="background:#64748b;"></div>Withdrawn</div>
+      <div class="backlog-legend-item"><div class="backlog-legend-dot" style="background:#ef4444;"></div>Denied/RFI</div>
+    </div>
+  </div>
 
-    const STATUS_ORDER = ['CERTIFIED', 'ANALYST REVIEW', 'RFI ISSUED', 'DENIED', 'WITHDRAWN'];
+  <div class="stats-grid" id="stats-grid"></div>
 
-    function statusClass(s) { return 'status-' + s.replace(/\s+/g, '_'); }
-    function fmtNum(n) { return n.toLocaleString(); }
-    function fmtDate(d) {
-      if (!d) return '—';
-      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    async function init() {
-      const resp = await fetch('data/perm_data.json');
-      const data = await resp.json();
-      renderStats(data);
-      renderRateBar(data);
-      renderStatusChart(data);
-      renderMonthlyChart(data);
-      renderTable(data);
-      renderMeta(data);
-    }
-
-    function renderStats(data) {
-      const grid = document.getElementById('stats-grid');
-      const cards = [
-        { label: 'Total Cases', value: data.total_cases, cls: 'total' },
-        { label: 'Certified', value: data.status_summary['CERTIFIED'] || 0, cls: 'certified' },
-        { label: 'Analyst Review', value: data.status_summary['ANALYST REVIEW'] || 0, cls: 'review' },
-        { label: 'Denied', value: data.status_summary['DENIED'] || 0, cls: 'denied' },
-        { label: 'RFI Issued', value: data.status_summary['RFI ISSUED'] || 0, cls: 'rfi' },
-        { label: 'Withdrawn', value: data.status_summary['WITHDRAWN'] || 0, cls: 'withdrawn' },
-      ];
-      grid.innerHTML = cards.map(c => `
-        <div class="stat-card ${c.cls}">
-          <div class="value">${fmtNum(c.value)}</div>
-          <div class="label">${c.label}</div>
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-header">
+        <div><span class="card-title">Processing Rate</span><div class="card-subtitle" id="rate-subtitle"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <div class="card-tabs" id="rate-tabs">
+            <button class="card-tab active" data-range="day">D</button>
+            <button class="card-tab" data-range="week">W</button>
+          </div>
+          <div id="rate-avg-stat" style="font-size:11px;color:#94a3b8;font-weight:600;white-space:nowrap;"></div>
         </div>
-      `).join('');
-    }
-
-    function renderRateBar(data) {
-      const container = document.getElementById('rate-bar-container');
-      const total = data.total_cases;
-      const segments = STATUS_ORDER.map(s => {
-        const count = data.status_summary[s] || 0;
-        const pct = ((count / total) * 100).toFixed(1);
-        const cls = s.toLowerCase().replace(/\s+/g, '-') + '-bar';
-        return { s, count, pct, cls };
-      }).filter(x => x.count > 0);
-
-      container.innerHTML = `
-        <div class="rate-bar">
-          ${segments.map(x => `<div class="${x.cls}" style="width:${x.pct}%" title="${x.s}: ${fmtNum(x.count)} (${x.pct}%)">${x.pct > 5 ? x.pct + '%' : ''}</div>`).join('')}
+      </div>
+      <div class="rate-chart-wrap" id="rate-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div><span class="card-title">Status Distribution</span><div class="card-subtitle" id="status-subtitle"></div></div>
+        <div class="card-tabs" id="status-tabs"></div>
+      </div>
+      <div class="donut-container">
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 180 180" id="donut-svg"></svg>
+          <div class="donut-center" id="donut-center">
+            <div class="donut-number" id="donut-total"></div>
+            <div class="donut-label"  id="donut-sublabel">Total Cases</div>
+            <div class="donut-pct"    id="donut-pct" style="display:none;"></div>
+          </div>
         </div>
-        <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
-          ${segments.map(x => `<span style="font-size:12px;color:${STATUS_COLORS[x.s]}">● ${x.s}: ${fmtNum(x.count)} (${x.pct}%)</span>`).join('')}
-        </div>
-      `;
-    }
+        <div class="legend" id="donut-legend"></div>
+      </div>
+    </div>
+  </div>
 
-    function renderStatusChart(data) {
-      const ctx = document.getElementById('statusChart').getContext('2d');
-      const labels = STATUS_ORDER.filter(s => data.status_summary[s]);
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels,
-          datasets: [{
-            data: labels.map(s => data.status_summary[s]),
-            backgroundColor: labels.map(s => STATUS_COLORS[s]),
-            borderColor: '#161b22',
-            borderWidth: 3,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'right', labels: { color: '#e6edf3', padding: 16, font: { size: 13 } } }
-          }
-        }
-      });
-    }
+  <div style="margin: 16px 0 40px;">
+    <div class="card">
+      <div class="card-header">
+        <div><span class="card-title">Top Employers by PERM Filings</span><div class="card-subtitle" id="employer-subtitle"></div></div>
+        <div class="card-tabs" id="employer-tabs"></div>
+      </div>
+      <div class="employer-grid" id="employer-list"></div>
+    </div>
+  </div>
+</div>
 
-    function renderMonthlyChart(data) {
-      const ctx = document.getElementById('monthlyChart').getContext('2d');
-      const months = Object.keys(data.monthly_breakdown).sort();
-      const statuses = STATUS_ORDER;
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: months,
-          datasets: statuses.map(s => ({
-            label: s,
-            data: months.map(m => data.monthly_breakdown[m]?.[s] || 0),
-            backgroundColor: STATUS_COLORS[s],
-          }))
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { stacked: true, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
-            y: { stacked: true, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
-          },
-          plugins: {
-            legend: { labels: { color: '#e6edf3', font: { size: 12 } } }
-          }
-        }
-      });
-    }
+<script>
 
-    function renderTable(data) {
-      const tbody = document.querySelector('#certTable tbody');
-      tbody.innerHTML = data.recent_certified.slice(0, 25).map(c => `
-        <tr>
-          <td style="font-family:monospace;font-size:12px;">${c.case_number}</td>
-          <td>${c.employer_name || '—'}</td>
-          <td>${c.job_title || '—'}</td>
-          <td>${fmtDate(c.submitted_date)}</td>
-          <td><span class="status-badge ${statusClass(c.current_status)}">${c.current_status}</span></td>
-        </tr>
-      `).join('');
-    }
+// Load data from external JSON and render
+fetch('data/dashboard_data.json?t=' + Date.now())
+  .then(r => r.json())
+  .then(data => {
+    window.DASHBOARD_DATA = data;
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+const D = window.DASHBOARD_DATA;
 
-    function renderMeta(data) {
-      const meta = document.getElementById('meta');
-      meta.innerHTML = `
-        Data last updated: ${fmtDate(data.generated_at)}<br>
-        Source: <a href="https://flag.dol.gov/programs/lca" target="_blank">FLAG.DOL.GOV</a> &middot;
-        Tracking ${fmtNum(data.total_cases)} PERM cases
-      `;
-    }
+function n(v)  { return v.toLocaleString(); }
+function pct(a,b) { return b ? Math.round(a/b*100) : 0; }
 
-    init();
-  </script>
+// Compute "last 12 months excluding current month" range string from an ISO timestamp
+// e.g. updatedAt = "2026-03-30..." → "Apr 2025 – Feb 2026"
+function last12MonthsRange(updatedAtIso) {
+  const ref = new Date(updatedAtIso);
+  // End = month before current month
+  const endYear  = ref.getUTCMonth() === 0 ? ref.getUTCFullYear()-1 : ref.getUTCFullYear();
+  const endMonth = ref.getUTCMonth() === 0 ? 12 : ref.getUTCMonth(); // 1-indexed
+  // Start = 11 months before end
+  let startMonth = endMonth - 11; let startYear = endYear;
+  if (startMonth <= 0) { startMonth += 12; startYear--; }
+  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return mo[startMonth-1]+' '+startYear+' – '+mo[endMonth-1]+' '+endYear;
+}
+
+function fmtUpdatedAt(iso) {
+  const d = new Date(iso), now = new Date();
+  const diff = Math.round((now - d) / 60000);
+  if (diff < 1)  return 'Just now';
+  if (diff < 60) return diff + ' minute' + (diff===1?'':'s') + ' ago';
+  const h = Math.round(diff/60);
+  if (h < 24)    return h + ' hour' + (h===1?'':'s') + ' ago';
+  return d.toLocaleDateString();
+}
+
+function fmtDayLabel(iso) {
+  const d = new Date(iso + 'T12:00:00Z');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return days[d.getUTCDay()] + '\n' + (d.getUTCMonth()+1) + '/' + d.getUTCDate();
+}
+function isWeekend(iso) {
+  const d = new Date(iso + 'T12:00:00Z');
+  return d.getUTCDay() === 0 || d.getUTCDay() === 6;
+}
+function fmtWeekLabel(iso) {
+  const d = new Date(iso + 'T12:00:00Z');
+  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return mo[d.getUTCMonth()] + ' ' + d.getUTCDate();
+}
+function fmtWeekRange(iso, partial) {
+  const s = new Date(iso + 'T12:00:00Z');
+  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if (partial) return fmtWeekLabel(iso) + ' (partial)';
+  const e = new Date(s); e.setUTCDate(e.getUTCDate() + 6);
+  const sy = s.getUTCFullYear(), ey = e.getUTCFullYear();
+  const sm = mo[s.getUTCMonth()], em = mo[e.getUTCMonth()];
+  if (sy !== ey) return sm+' '+s.getUTCDate()+', '+sy+' – '+em+' '+e.getUTCDate()+', '+ey;
+  if (sm !== em) return sm+' '+s.getUTCDate()+' – '+em+' '+e.getUTCDate()+', '+sy;
+  return sm+' '+s.getUTCDate()+' – '+e.getUTCDate()+', '+sy;
+}
+
+// ── Global tooltip ──
+const GTIP = document.getElementById('gtip');
+let gtipOn = false;
+function showTip(html, e) { GTIP.innerHTML = html; GTIP.style.display = 'block'; gtipOn = true; moveTip(e); }
+function hideTip()        { GTIP.style.display = 'none'; gtipOn = false; }
+function moveTip(e) {
+  if (!gtipOn) return;
+  const w = GTIP.offsetWidth, h = GTIP.offsetHeight;
+  let x = e.clientX - w/2, y = e.clientY - h - 16;
+  if (x < 8) x = 8;
+  if (x + w > innerWidth - 8) x = innerWidth - w - 8;
+  if (y < 8) y = e.clientY + 16;
+  GTIP.style.left = x+'px'; GTIP.style.top = y+'px';
+}
+document.addEventListener('mousemove', moveTip);
+
+function tipRow(lbl, val, color) {
+  return '<div class="gt-row"><span class="gt-label">'+lbl+'</span><span class="gt-val"'+(color?' style="color:'+color+';"':'')+'>'+val+'</span></div>';
+}
+
+function setupTabs(id, cb) {
+  const c = document.getElementById(id); if (!c) return;
+  c.querySelectorAll('.card-tab').forEach(t => t.addEventListener('click', () => {
+    c.querySelectorAll('.card-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active'); if (cb) cb(t);
+  }));
+}
+
+// ═══════════════════════════════════════════════════════
+// UPDATED-AT
+// ═══════════════════════════════════════════════════════
+document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdatedAt(D.updatedAt);
+
+// ═══════════════════════════════════════════════════════
+// STAT CARDS
+// ═══════════════════════════════════════════════════════
+(function renderStatCards() {
+  const { backlog, avgDays, today, dol } = D;
+  const netThis = backlog.thisMonth.processed - backlog.thisMonth.intake; // positive = backlog reduced
+  const netLast = backlog.lastMonth.processed - backlog.lastMonth.intake;
+  // Format net: always show direction explicitly, never double-negate
+  function fmtNet(v) {
+    if (v > 0) return { str: '−'+n(v), color:'#22c55e' };       // processed > intake = good (backlog shrinks)
+    if (v < 0) return { str: '+'+n(Math.abs(v)), color:'#ef4444' }; // intake > processed = bad (backlog grows)
+    return { str: '0', color:'#64748b' };
+  }
+  const ntThis = fmtNet(netThis), ntLast = fmtNet(netLast);
+  const deltaDir = avgDays.deltaFromLastMonth > 0 ? '▲' : avgDays.deltaFromLastMonth < 0 ? '▼' : '—';
+  const deltaClass = avgDays.deltaFromLastMonth > 0 ? 'trend-down' : avgDays.deltaFromLastMonth < 0 ? 'trend-up' : 'trend-neutral';
+  const prog = Math.round(dol.day / dol.daysInMonth * 100);
+  const todayStatus = today.stillUpdating ? '⏳ Still updating — yesterday: '+n(today.yesterday.total) : 'Final count';
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card" style="--accent:#3b82f6;">
+      <div class="stat-label">Total Backlog
+        <span class="info-icon">?<span class="tooltip">
+          <div class="tt-section">This month (${backlog.thisMonth.name}, so far)</div>
+          <div class="tt-row"><span class="tt-label">Processed</span><span class="tt-val">${n(backlog.thisMonth.processed)}</span></div>
+          <div class="tt-row"><span class="tt-label">New intake</span><span class="tt-val">+${n(backlog.thisMonth.intake)}</span></div>
+          <div class="tt-row"><span class="tt-label">Net change</span><span class="tt-val" style="color:${ntThis.color};">${ntThis.str}</span></div>
+        </span></span>
+      </div>
+      <div class="stat-value" style="color:#f0f0f8;">${n(backlog.total)}</div>
+      <div class="stat-trend trend-neutral">Backlog at start of month: ${n(backlog.startOfMonth)}</div>
+      <div class="stat-details">
+        <div class="stat-detail-row"><span class="stat-detail-label" style="color:#94a3b8;font-weight:500;">Last month (${backlog.lastMonth.name})</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Processed</span><span class="stat-detail-value">${n(backlog.lastMonth.processed)}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">New intake</span><span class="stat-detail-value">+${n(backlog.lastMonth.intake)}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Net change</span><span class="stat-detail-value" style="color:${ntLast.color};">${ntLast.str}</span></div>
+      </div>
+    </div>
+
+    <div class="stat-card" style="--accent:#f59e0b;">
+      <div class="stat-label">Avg Processing Days
+        <span class="info-icon">?<span class="tooltip">Average calendar days from PERM filing to DOL decision, based on cases decided in the last 30 days.</span></span>
+      </div>
+      <div class="stat-value" style="color:#f59e0b;">${n(avgDays.current)}</div>
+      <div class="stat-trend ${deltaClass}">${deltaDir} ${Math.abs(avgDays.deltaFromLastMonth)} days from last month</div>
+      <div class="stat-details">
+        <div class="stat-detail-row"><span class="stat-detail-label">Certified cases avg</span><span class="stat-detail-value">${n(avgDays.certified)} days</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">RFI cases avg</span><span class="stat-detail-value">${n(avgDays.rfi)} days</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Denied cases avg</span><span class="stat-detail-value">${n(avgDays.denied)} days</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">90-day trend</span><span class="stat-detail-value" style="color:${avgDays.trend90Day>0?'#ef4444':'#22c55e'};">${avgDays.trend90Day>0?'+':''}${avgDays.trend90Day} days</span></div>
+      </div>
+    </div>
+
+    <div class="stat-card" style="--accent:#22c55e;">
+      <div class="stat-label">Processed Today
+        <span class="info-icon">?<span class="tooltip">
+          <div class="tt-section">Today's breakdown</div>
+          <div class="tt-row"><span class="tt-label">Certified</span><span class="tt-val" style="color:#22c55e;">${n(today.certified)}</span></div>
+          <div class="tt-row"><span class="tt-label">RFI</span><span class="tt-val" style="color:#f59e0b;">${n(today.rfi)}</span></div>
+          <div class="tt-row"><span class="tt-label">Denied</span><span class="tt-val" style="color:#ef4444;">${n(today.denied)}</span></div>
+          <div class="tt-row"><span class="tt-label">Withdrawn</span><span class="tt-val" style="color:#64748b;">${n(today.withdrawn)}</span></div>
+        </span></span>
+      </div>
+      <div class="stat-value" style="color:#22c55e;">${n(today.total)}</div>
+      <div class="stat-trend trend-neutral">${todayStatus}</div>
+      <div class="stat-details">
+        <div class="stat-detail-row"><span class="stat-detail-label">Yesterday certified</span><span class="stat-detail-value" style="color:#22c55e;">${n(today.yesterday.certified)}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Yesterday denied</span><span class="stat-detail-value" style="color:#ef4444;">${n(today.yesterday.denied)}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Yesterday RFI</span><span class="stat-detail-value" style="color:#f59e0b;">${n(today.yesterday.rfi)}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Yesterday withdrawn</span><span class="stat-detail-value">${n(today.yesterday.withdrawn)}</span></div>
+      </div>
+    </div>
+
+    <div class="stat-card" style="--accent:#8b5cf6;">
+      <div class="stat-label">DOL Currently Processing
+        <span class="info-icon">?<span class="tooltip">The filing month DOL is currently reviewing.</span></span>
+      </div>
+      <div class="stat-value" style="color:#8b5cf6;">${dol.label}</div>
+      <div class="stat-trend trend-neutral">${dol.label} day ${dol.day} — ${prog}% through</div>
+      <div class="stat-details">
+        <div class="stat-detail-row"><span class="stat-detail-label">Days into month</span><span class="stat-detail-value">${dol.day} of ${dol.daysInMonth}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Est. finish</span><span class="stat-detail-value">${dol.estFinish}</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Movement/week</span><span class="stat-detail-value">~${dol.movementPerWeek} days</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label">Cases remaining</span><span class="stat-detail-value">~${n(dol.casesRemaining)}</span></div>
+      </div>
+    </div>`;
+})();
+
+// ═══════════════════════════════════════════════════════
+// TIMELINE + BACKLOG
+// ═══════════════════════════════════════════════════════
+(function renderCombo() {
+  const el = document.getElementById('combo-chart');
+  const months = D.timeline;
+  const maxT = Math.max(...months.map(m => m.total));
+  const maxH = 140, n2 = months.length;
+  const ai = months.findIndex(m => m.status === 'active');
+
+  function comboTip(m) {
+    const certPct = pct(m.certified, m.total);
+    const revPct  = pct(m.review,    m.total);
+    const wdPct   = pct(m.withdrawn, m.total);
+    const denPct  = pct(m.denied,    m.total);
+    let h = '<div class="gt-title">'+m.label+' — '+n(m.total)+' cases</div>';
+    h += tipRow('Certified',  n(m.certified)+' ('+certPct+'%)', '#22c55e');
+    h += tipRow('Review',     n(m.review)   +' ('+revPct +'%)', '#f59e0b');
+    h += tipRow('Withdrawn',  n(m.withdrawn)+' ('+wdPct  +'%)', '#64748b');
+    h += tipRow('Denied/RFI', n(m.denied)   +' ('+denPct +'%)', '#ef4444');
+    h += '<div class="gt-sep"></div>';
+    h += tipRow('Status', m.status==='done'?'✅ Complete':m.status==='active'?'🔶 Processing':'⏳ Pending');
+    if (m.status==='active') h += tipRow('Progress', Math.round(m.dolDay/m.dolDays*100)+'%');
+    return h;
+  }
+
+  let html = '';
+  months.forEach((m, i) => {
+    const barH  = Math.round(m.total / maxT * maxH);
+    const certH = Math.round(barH * m.certified / m.total);
+    const revH  = Math.round(barH * m.review    / m.total);
+    const wdH   = Math.round(barH * m.withdrawn / m.total);
+    const denH  = Math.max(0, barH - certH - revH - wdH);
+    const certPct = pct(m.certified, m.total);
+    const pctLbl  = certPct > 0 ? certPct+'%' : '';
+
+    let lc = 'rgba(255,255,255,0.07)', rc = 'rgba(255,255,255,0.07)';
+    if (m.status==='done')   { lc = '#22c55e'; rc = '#22c55e'; }
+    if (m.status==='active') { lc = '#22c55e'; rc = 'rgba(255,255,255,0.07)'; }
+    if (i === 0)     lc = 'transparent';
+    if (i === n2-1)  rc = 'transparent';
+
+    html += '<div class="combo-col'+(m.status==='active'?' active-month':'')+'" data-ci="'+i+'">';
+    html += '<div class="tl-row">';
+    html += '<div class="tl-left"  style="background:'+lc+';"></div>';
+    html += '<div class="tl-right" style="background:'+rc+';"></div>';
+    if (m.status==='active') {
+      html += '<div class="tl-dot-wrap"><div class="tl-spin-ring"></div><div class="tl-dot active"></div></div>';
+    } else {
+      html += '<div class="tl-dot '+m.status+'"></div>';
+    }
+    html += '</div>';
+
+    html += '<div class="bl-row">';
+    if (pctLbl) html += '<div class="bl-pct">'+pctLbl+'</div>';
+    html += '<div class="bl-bar" data-ci="'+i+'" style="height:'+barH+'px;">';
+    if (denH  > 0) html += '<div class="bl-seg" style="height:'+denH +'px;background:#ef4444;"></div>';
+    if (wdH   > 0) html += '<div class="bl-seg" style="height:'+wdH  +'px;background:#64748b;"></div>';
+    if (revH  > 0) html += '<div class="bl-seg" style="height:'+revH +'px;background:#f59e0b;"></div>';
+    if (certH > 0) html += '<div class="bl-seg" style="height:'+certH+'px;background:#22c55e;"></div>';
+    html += '</div></div>';
+
+    html += '<div class="ml-row"><span class="ml-label">'+m.label+'</span></div>';
+    if (m.status !== 'pending') {
+      const pctColor = m.status==='done' ? '#22c55e' : '#f59e0b';
+      const pctTxt   = m.status==='done' ? certPct+'%' : Math.round(m.dolDay/m.dolDays*100)+'%';
+      html += '<div style="font-size:8px;color:'+pctColor+';font-weight:600;">'+pctTxt+'</div>';
+    }
+    html += '</div>';
+  });
+  el.innerHTML = html;
+
+  // Hover
+  const allBars = el.querySelectorAll('.bl-bar');
+  allBars.forEach(bar => {
+    const idx = parseInt(bar.dataset.ci);
+    bar.addEventListener('mouseenter', e => {
+      allBars.forEach(b => b.classList.add('dimmed'));
+      bar.classList.remove('dimmed'); bar.classList.add('hovered');
+      showTip(comboTip(months[idx]), e);
+    });
+    bar.addEventListener('mouseleave', () => {
+      allBars.forEach(b => b.classList.remove('dimmed','hovered'));
+      hideTip();
+    });
+  });
+
+  // DOL marker
+  requestAnimationFrame(() => {
+    const cols = el.querySelectorAll('.combo-col');
+    const aC = cols[ai], nC = cols[ai+1];
+    if (!aC) return;
+    const am = months[ai];
+    const prog = am.dolDay / am.dolDays;
+
+    const aLeft = aC.offsetLeft + aC.offsetWidth/2;
+    const bLeft = nC ? (nC.offsetLeft + nC.offsetWidth/2) : (aC.offsetLeft + aC.offsetWidth);
+    const dolX = aLeft + (bLeft - aLeft) * prog;
+    const tlRow = aC.querySelector('.tl-row');
+    const dolY  = aC.offsetTop + tlRow.offsetTop + tlRow.offsetHeight/2;
+
+    // Green extension line
+    const oldExt = el.querySelector('#dol-green-ext');
+    if (oldExt) oldExt.remove();
+    const ext = document.createElement('div');
+    ext.id = 'dol-green-ext';
+    ext.style.cssText = 'position:absolute;z-index:3;pointer-events:none;left:'+aLeft+'px;top:'+(dolY-1.5)+'px;width:'+(dolX-aLeft)+'px;height:3px;background:linear-gradient(90deg,#22c55e,#f59e0b);border-radius:2px;';
+    el.appendChild(ext);
+
+    // Marker pill
+    const old = el.querySelector('#dol-marker');
+    if (old) old.remove();
+    const mk = document.createElement('div');
+    mk.id = 'dol-marker';
+    mk.innerHTML =
+      '<div class="dol-pill">'+
+        '<div class="dol-pill-top">📍 DOL HERE</div>'+
+        '<div class="dol-pill-bottom">'+(D.dol.monthFull || am.label)+' · '+Math.round(D.dol.pctProcessed || am.dolDay)+'%</div>'+
+      '</div>'+
+      '<div class="dol-stem"></div>'+
+      '<div class="dol-radar-wrap">'+
+        '<div class="dol-radar-ring"></div>'+
+        '<div class="dol-radar-ring2"></div>'+
+        '<div class="dol-dot"></div>'+
+      '</div>';
+    el.appendChild(mk);
+    requestAnimationFrame(() => {
+      const rw = mk.querySelector('.dol-radar-wrap');
+      const dotCenter = rw.offsetTop + rw.offsetHeight/2;
+      mk.style.left = dolX+'px';
+      mk.style.top  = (dolY - dotCenter)+'px';
+      mk.style.transform = 'translateX(-50%)';
+    });
+  });
+})();
+
+// ═══════════════════════════════════════════════════════
+// PROCESSING RATE
+// ═══════════════════════════════════════════════════════
+function renderRate(range) {
+  const wrap = document.getElementById('rate-chart');
+  const bars  = range === 'day' ? D.rateDays  : D.rateWeeks;
+  const isTodayUpdating = range === 'day' && D.today.stillUpdating;
+
+  // Compute max and ticks dynamically
+  const rawMax = Math.max(...bars.map(b => b.total));
+  const niceMax = Math.ceil(rawMax / 100) * 100 + 100;
+  const step = Math.ceil(niceMax / 4 / 100) * 100;
+  const ticks = [];
+  for (let v = niceMax; v >= 0; v -= step) ticks.push(v);
+  if (ticks[ticks.length-1] !== 0) ticks.push(0);
+
+  const subtitle = range === 'day'
+    ? fmtDayLabel(bars[0].date).replace('\n',' ') + ' – ' + fmtDayLabel(bars[bars.length-1].date).replace('\n',' ')
+    : fmtWeekLabel(bars[0].weekStart) + ' – ' + fmtWeekLabel(bars[bars.length-1].weekStart);
+  document.getElementById('rate-subtitle').textContent = subtitle;
+
+  const chartH = 190;
+  const avgVal = Math.round(bars.reduce((s,b) => s+b.total,0) / bars.length);
+  const avgH   = Math.round(avgVal / niceMax * (chartH-4));
+  const avgLabel = range === 'day' ? 'Daily avg: '+n(avgVal) : 'Weekly avg: '+n(avgVal);
+  document.getElementById('rate-avg-stat').textContent = avgLabel;
+
+  let h = '<div class="y-axis">';
+  ticks.forEach(t => { h += '<div class="y-tick">'+n(t)+'</div>'; });
+  h += '</div><div class="chart-area">';
+  h += '<div class="grid-lines">'; ticks.forEach(() => { h += '<div class="grid-line"></div>'; }); h += '</div>';
+  h += '<div class="avg-line" style="bottom:'+(26+avgH)+'px;"><span class="avg-label">avg '+n(avgVal)+'</span></div>';
+  h += '<div class="bars-container">';
+  bars.forEach((b, i) => {
+    const bH  = Math.max(2, Math.round(b.total / niceMax * (chartH-4)));
+    const wk  = (range==='day' && isWeekend(b.date)) ? ' weekend' : '';
+    h += '<div class="bar-group"><div class="bar'+wk+'" data-ri="'+i+'" style="height:'+bH+'px;"></div></div>';
+  });
+  h += '</div><div class="bar-labels">';
+  bars.forEach(b => {
+    const lbl = range==='day' ? fmtDayLabel(b.date) : fmtWeekLabel(b.weekStart);
+    const lines = lbl.split('\n');
+    h += '<div class="bar-label-slot"><span class="bar-label">'+lines.map(l=>'<span>'+l+'</span>').join('<br>')+'</span></div>';
+  });
+  h += '</div></div>';
+  wrap.innerHTML = h;
+
+  wrap.querySelectorAll('.bar').forEach(bar => {
+    const idx = parseInt(bar.dataset.ri);
+    const b = bars[idx];
+    const title = range==='day' ? fmtDayLabel(b.date).replace('\n',' ') : fmtWeekRange(b.weekStart, b.partial);
+    const diff  = b.total - avgVal;
+    const tipH  =
+      '<div class="gt-title">'+title+' — '+n(b.total)+' total</div>'+
+      tipRow('Certified',  n(b.certified),  '#22c55e')+
+      tipRow('RFI',        n(b.rfi),        '#f59e0b')+
+      tipRow('Denied',     n(b.denied),     '#ef4444')+
+      tipRow('Withdrawn',  n(b.withdrawn),  '#64748b')+
+      '<div class="gt-sep"></div>'+
+      tipRow('vs avg', (diff>=0?'+':'')+n(diff), diff>=0?'#22c55e':'#ef4444');
+    bar.addEventListener('mouseenter', e => {
+      wrap.querySelectorAll('.bar').forEach(x => x.classList.add('dimmed'));
+      bar.classList.remove('dimmed'); bar.classList.add('hovered');
+      showTip(tipH, e);
+    });
+    bar.addEventListener('mouseleave', () => {
+      wrap.querySelectorAll('.bar').forEach(x => x.classList.remove('dimmed','hovered'));
+      hideTip();
+    });
+  });
+}
+renderRate('day');
+setupTabs('rate-tabs', t => renderRate(t.dataset.range));
+
+// ═══════════════════════════════════════════════════════
+// STATUS DISTRIBUTION (donut)
+// ═══════════════════════════════════════════════════════
+// Build tabs dynamically from D.statusDistribution
+(function() {
+  const tabsEl = document.getElementById('status-tabs');
+  tabsEl.innerHTML = D.statusDistribution.map((s,i) =>
+    '<button class="card-tab'+(i===0?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
+  ).join('');
+})();
+
+function renderDonut(idx) {
+  const s = D.statusDistribution[idx]; if (!s) return;
+  const items = [
+    { color:'#22c55e', label:'Certified',      value: s.certified },
+    { color:'#f59e0b', label:'Analyst Review',  value: s.review    },
+    { color:'#64748b', label:'Withdrawn',        value: s.withdrawn },
+    { color:'#3b82f6', label:'RFI Issued',       value: s.rfi       },
+    { color:'#ef4444', label:'Denied',           value: s.denied    }
+  ];
+  const total = items.reduce((t,i) => t+i.value, 0);
+  items.forEach(i => { i.pct = total ? +(i.value/total*100).toFixed(1) : 0; });
+  const totalStr = n(total);
+
+  const totalEl = document.getElementById('donut-total');
+  const subEl   = document.getElementById('donut-sublabel');
+  const pctEl   = document.getElementById('donut-pct');
+  const subtitle = s.tabKey === '1y' ? 'Last 12 months: '+last12MonthsRange(D.updatedAt) : s.subtitle;
+  document.getElementById('status-subtitle').textContent = subtitle;
+  totalEl.textContent = totalStr; totalEl.style.color = '#f0f0f8';
+  subEl.textContent = 'Total Cases'; pctEl.style.display = 'none';
+
+  const svg = document.getElementById('donut-svg');
+  const r = 70, circ = 2 * Math.PI * r;
+  let off = 0, svgH = '';
+  items.forEach((item, i) => {
+    const len = item.pct/100 * circ;
+    svgH += '<circle class="donut-seg" data-di="'+i+'" cx="90" cy="90" r="'+r+'" fill="none" stroke="'+item.color+'" stroke-width="30" stroke-dasharray="'+len+' '+(circ-len)+'" stroke-dashoffset="'+(-off)+'" />';
+    off += len;
+  });
+  svg.innerHTML = svgH;
+
+  document.getElementById('donut-legend').innerHTML = items.map(item =>
+    '<div class="legend-item"><div class="legend-dot" style="background:'+item.color+';"></div>'+item.label+'<span class="legend-value">'+n(item.value)+'</span></div>'
+  ).join('');
+
+  svg.querySelectorAll('.donut-seg').forEach(seg => {
+    seg.addEventListener('mouseenter', () => {
+      const item = items[parseInt(seg.dataset.di)];
+      svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = s===seg?'1':'0.2'; });
+      totalEl.textContent = n(item.value); totalEl.style.color = item.color;
+      subEl.textContent = item.label;
+      pctEl.textContent = item.pct+'%'; pctEl.style.color = item.color; pctEl.style.display = '';
+    });
+    seg.addEventListener('mouseleave', () => {
+      svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = '1'; });
+      totalEl.textContent = totalStr; totalEl.style.color = '#f0f0f8';
+      subEl.textContent = 'Total Cases'; pctEl.style.display = 'none';
+    });
+  });
+}
+renderDonut(0);
+setupTabs('status-tabs', t => renderDonut(parseInt(t.dataset.si)));
+
+// ═══════════════════════════════════════════════════════
+// TOP EMPLOYERS
+// ═══════════════════════════════════════════════════════
+(function() {
+  const tabsEl = document.getElementById('employer-tabs');
+  tabsEl.innerHTML = D.employers.map((e,i) =>
+    '<button class="card-tab'+(i===0?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
+  ).join('');
+})();
+
+function renderEmployers(idx) {
+  const emp = D.employers[idx]; if (!emp) return;
+  const max = emp.list[0].count;
+  const empSubtitle = emp.tabKey === '1y' ? 'Last 12 months: '+last12MonthsRange(D.updatedAt) : emp.subtitle;
+  document.getElementById('employer-subtitle').textContent = empSubtitle;
+  document.getElementById('employer-list').innerHTML = emp.list.map((e,i) =>
+    '<div class="employer-row">'+
+      '<span class="employer-rank">'+(i+1)+'</span>'+
+      '<span class="employer-name">'+e.name+'</span>'+
+      '<span class="employer-count">'+n(e.count)+'</span>'+
+      '<div class="employer-bar"><div class="employer-bar-fill" style="width:'+Math.round(e.count/max*100)+'%;"></div></div>'+
+    '</div>'
+  ).join('');
+}
+renderEmployers(0);
+setupTabs('employer-tabs', t => renderEmployers(parseInt(t.dataset.ei)));
+  })
+  .catch(err => {
+    document.querySelector('.hero h2').textContent = 'Error loading data';
+    console.error(err);
+  });
+</script>
 </body>
 </html>
