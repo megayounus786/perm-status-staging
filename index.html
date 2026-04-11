@@ -103,7 +103,7 @@
 
   /* ── TIMELINE + BACKLOG ── */
   .combo-section { margin: 16px 0; overflow: visible; }
-  .combo-scroll  { overflow-x: auto; overflow-y: visible; padding-bottom: 8px; }
+  .combo-scroll  { overflow-x: auto; overflow-y: visible; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
   .combo-grid    { display: flex; gap: 0; min-width: max-content; padding: 56px 8px 0; position: relative; }
   .combo-col     { display: flex; flex-direction: column; align-items: center; min-width: 68px; flex: 1; position: relative; }
 
@@ -153,6 +153,99 @@
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  @media (max-width: 768px) {
+    .container { padding: 0 14px; }
+    nav {
+      padding: 12px 14px;
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+    .logo { font-size: 18px; }
+    .logo-icon { width: 28px; height: 28px; font-size: 14px; }
+    .nav-links {
+      width: 100%;
+      order: 3;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .nav-links li { flex: 0 0 auto; }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 8px;
+    }
+    .hero { padding: 24px 0 14px; }
+    .hero h2 { font-size: 24px; }
+    .stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .stat-card {
+      min-height: auto;
+      padding: 20px 16px;
+    }
+    .stat-value { font-size: 30px; }
+    .card {
+      padding: 18px;
+      border-radius: 14px;
+    }
+    .card-header {
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .card-tabs { flex-wrap: wrap; }
+    .card-tab {
+      min-height: 44px;
+      padding: 8px 12px;
+    }
+    .charts-row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 12px 0;
+    }
+    .donut-container {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+    }
+    .employer-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    nav { padding: 10px 10px; }
+    .container { padding: 0 10px; }
+    .logo { font-size: 16px; }
+    .logo-icon { width: 26px; height: 26px; }
+    .nav-links a { font-size: 13px; }
+    .hero h1 { font-size: 12px; }
+    .hero h2 { font-size: 20px; }
+    .update-time { font-size: 13px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-value { font-size: 28px; }
+    .card { padding: 14px; }
+    .card-title { font-size: 15px; }
+    .card-subtitle { font-size: 12px; }
+    .rate-chart-wrap { height: 200px; }
+    .y-axis { width: 32px; }
+    .y-tick { font-size: 10px; }
+    .bar-label { font-size: 9px; }
+    .combo-grid { min-width: 760px; }
+    .donut-wrap,
+    .donut-svg {
+      width: 160px;
+      height: 160px;
+    }
+    .donut-number { font-size: 18px; }
+    .employer-row { grid-template-columns: 20px 1fr 54px 70px; }
+  }
 </style>
 </head>
 <body>
