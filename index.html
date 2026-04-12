@@ -676,7 +676,11 @@ function renderRate(range) {
   document.getElementById('rate-subtitle').textContent = subtitle;
 
   const chartH = 190;
-  const avgVal = Math.round(bars.reduce((s,b) => s+b.total,0) / bars.length);
+  const observedBars = bars.filter(b => (b.total || 0) > 0);
+  const avgBase = observedBars.length ? observedBars : bars;
+  const avgVal = avgBase.length
+    ? Math.round(avgBase.reduce((s,b) => s + (b.total || 0), 0) / avgBase.length)
+    : 0;
   const avgH   = Math.round(avgVal / niceMax * (chartH-4));
   const avgLabel = range === 'day' ? 'Daily avg: '+n(avgVal) : 'Weekly avg: '+n(avgVal);
   document.getElementById('rate-avg-stat').textContent = avgLabel;
