@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-04-12T03:09:04-04:00",
+  "updatedAt": "2026-04-12T06:08:40-04:00",
   "backlog": {
-    "total": 143001,
-    "startOfMonth": 143001,
+    "total": 142989,
+    "startOfMonth": 142989,
     "thisMonth": {
       "name": "Apr 2026",
-      "processed": 4952,
+      "processed": 4964,
       "intake": 0
     },
     "lastMonth": {
@@ -23,10 +23,10 @@
     "trend90Day": 8
   },
   "today": {
-    "total": 1,
-    "certified": 1,
+    "total": 13,
+    "certified": 12,
     "rfi": 0,
-    "denied": 0,
+    "denied": 1,
     "withdrawn": 0,
     "stillUpdating": false,
     "yesterday": {
@@ -44,8 +44,8 @@
     "daysInMonth": 100,
     "estFinish": "TBD",
     "movementPerWeek": 4.2,
-    "casesRemaining": 6596,
-    "latestLetter": "P",
+    "casesRemaining": 6584,
+    "latestLetter": "S",
     "pctProcessed": 32
   },
   "timeline": [
@@ -61,10 +61,10 @@
     {
       "label": "Dec '24",
       "total": 10512,
-      "certified": 3160,
-      "review": 6596,
+      "certified": 3171,
+      "review": 6584,
       "withdrawn": 522,
-      "denied": 231,
+      "denied": 232,
       "status": "active",
       "dolDay": 32,
       "dolDays": 100
@@ -449,10 +449,10 @@
     },
     {
       "date": "2026-04-12",
-      "total": 1,
-      "certified": 1,
+      "total": 13,
+      "certified": 12,
       "rfi": 0,
-      "denied": 0,
+      "denied": 1,
       "withdrawn": 0
     }
   ],
@@ -547,10 +547,10 @@
     },
     {
       "weekStart": "2026-04-06",
-      "total": 2724,
-      "certified": 2466,
+      "total": 2736,
+      "certified": 2477,
       "rfi": 88,
-      "denied": 165,
+      "denied": 166,
       "withdrawn": 3,
       "partial": true
     }
@@ -570,11 +570,11 @@
       "tabKey": "next",
       "tabLabel": "Dec",
       "subtitle": "Dec 2024 filings \u00b7 10,509 total",
-      "certified": 3160,
-      "review": 6596,
+      "certified": 3171,
+      "review": 6584,
       "withdrawn": 522,
       "rfi": 66,
-      "denied": 165
+      "denied": 166
     }
   ],
   "employers": [
