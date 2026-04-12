@@ -3,7 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PERM Tracker — Dashboard</title>
+<title>PERM Processing Times 2026 — DOL Labor Certification Tracker | ImmiLane</title>
+<meta name="description" content="Track PERM labor certification processing times in real time. Live DOL case status data — certified, analyst review, denied, RFI, and withdrawn. Updated daily from FLAG.DOL.GOV.">
+<meta name="keywords" content="PERM processing times, PERM tracker, DOL labor certification, PERM status, PERM case tracker, green card PERM, PERM processing time 2026, PERM audit, immigration tracker">
+<link rel="canonical" href="https://immilane.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PERM Processing Times 2026 — Live DOL Tracker | ImmiLane">
+<meta property="og:description" content="Real-time PERM labor certification tracking with status breakdowns, monthly trends, and employer filing stats.">
+<meta property="og:url" content="https://immilane.com/">
+<meta property="og:site_name" content="ImmiLane">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PERM Processing Times 2026 — Live DOL Tracker">
+<meta name="twitter:description" content="Real-time PERM labor certification tracking with status breakdowns, monthly trends, and employer filing stats.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ImmiLane PERM Tracker","url":"https://immilane.com","description":"Real-time PERM labor certification processing tracker with DOL case data, status breakdowns, and monthly trends.","applicationCategory":"Government Data Tracker","operatingSystem":"Web","provider":{"@type":"Organization","name":"ImmiLane","url":"https://immilane.com"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -246,6 +259,9 @@
     .donut-number { font-size: 18px; }
     .employer-row { grid-template-columns: 20px 1fr 54px 70px; }
   }
+  footer { text-align: center; padding: 32px 24px; color: #475569; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0; }
+  footer a { color: #64748b; text-decoration: none; }
+  footer a:hover { color: #94a3b8; }
 </style>
 </head>
 <body>
@@ -828,5 +844,8 @@ setupTabs('employer-tabs', t => renderEmployers(parseInt(t.dataset.ei)));
     console.error(err);
   });
 </script>
+<footer>
+  Data sourced from <a href="https://flag.dol.gov/programs/lca" target="_blank" rel="noopener">FLAG.DOL.GOV</a> &middot; Updated daily &middot; &copy; 2026 ImmiLane
+</footer>
 </body>
 </html>
