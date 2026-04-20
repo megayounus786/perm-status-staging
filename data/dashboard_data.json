@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-04-20T15:03:18-04:00",
+  "updatedAt": "2026-04-20T18:03:29-04:00",
   "backlog": {
-    "total": 140174,
-    "startOfMonth": 140174,
+    "total": 140077,
+    "startOfMonth": 140077,
     "thisMonth": {
       "name": "Apr 2026",
-      "processed": 9514,
+      "processed": 9611,
       "intake": 4466
     },
     "lastMonth": {
@@ -23,10 +23,10 @@
     "trend90Day": 0
   },
   "today": {
-    "total": 350,
-    "certified": 331,
-    "rfi": 5,
-    "denied": 14,
+    "total": 447,
+    "certified": 422,
+    "rfi": 8,
+    "denied": 17,
     "withdrawn": 0,
     "stillUpdating": false,
     "yesterday": {
@@ -40,20 +40,20 @@
   "dol": {
     "label": "Dec '24",
     "monthFull": "December",
-    "day": 74,
+    "day": 75,
     "daysInMonth": 100,
-    "estFinish": "Apr 27",
-    "movementPerWeek": 8.4,
-    "casesRemaining": 2176,
+    "estFinish": "Apr 26",
+    "movementPerWeek": 8.5,
+    "casesRemaining": 2082,
     "latestLetter": "Z",
-    "pctProcessed": 74
+    "pctProcessed": 75
   },
   "timeline": [
     {
       "label": "Nov '24",
       "total": 10623,
-      "certified": 9071,
-      "review": 194,
+      "certified": 9074,
+      "review": 191,
       "withdrawn": 508,
       "denied": 820,
       "status": "done"
@@ -61,12 +61,12 @@
     {
       "label": "Dec '24",
       "total": 10512,
-      "certified": 7243,
-      "review": 2176,
+      "certified": 7331,
+      "review": 2082,
       "withdrawn": 523,
-      "denied": 567,
+      "denied": 573,
       "status": "active",
-      "dolDay": 74,
+      "dolDay": 75,
       "dolDays": 100
     },
     {
@@ -449,10 +449,10 @@
     },
     {
       "date": "2026-04-20",
-      "total": 350,
-      "certified": 331,
-      "rfi": 5,
-      "denied": 14,
+      "total": 447,
+      "certified": 422,
+      "rfi": 8,
+      "denied": 17,
       "withdrawn": 0
     }
   ],
@@ -547,10 +547,10 @@
     },
     {
       "weekStart": "2026-04-20",
-      "total": 350,
-      "certified": 331,
-      "rfi": 5,
-      "denied": 14,
+      "total": 447,
+      "certified": 422,
+      "rfi": 8,
+      "denied": 17,
       "withdrawn": 0,
       "partial": true
     }
@@ -560,8 +560,8 @@
       "tabKey": "active",
       "tabLabel": "Nov",
       "subtitle": "November 2024 filings \u00b7 10,593 total",
-      "certified": 9071,
-      "review": 194,
+      "certified": 9074,
+      "review": 191,
       "withdrawn": 508,
       "rfi": 320,
       "denied": 500
@@ -570,11 +570,11 @@
       "tabKey": "next",
       "tabLabel": "Dec",
       "subtitle": "December 2024 filings \u00b7 10,509 total",
-      "certified": 7243,
-      "review": 2176,
+      "certified": 7331,
+      "review": 2082,
       "withdrawn": 523,
-      "rfi": 209,
-      "denied": 358
+      "rfi": 212,
+      "denied": 361
     }
   ],
   "employers": [
