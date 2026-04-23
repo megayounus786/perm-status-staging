@@ -20,6 +20,9 @@
 <meta name="twitter:description" content="Real-time PERM labor certification tracking with status breakdowns, monthly trends, and employer filing stats.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ImmiLane PERM Tracker","url":"https://immilane.com","description":"Real-time PERM labor certification processing tracker with DOL case data, status breakdowns, and monthly trends.","applicationCategory":"Government Data Tracker","operatingSystem":"Web","provider":{"@type":"Organization","name":"ImmiLane","url":"https://immilane.com"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What are current PERM processing times in 2026?","acceptedAnswer":{"@type":"Answer","text":"ImmiLane tracks PERM labor certification processing times in real time using DOL FLAG data. Visit immilane.com for live status breakdowns and monthly trends."}},{"@type":"Question","name":"What is the PERM certification rate?","acceptedAnswer":{"@type":"Answer","text":"The PERM certification rate varies by filing month. ImmiLane provides real-time status distribution showing certified, analyst review, denied, RFI, and withdrawn cases."}}]}</script>
+<!-- Google Analytics (GA4) — in <head> for early engagement tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G8NXS7DNX1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-G8NXS7DNX1');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
@@ -1860,9 +1863,43 @@ const API_BASE = 'https://api.immilane.com';
 <footer>
   Data sourced from <a href="https://flag.dol.gov/programs/lca" target="_blank" rel="noopener">FLAG.DOL.GOV</a> &middot; Updated daily &middot; &copy; 2026 ImmiLane
 </footer>
-<!-- Google Analytics (GA4) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G8NXS7DNX1"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-G8NXS7DNX1');</script>
+<script>
+(function(){
+  var scrollFired = {};
+  window.addEventListener('scroll', function() {
+    var pct = Math.round(100 * window.scrollY / (document.documentElement.scrollHeight - window.innerHeight));
+    [25, 50, 75, 90].forEach(function(t) {
+      if (pct >= t && !scrollFired[t]) {
+        scrollFired[t] = true;
+        gtag('event', 'scroll_depth', { percent: t });
+      }
+    });
+  }, { passive: true });
+
+  [10, 30, 60, 180].forEach(function(s) {
+    setTimeout(function() {
+      if (!document.hidden) gtag('event', 'time_on_page', { seconds: s });
+    }, s * 1000);
+  });
+
+  var sections = ['est-form-case', 'combo-chart', 'employer-list', 'stats-grid'];
+  var seen = {};
+  if (window.IntersectionObserver) {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting && !seen[e.target.id]) {
+          seen[e.target.id] = true;
+          gtag('event', 'section_view', { section: e.target.id });
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+  }
+})();
+</script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "aa22dbee0e9b4144965de16be0ccbae4"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
