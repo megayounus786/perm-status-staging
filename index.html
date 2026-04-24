@@ -2327,15 +2327,16 @@ const API_BASE = 'https://api.immilane.com';
       if (PENDING_STATUSES.has(k)) pendingCount += v;
     });
 
-    // Decided cases (terminal statuses)
+    // Resolved cases
     const certCount = statuses['CERTIFIED'] || 0;
     const deniedCount = statuses['DENIED'] || 0;
     const withdrawnCount = statuses['WITHDRAWN'] || 0;
-    const decided = certCount + deniedCount + withdrawnCount;
+    const adjudicated = certCount + deniedCount;
+    const resolved = adjudicated + withdrawnCount;
 
     let certRateDisplay, certClass;
-    if (decided > 0) {
-      const cr = certCount / decided * 100;
+    if (adjudicated > 0) {
+      const cr = certCount / adjudicated * 100;
       certRateDisplay = cr.toFixed(1) + '%';
       certClass = cr > 80 ? 'cr-good' : cr >= 60 ? 'cr-med' : 'cr-bad';
     } else {
@@ -2351,9 +2352,7 @@ const API_BASE = 'https://api.immilane.com';
     const crBreakdownHtml = crRows.map(r =>
       '<div class="stat-detail-row">' +
         '<span class="stat-detail-label" style="color:'+r.color+'">' + r.label + '</span>' +
-        '<span class="stat-detail-value">' + n(r.val) +
-          (decided > 0 ? ' <span style="color:#475569;font-weight:400;">(' + (r.val/decided*100).toFixed(1) + '%)</span>' : '') +
-        '</span>' +
+        '<span class="stat-detail-value">' + n(r.val) + '</span>' +
       '</div>'
     ).join('');
 
@@ -2409,13 +2408,13 @@ const API_BASE = 'https://api.immilane.com';
             '<div class="emp-stat-sub">' + esc(filingPeriod) + '</div>' +
             '<div class="stat-details">' +
               '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(pendingCount) + '</span></div>' +
-              '<div class="stat-detail-row"><span class="stat-detail-label">Decided</span><span class="stat-detail-value">' + n(decided) + '</span></div>' +
+              '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(resolved) + '</span></div>' +
             '</div>' +
           '</div>' +
           '<div class="emp-stat-card">' +
             '<div class="emp-stat-label">Certification Rate</div>' +
             '<div class="emp-stat-value ' + certClass + '">' + certRateDisplay + '</div>' +
-            '<div class="emp-stat-sub">' + (decided > 0 ? n(certCount) + ' of ' + n(decided) + ' decided cases certified' : 'No cases decided yet') + '</div>' +
+            '<div class="emp-stat-sub">' + (adjudicated > 0 ? n(certCount) + ' certified of ' + n(adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
             (crRows.length ? '<div class="stat-details">' + crBreakdownHtml + '</div>' : '') +
             '<div class="emp-stat-disclaimer">Based on filings since ' + esc(firstStr || '—') + '</div>' +
           '</div>' +
