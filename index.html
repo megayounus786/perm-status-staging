@@ -1598,7 +1598,13 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
 // ═══════════════════════════════════════════════════════
 (function renderCombo() {
   const el = document.getElementById('combo-chart');
-  const months = D.timeline;
+  // Show only 2 most recent completed months + active + pending
+  const allMonths = D.timeline;
+  const activeIdx = allMonths.findIndex(m => m.status === 'active');
+  const doneMonths = allMonths.filter(m => m.status === 'done');
+  const keep2Done = doneMonths.slice(-2);
+  const cutoff = keep2Done.length ? allMonths.indexOf(keep2Done[0]) : 0;
+  const months = allMonths.slice(cutoff);
   const maxT = Math.max(...months.map(m => m.total));
   const maxH = 140, n2 = months.length;
   const ai = months.findIndex(m => m.status === 'active');
@@ -1809,10 +1815,12 @@ setupTabs('rate-tabs', t => renderRate(t.dataset.range));
 // STATUS DISTRIBUTION (donut)
 // ═══════════════════════════════════════════════════════
 // Build tabs dynamically from D.statusDistribution
+// Default to the currently-processing month (tabKey "next") instead of first tab
+const statusDefaultIdx = Math.max(0, D.statusDistribution.findIndex(s => s.tabKey === 'next'));
 (function() {
   const tabsEl = document.getElementById('status-tabs');
   tabsEl.innerHTML = D.statusDistribution.map((s,i) =>
-    '<button class="card-tab'+(i===0?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
+    '<button class="card-tab'+(i===statusDefaultIdx?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
   ).join('');
 })();
 
@@ -1866,16 +1874,17 @@ function renderDonut(idx) {
     });
   });
 }
-renderDonut(0);
+renderDonut(statusDefaultIdx);
 setupTabs('status-tabs', t => renderDonut(parseInt(t.dataset.si)));
 
 // ═══════════════════════════════════════════════════════
 // TOP EMPLOYERS
 // ═══════════════════════════════════════════════════════
+const employerDefaultIdx = Math.max(0, D.employers.findIndex(e => e.tabKey === 'next'));
 (function() {
   const tabsEl = document.getElementById('employer-tabs');
   tabsEl.innerHTML = D.employers.map((e,i) =>
-    '<button class="card-tab'+(i===0?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
+    '<button class="card-tab'+(i===employerDefaultIdx?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
   ).join('');
 })();
 
@@ -1894,7 +1903,7 @@ function renderEmployers(idx) {
     '</div>'
   ).join('');
 }
-renderEmployers(0);
+renderEmployers(employerDefaultIdx);
 setupTabs('employer-tabs', t => renderEmployers(parseInt(t.dataset.ei)));
 
 // ═══════════════════════════════════════════════════════
