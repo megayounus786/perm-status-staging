@@ -309,7 +309,7 @@
     color: #475569; pointer-events: none; display: flex; align-items: center;
   }
   .nav-search-input {
-    width: 260px; padding: 8px 14px 8px 34px;
+    width: 260px; padding: 8px 32px 8px 34px;
     border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.04);
     color: #f0f0f8; font-size: 13px; font-family: inherit;
@@ -317,6 +317,15 @@
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   }
   .nav-search-input::placeholder { color: #475569; }
+  .nav-search-clear {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; border: none; background: rgba(255,255,255,0.1);
+    color: #94a3b8; font-size: 14px; line-height: 1; cursor: pointer;
+    border-radius: 50%; display: none; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-search-clear:hover { background: rgba(255,255,255,0.2); color: #f0f0f8; }
+  .nav-search-clear.visible { display: flex; }
   .nav-search-input:focus {
     border-color: rgba(59,130,246,0.5);
     background: rgba(255,255,255,0.06);
@@ -528,6 +537,7 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </div>
       <input type="text" class="nav-search-input" id="nav-search-input" placeholder="Search your employer" autocomplete="off" spellcheck="false" aria-label="Search your employer">
+      <button type="button" class="nav-search-clear" id="nav-search-clear" aria-label="Clear search">&times;</button>
     </div>
   </div>
   <div class="nav-search-dropdown" id="nav-search-dropdown"></div>
@@ -2173,12 +2183,25 @@ function employerSlug(name) {
 
   const navSearch     = document.getElementById('nav-search');
   const searchInput   = document.getElementById('nav-search-input');
+  const clearBtn      = document.getElementById('nav-search-clear');
   const dropdown      = document.getElementById('nav-search-dropdown');
   const modal         = document.getElementById('emp-modal');
   const modalBackdrop = document.getElementById('emp-modal-backdrop');
   const modalBody     = document.getElementById('emp-modal-body');
 
   if (!navSearch || !searchInput || !dropdown || !modal || !modalBackdrop || !modalBody) return;
+
+  function toggleClearBtn() {
+    if (clearBtn) clearBtn.classList.toggle('visible', searchInput.value.length > 0);
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      searchInput.value = '';
+      toggleClearBtn();
+      closeDropdown();
+      searchInput.focus();
+    });
+  }
 
   let globalLastFiling = null;
   let activeIdx     = -1;
@@ -2234,6 +2257,7 @@ function employerSlug(name) {
   });
 
   searchInput.addEventListener('input', () => {
+    toggleClearBtn();
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(runSearch, 200);
   });
