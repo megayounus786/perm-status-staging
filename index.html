@@ -2131,6 +2131,28 @@ const API_BASE = 'https://api.immilane.com';
 // ═══════════════════════════════════════════════════════
 // EMPLOYER SEARCH (nav icon + typeahead + modal overlay)
 // ═══════════════════════════════════════════════════════
+//
+// Backend: Cloudflare Worker (immilane-api). Override the base URL with
+// `window.IMMILANE_API_BASE` before this script runs to point staging at a
+// different worker (e.g. the *-staging deployment).
+const EMPLOYER_API_BASE = (typeof window !== 'undefined' && window.IMMILANE_API_BASE)
+  ? String(window.IMMILANE_API_BASE).replace(/\/+$/, '')
+  : 'https://immilane-api.immilane.workers.dev';
+const EMPLOYER_API_DEBOUNCE_MS = 200;
+const EMPLOYER_API_LIMIT = 8;
+
+function employerSlug(name) {
+  if (!name) return '';
+  return String(name)
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 200);
+}
+
 (function initEmployerSearch() {
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const STATUS_COLORS = {
@@ -2158,24 +2180,40 @@ const API_BASE = 'https://api.immilane.com';
 
   if (!navSearch || !searchInput || !dropdown || !modal || !modalBackdrop || !modalBody) return;
 
-  let employerIndex = null;
-  let employerData  = null;
-  let dataPromise   = null;
   let globalLastFiling = null;
   let activeIdx     = -1;
   let lastMatches   = [];
   let debounceTimer = null;
+  let searchSeq     = 0;
+  const detailCache = new Map(); // slug -> employer detail object
+  let metaPromise   = null;
 
-  // Load index on page load
-  fetch('data/employer_index.json')
-    .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(d => { employerIndex = d.employers || []; })
-    .catch(() => { employerIndex = []; });
+  function loadMeta() {
+    if (metaPromise) return metaPromise;
+    metaPromise = fetch(EMPLOYER_API_BASE + '/api/meta')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(m => {
+        if (m && m.lastFiling) globalLastFiling = m.lastFiling;
+        return m;
+      })
+      .catch(() => null);
+    return metaPromise;
+  }
+  loadMeta();
 
-  function loadData() {
-    if (dataPromise) return dataPromise;
-    dataPromise = fetch('data/employer_data.json').then(r => r.json());
-    return dataPromise;
+  function loadEmployer(name) {
+    const slug = employerSlug(name);
+    if (!slug) return Promise.reject(new Error('invalid employer name'));
+    if (detailCache.has(slug)) return Promise.resolve(detailCache.get(slug));
+    return fetch(EMPLOYER_API_BASE + '/api/employers/' + encodeURIComponent(slug))
+      .then(r => {
+        if (!r.ok) throw new Error('employer fetch failed: ' + r.status);
+        return r.json();
+      })
+      .then(emp => {
+        detailCache.set(slug, emp);
+        return emp;
+      });
   }
 
   function titleCase(s) {
@@ -2232,24 +2270,35 @@ const API_BASE = 'https://api.immilane.com';
   }
 
   function runSearch() {
-    const q = searchInput.value.trim().toLowerCase();
+    const q = searchInput.value.trim();
     if (!q) {
       closeDropdown();
       return;
     }
-    if (!employerIndex) {
-      dropdown.innerHTML = '<div class="nav-search-empty">Loading employer index…</div>';
-      dropdown.classList.add('open');
-      return;
-    }
-    const matches = [];
-    for (let i = 0; i < employerIndex.length && matches.length < 8; i++) {
-      const e = employerIndex[i];
-      if (e.n && e.n.toLowerCase().includes(q)) matches.push(e);
-    }
-    lastMatches = matches;
-    activeIdx = matches.length > 0 ? 0 : -1;
-    renderDropdown();
+    const seq = ++searchSeq;
+    dropdown.innerHTML = '<div class="nav-search-empty">Searching…</div>';
+    dropdown.classList.add('open');
+    const url = EMPLOYER_API_BASE + '/api/employers'
+      + '?q=' + encodeURIComponent(q)
+      + '&limit=' + EMPLOYER_API_LIMIT;
+    fetch(url)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(payload => {
+        // Drop stale responses if the user kept typing.
+        if (seq !== searchSeq) return;
+        const results = (payload && Array.isArray(payload.results)) ? payload.results : [];
+        // Map API shape {name,total} to the {n,t} shape the renderer expects.
+        lastMatches = results.map(r => ({ n: r.name, t: r.total }));
+        activeIdx = lastMatches.length > 0 ? 0 : -1;
+        renderDropdown();
+      })
+      .catch(() => {
+        if (seq !== searchSeq) return;
+        lastMatches = [];
+        activeIdx = -1;
+        dropdown.innerHTML = '<div class="nav-search-empty">Search unavailable. Try again.</div>';
+        dropdown.classList.add('open');
+      });
   }
 
   function renderDropdown() {
@@ -2289,20 +2338,22 @@ const API_BASE = 'https://api.immilane.com';
     document.body.style.overflow = 'hidden';
     modalBody.innerHTML = '<div class="emp-loading"><div class="emp-loading-spinner"></div>Loading employer data…</div>';
 
-    loadData().then(data => {
-      const list = (data && data.employers) || [];
-      if (!globalLastFiling) {
-        globalLastFiling = list.reduce((max, e) => e.lastFiling && e.lastFiling > max ? e.lastFiling : max, '');
-      }
-      const emp = list.find(e => e.name === name);
-      if (!emp) {
-        modalBody.innerHTML = '<div class="emp-error">Employer data not found.</div>';
-        return;
-      }
-      renderEmployerModal(emp);
-    }).catch(() => {
-      modalBody.innerHTML = '<div class="emp-error">Failed to load employer data. Please try again.</div>';
-    });
+    // Make sure globalLastFiling is populated before we render the modal.
+    Promise.all([loadEmployer(name), loadMeta()])
+      .then(([emp]) => {
+        if (!emp) {
+          modalBody.innerHTML = '<div class="emp-error">Employer data not found.</div>';
+          return;
+        }
+        renderEmployerModal(emp);
+      })
+      .catch((err) => {
+        if (err && (err.message || '').includes('404')) {
+          modalBody.innerHTML = '<div class="emp-error">Employer data not found.</div>';
+        } else {
+          modalBody.innerHTML = '<div class="emp-error">Failed to load employer data. Please try again.</div>';
+        }
+      });
   }
 
   function closeModal() {
