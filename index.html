@@ -1521,15 +1521,6 @@ function isWeekend(iso) {
   const d = new Date(iso + 'T12:00:00Z');
   return d.getUTCDay() === 0 || d.getUTCDay() === 6;
 }
-// Returns true if the last 3 business days in rateDays all had 0 total flips.
-// Uses global daily activity as a proxy for the active month (DOL processes months sequentially).
-function isMonthLikelyComplete(rateDays) {
-  const bizEntries = rateDays
-    .filter(r => { const d = new Date(r.date+'T12:00:00Z'); const w = d.getUTCDay(); return w !== 0 && w !== 6; })
-    .sort((a, b) => a.date.localeCompare(b.date));
-  if (bizEntries.length < 3) return false;
-  return bizEntries.slice(-3).every(r => r.total === 0);
-}
 function fmtWeekLabel(iso) {
   const d = new Date(iso + 'T12:00:00Z');
   const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1696,15 +1687,8 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     h += tipRow('Withdrawn',  n(m.withdrawn)+' ('+wdPct  +'%)', '#64748b');
     h += tipRow('Denied/RFI', n(m.denied)   +' ('+denPct +'%)', '#ef4444');
     h += '<div class="gt-sep"></div>';
-    if (m.status === 'done') {
-      h += tipRow('Status', '✅ Processing complete');
-    } else if (m.status === 'active') {
-      const likelyDone = isMonthLikelyComplete(D.rateDays);
-      h += tipRow('Status', likelyDone ? '✅ No recent activity — likely complete' : '🔶 Processing');
-      if (!likelyDone) h += tipRow('Progress', Math.round(m.dolDay/m.dolDays*100)+'%');
-    } else {
-      h += tipRow('Status', '⏳ Pending');
-    }
+    h += tipRow('Status', m.status==='done'?'✅ Complete':m.status==='active'?'🔶 Processing':'⏳ Pending');
+    if (m.status==='active') h += tipRow('Progress', Math.round(m.dolDay/m.dolDays*100)+'%');
     return h;
   }
 
@@ -1745,14 +1729,10 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     html += '</div></div>';
 
     html += '<div class="ml-row"><span class="ml-label">'+m.label+'</span></div>';
-    if (m.status === 'done') {
-      html += '<div style="font-size:8px;color:#22c55e;font-weight:600;">Processing complete</div>';
-    } else if (m.status === 'active') {
-      if (isMonthLikelyComplete(D.rateDays)) {
-        html += '<div style="font-size:8px;color:#22c55e;font-weight:600;">No recent activity — likely complete</div>';
-      } else {
-        html += '<div style="font-size:8px;color:#f59e0b;font-weight:600;">Processing ('+certPct+'% certified, '+n(m.review)+' remaining)</div>';
-      }
+    if (m.status !== 'pending') {
+      const pctColor = m.status==='done' ? '#22c55e' : '#f59e0b';
+      const pctTxt   = m.status==='done' ? certPct+'%' : Math.round(m.dolDay/m.dolDays*100)+'%';
+      html += '<div style="font-size:8px;color:'+pctColor+';font-weight:600;">'+pctTxt+'</div>';
     }
     html += '</div>';
   });
