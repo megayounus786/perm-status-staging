@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PERM Processing Times 2026 — DOL Labor Certification Tracker | ImmiLane</title>
 <meta name="description" content="Track PERM labor certification processing times in real time. Live DOL case status data — certified, analyst review, denied, RFI, and withdrawn. Updated daily from FLAG.DOL.GOV.">
 <meta name="keywords" content="PERM processing times, PERM tracker, DOL labor certification, PERM status, PERM case tracker, green card PERM, PERM processing time 2026, PERM audit, immigration tracker">
@@ -20,66 +20,27 @@
 <meta name="twitter:description" content="Real-time PERM labor certification tracking with status breakdowns, monthly trends, and employer filing stats.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ImmiLane PERM Tracker","url":"https://immilane.com","description":"Real-time PERM labor certification processing tracker with DOL case data, status breakdowns, and monthly trends.","applicationCategory":"Government Data Tracker","operatingSystem":"Web","provider":{"@type":"Organization","name":"ImmiLane","url":"https://immilane.com"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What are current PERM processing times in 2026?","acceptedAnswer":{"@type":"Answer","text":"ImmiLane tracks PERM labor certification processing times in real time using DOL FLAG data. Visit immilane.com for live status breakdowns and monthly trends."}},{"@type":"Question","name":"What is the PERM certification rate?","acceptedAnswer":{"@type":"Answer","text":"The PERM certification rate varies by filing month. ImmiLane provides real-time status distribution showing certified, analyst review, denied, RFI, and withdrawn cases."}}]}</script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G8NXS7DNX1"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-G8NXS7DNX1');</script>
-<script>if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --bg-html: #0a0a12; --bg-body: #0a0a12; --text-primary: #f0f0f8; --text-secondary: #94a3b8; --text-muted: #64748b; --text-dim: #475569;
-    --card-bg: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.06); --card-hover: rgba(255,255,255,0.07); --card-border-hover: rgba(255,255,255,0.1);
-    --nav-bg: rgba(255,255,255,0.03); --nav-border: rgba(255,255,255,0.06);
-    --input-bg: rgba(255,255,255,0.06); --input-border: rgba(255,255,255,0.1); --input-focus: rgba(59,130,246,0.5);
-    --tab-bg: rgba(255,255,255,0.05); --tab-active: rgba(255,255,255,0.1);
-    --grid-line: rgba(255,255,255,0.05); --grid-line-last: rgba(255,255,255,0.09);
-    --scrollbar-thumb: rgba(255,255,255,0.1); --sep: rgba(255,255,255,0.06);
-    --tooltip-bg: #1e293b; --tooltip-border: rgba(255,255,255,0.1); --gtip-bg: #1a2540; --gtip-border: rgba(255,255,255,0.14);
-    --modal-bg: #0e0e1a; --modal-backdrop: rgba(0,0,0,0.65); --modal-border: rgba(255,255,255,0.08);
-    --dot-pending-bg: #0a0a12; --bar-dimmed: 0.22;
-    --bg-card: rgba(15,15,24,0.92);
-    --gradient-start: rgba(59,130,246,0.08); --gradient-end: rgba(139,92,246,0.06);
-    --noscript-bg: #0a0a12;
-    --avg-color: #fbbf24;
-  }
-
-  html.light {
-    --bg-html: #f5f7fa; --bg-body: #f5f7fa; --text-primary: #1a1a2e; --text-secondary: #475569; --text-muted: #64748b; --text-dim: #94a3b8;
-    --card-bg: rgba(255,255,255,0.85); --card-border: rgba(0,0,0,0.08); --card-hover: rgba(255,255,255,0.95); --card-border-hover: rgba(0,0,0,0.12);
-    --nav-bg: rgba(255,255,255,0.85); --nav-border: rgba(0,0,0,0.08);
-    --input-bg: rgba(0,0,0,0.04); --input-border: rgba(0,0,0,0.12); --input-focus: rgba(59,130,246,0.4);
-    --tab-bg: rgba(0,0,0,0.04); --tab-active: rgba(0,0,0,0.08);
-    --grid-line: rgba(0,0,0,0.06); --grid-line-last: rgba(0,0,0,0.12);
-    --scrollbar-thumb: rgba(0,0,0,0.12); --sep: rgba(0,0,0,0.08);
-    --tooltip-bg: #fff; --tooltip-border: rgba(0,0,0,0.12); --gtip-bg: #fff; --gtip-border: rgba(0,0,0,0.12);
-    --modal-bg: #fff; --modal-backdrop: rgba(0,0,0,0.3); --modal-border: rgba(0,0,0,0.1);
-    --dot-pending-bg: #f5f7fa; --bar-dimmed: 0.3;
-    --bg-card: rgba(245,247,250,0.95);
-    --gradient-start: transparent; --gradient-end: transparent;
-    --noscript-bg: #f5f7fa;
-    --avg-color: #b45309;
-  }
-
-  html { background: var(--bg-html); }
-  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-body); color: var(--text-primary); min-height: 100vh; min-width: 100%; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, var(--gradient-start) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, var(--gradient-end) 0%, transparent 50%); z-index: 0; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #0a0a12; color: #f0f0f8; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(139,92,246,0.06) 0%, transparent 50%); z-index: 0; }
   .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; backdrop-filter: blur(20px); background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); position: sticky; top: 0; z-index: 100; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; backdrop-filter: blur(20px); background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 100; }
   .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
   .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
   .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
-  .nav-links a.active, .nav-links a:hover { color: var(--text-primary); }
-  footer { text-align: center; padding: 32px 24px; color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--sep); margin-top: 0; }
-  footer a { color: var(--text-muted); text-decoration: none; }
-  footer a:hover { color: var(--text-secondary); }
+  .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a.active, .nav-links a:hover { color: #f0f0f8; }
+  footer { text-align: center; padding: 32px 24px; color: #475569; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0; }
+  footer a { color: #64748b; text-decoration: none; }
+  footer a:hover { color: #94a3b8; }
   .hero { padding: 40px 0 20px; }
   .hero h1 { font-size: 14px; font-weight: 500; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
-  .hero h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .update-time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .hero h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, #f0f0f8, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .update-time { font-size: 12px; color: #475569; margin-top: 4px; }
   .update-time .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-right: 6px; animation: pulse 2s infinite; }
   @keyframes pulse    { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
   @keyframes dotpulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.6),0 0 12px rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0),0 0 20px rgba(245,158,11,0.6)} }
@@ -89,76 +50,76 @@
 
   /* ── STAT CARDS ── */
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0; }
-  .stat-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px 24px 24px; transition: all 0.3s; position: relative; min-height: 220px; }
+  .stat-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 24px 24px; transition: all 0.3s; position: relative; min-height: 220px; }
   .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.6; }
-  .stat-card:hover { background: var(--card-hover); border-color: var(--card-border-hover); transform: translateY(-2px); }
-  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .stat-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); transform: translateY(-2px); }
+  .stat-label { font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
   .stat-value { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
   .stat-trend { font-size: 12px; font-weight: 600; }
-  .stat-details { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--sep); display: flex; flex-direction: column; gap: 6px; }
+  .stat-details { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 6px; }
   .stat-detail-row { display: flex; justify-content: space-between; font-size: 12px; }
-  .stat-detail-label { color: var(--text-muted); } .stat-detail-value { color: var(--text-secondary); font-weight: 600; }
-  .trend-up { color: #22c55e; } .trend-down { color: #ef4444; } .trend-neutral { color: var(--text-muted); }
-  .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-dim); font-size: 9px; color: var(--text-dim); cursor: help; position: relative; }
+  .stat-detail-label { color: #64748b; } .stat-detail-value { color: #94a3b8; font-weight: 600; }
+  .trend-up { color: #22c55e; } .trend-down { color: #ef4444; } .trend-neutral { color: #64748b; }
+  .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #475569; font-size: 9px; color: #475569; cursor: help; position: relative; }
   .info-icon:hover .tooltip { display: block; }
-  .tooltip { display: none; position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--tooltip-bg); color: var(--text-primary); font-size: 11px; padding: 10px 14px; border-radius: 8px; z-index: 200; border: 1px solid var(--tooltip-border); line-height: 1.5; max-width: 300px; min-width: 200px; white-space: normal; box-shadow: 0 8px 24px rgba(0,0,0,0.3); pointer-events: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
-  .tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--tooltip-bg); }
+  .tooltip { display: none; position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #e2e8f0; font-size: 11px; padding: 10px 14px; border-radius: 8px; z-index: 200; border: 1px solid rgba(255,255,255,0.1); line-height: 1.5; max-width: 300px; min-width: 200px; white-space: normal; box-shadow: 0 8px 24px rgba(0,0,0,0.5); pointer-events: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
+  .tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:#1e293b; }
   .tooltip .tt-row { display:flex; justify-content:space-between; gap:12px; }
-  .tooltip .tt-label { color:var(--text-muted); } .tooltip .tt-val { font-weight:600; color:var(--text-primary); }
-  .tooltip .tt-section { font-weight:600; color:var(--text-primary); margin:4px 0 2px; font-size:11px; border-bottom:1px solid var(--sep); padding-bottom:3px; }
+  .tooltip .tt-label { color:#94a3b8; } .tooltip .tt-val { font-weight:600; color:#f0f0f8; }
+  .tooltip .tt-section { font-weight:600; color:#f0f0f8; margin:4px 0 2px; font-size:11px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:3px; }
 
   /* ── CARD / TABS ── */
-  .card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; position: relative; }
+  .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; position: relative; }
   .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .card-title { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
-  .card-subtitle { font-size: 11px; color: var(--text-muted); }
-  .card-tabs { display: flex; gap: 4px; background: var(--tab-bg); border-radius: 8px; padding: 3px; }
-  .card-tab { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; border: none; background: none; transition: all 0.2s; }
-  .card-tab:hover { color: var(--text-secondary); }
-  .card-tab.active { background: var(--tab-active); color: var(--text-primary); }
+  .card-subtitle { font-size: 11px; color: #64748b; }
+  .card-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 3px; }
+  .card-tab { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: #64748b; cursor: pointer; border: none; background: none; transition: all 0.2s; }
+  .card-tab:hover { color: #94a3b8; }
+  .card-tab.active { background: rgba(255,255,255,0.1); color: #f0f0f8; }
   .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin: 16px 0; }
 
   /* ── GLOBAL FIXED TOOLTIP ── */
-  #gtip { display: none; position: fixed; background: var(--gtip-bg); border: 1px solid var(--gtip-border); border-radius: 12px; padding: 12px 16px; z-index: 9999; white-space: nowrap; font-size: 11px; line-height: 1.8; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); pointer-events: none; }
-  #gtip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:var(--gtip-bg); }
-  #gtip .gt-title { font-weight: 700; color: var(--text-primary); font-size: 12px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--sep); }
+  #gtip { display: none; position: fixed; background: #1a2540; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 12px 16px; z-index: 9999; white-space: nowrap; font-size: 11px; line-height: 1.8; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.7); pointer-events: none; }
+  #gtip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:#1a2540; }
+  #gtip .gt-title { font-weight: 700; color: #f0f0f8; font-size: 12px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
   #gtip .gt-row { display: flex; justify-content: space-between; gap: 24px; }
-  #gtip .gt-label { color: var(--text-muted); } #gtip .gt-val { font-weight: 700; }
-  #gtip .gt-sep { border-top: 1px solid var(--sep); margin: 5px 0; }
+  #gtip .gt-label { color: #64748b; } #gtip .gt-val { font-weight: 700; }
+  #gtip .gt-sep { border-top: 1px solid rgba(255,255,255,0.07); margin: 5px 0; }
 
   /* ── RATE CHART ── */
   .rate-chart-wrap { position: relative; height: 220px; display: flex; }
   .y-axis { width: 38px; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 26px; padding-top: 4px; flex-shrink: 0; }
-  .y-tick { font-size: 9px; color: var(--text-dim); text-align: right; padding-right: 6px; font-weight: 500; }
+  .y-tick { font-size: 9px; color: #475569; text-align: right; padding-right: 6px; font-weight: 500; }
   .chart-area { flex: 1; position: relative; padding-bottom: 26px; }
   .grid-lines { position: absolute; inset: 0 0 26px 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; z-index: 0; }
-  .grid-line { border-top: 1px dashed var(--grid-line); }
-  .grid-line:last-child { border-top: 1px solid var(--grid-line-last); }
-  .avg-line { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--avg-color, #fbbf24); z-index: 4; pointer-events: none; }
-  .avg-label { position: absolute; right: 4px; font-size: 10px; color: var(--avg-color, #fbbf24); font-weight: 800; transform: translateY(-13px); text-shadow: 0 0 6px var(--bg-body), 0 0 6px var(--bg-body), 0 0 6px var(--bg-body); letter-spacing: 0.2px; }
+  .grid-line { border-top: 1px dashed rgba(255,255,255,0.05); }
+  .grid-line:last-child { border-top: 1px solid rgba(255,255,255,0.09); }
+  .avg-line { position: absolute; left: 0; right: 0; border-top: 2px dashed rgba(99,102,241,0.5); z-index: 3; pointer-events: none; }
+  .avg-label { position: absolute; right: 4px; font-size: 9px; color: rgba(99,102,241,0.8); font-weight: 700; transform: translateY(-13px); }
   .bars-container { position: absolute; inset: 0 0 26px 0; display: flex; align-items: flex-end; gap: 3px; z-index: 1; padding: 0 2px; }
   .bar-group { flex: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
   .bar { width: 100%; max-width: 26px; border-radius: 4px 4px 0 0; cursor: pointer; transition: opacity 0.18s, box-shadow 0.18s, transform 0.12s; background: linear-gradient(180deg, #6366f1, #3b82f6); }
   .bar.weekend { background: linear-gradient(180deg, rgba(99,102,241,0.3), rgba(59,130,246,0.3)); }
-  .bar.dimmed  { opacity: var(--bar-dimmed); }
+  .bar.dimmed  { opacity: 0.22; }
   .bar.hovered { opacity: 1 !important; box-shadow: 0 0 16px rgba(99,102,241,0.5); transform: scaleX(1.08); }
   .bar-labels { position: absolute; bottom: 0; left: 0; right: 0; height: 26px; display: flex; padding: 0 2px; }
   .bar-label-slot { flex: 1; display: flex; align-items: center; justify-content: center; }
-  .bar-label { font-size: 8px; color: var(--text-dim); font-weight: 500; text-align: center; line-height: 1.3; }
+  .bar-label { font-size: 8px; color: #475569; font-weight: 500; text-align: center; line-height: 1.3; }
 
   /* ── DONUT ── */
-  .donut-container { display: flex; align-items: center; gap: 24px; }
+  .donut-container { display: flex; flex-direction: column; align-items: center; gap: 16px; }
   .donut-wrap { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
   .donut-svg { width: 180px; height: 180px; transform: rotate(-90deg); }
   .donut-seg { cursor: pointer; transition: opacity 0.2s; }
   .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-  .donut-number { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); }
-  .donut-label  { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+  .donut-number { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #f0f0f8; }
+  .donut-label  { font-size: 10px; color: #64748b; font-weight: 500; }
   .donut-pct    { font-size: 10px; font-weight: 600; margin-top: 1px; }
-  .legend { display: flex; flex-direction: column; gap: 8px; }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; }
   .legend-dot   { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-  .legend-value { margin-left: auto; font-weight: 600; color: var(--text-secondary); font-size: 12px; }
+  .legend-value { margin-left: 4px; font-weight: 600; color: #94a3b8; font-size: 12px; }
 
   /* ── TIMELINE + BACKLOG ── */
   .combo-section { margin: 16px 0; overflow: visible; }
@@ -169,8 +130,8 @@
   .tl-row  { height: 52px; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; }
   .tl-dot  { width: 16px; height: 16px; border-radius: 50%; border: 3px solid; z-index: 4; position: relative; flex-shrink: 0; }
   .tl-dot.done    { border-color: #22c55e; background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
-  .tl-dot.active  { border-color: #f59e0b; background: var(--dot-pending-bg); animation: dotpulse 2s infinite; }
-  .tl-dot.pending { border-color: #2d3748; background: var(--dot-pending-bg); }
+  .tl-dot.active  { border-color: #f59e0b; background: #0a0a12; animation: dotpulse 2s infinite; }
+  .tl-dot.pending { border-color: #2d3748; background: #0a0a12; }
   .tl-dot-wrap { position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .tl-spin-ring { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid transparent; border-top-color: #22c55e; border-right-color: #f59e0b; animation: spin 1.2s linear infinite; }
   .tl-left  { position: absolute; top: 50%; left: 0;   right: 50%; height: 3px; transform: translateY(-50%); border-radius: 2px; z-index: 1; }
@@ -181,13 +142,13 @@
   .bl-bar.dimmed  { opacity: 0.2; }
   .bl-bar.hovered { opacity: 1 !important; box-shadow: 0 0 16px rgba(255,255,255,0.15); }
   .bl-seg { width: 100%; }
-  .bl-pct { font-size: 9px; font-weight: 700; color: var(--text-secondary); margin-bottom: 3px; }
+  .bl-pct { font-size: 9px; font-weight: 700; color: #94a3b8; margin-bottom: 3px; }
   .ml-row { padding-top: 5px; }
-  .ml-label { font-size: 9px; color: var(--text-dim); font-weight: 500; white-space: nowrap; }
+  .ml-label { font-size: 9px; color: #475569; font-weight: 500; white-space: nowrap; }
   .combo-col.active-month .ml-label { color: #f59e0b; font-weight: 700; }
   .combo-col.active-month .bl-bar  { box-shadow: 0 0 14px rgba(245,158,11,0.25); }
   .backlog-legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; }
-  .backlog-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+  .backlog-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
   .backlog-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
 
   /* ── DOL MARKER ── */
@@ -203,15 +164,15 @@
 
   /* ── EMPLOYERS ── */
   .employer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
-  .employer-row { display: grid; grid-template-columns: 24px 1fr 60px 80px; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--sep); }
-  .employer-rank  { font-size: 12px; font-weight: 700; color: var(--text-dim); text-align: center; }
+  .employer-row { display: grid; grid-template-columns: 24px 1fr 60px 80px; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .employer-rank  { font-size: 12px; font-weight: 700; color: #475569; text-align: center; }
   .employer-name  { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .employer-count { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-align: right; }
-  .employer-bar   { height: 5px; border-radius: 3px; background: var(--card-border); overflow: hidden; }
+  .employer-count { font-size: 12px; font-weight: 700; color: #94a3b8; text-align: right; }
+  .employer-bar   { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
   .employer-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
 @media (max-width: 768px) {
     .container { padding: 0 14px; }
@@ -223,16 +184,21 @@
     .logo { font-size: 18px; }
     .logo-icon { width: 28px; height: 28px; font-size: 14px; }
     .nav-links {
+      width: 100%;
+      order: 3;
       gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
     }
     .nav-links li { flex: 0 0 auto; }
     .nav-links a {
       display: inline-flex;
       align-items: center;
-      min-height: 36px;
-      padding: 0 8px;
+      min-height: 44px;
+      padding: 0 12px;
       border-radius: 8px;
-      font-size: 13px;
     }
     .hero { padding: 24px 0 14px; }
     .hero h2 { font-size: 24px; }
@@ -288,15 +254,15 @@
 
   /* ── ESTIMATE TAB ── */
   .estimate-card { max-width: none; }
-  .est-subtabs { display: flex; gap: 4px; background: var(--tab-bg); border-radius: 8px; padding: 3px; margin-bottom: 20px; }
-  .est-subtab { flex: 1; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border: none; background: none; transition: all 0.2s; text-align: center; }
-  .est-subtab:hover { color: var(--text-secondary); }
-  .est-subtab.active { background: var(--tab-active); color: var(--text-primary); }
+  .est-subtabs { display: flex; gap: 4px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 3px; margin-bottom: 20px; }
+  .est-subtab { flex: 1; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; color: #64748b; cursor: pointer; border: none; background: none; transition: all 0.2s; text-align: center; }
+  .est-subtab:hover { color: #94a3b8; }
+  .est-subtab.active { background: rgba(255,255,255,0.1); color: #f0f0f8; }
   .est-input-group { margin-bottom: 16px; }
-  .est-input-group label { display: block; font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .est-input { width: 100%; padding: 12px 16px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: var(--text-primary); font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box; -webkit-appearance: none; appearance: none; max-width: 100%; }
+  .est-input-group label { display: block; font-size: 12px; color: #94a3b8; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .est-input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f0f0f8; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box; -webkit-appearance: none; appearance: none; max-width: 100%; }
   .est-input:focus { border-color: #3b82f6; }
-  .est-input::placeholder { color: var(--text-dim); }
+  .est-input::placeholder { color: #475569; }
   .est-btn { width: 100%; padding: 14px; border: none; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; font-family: inherit; }
   .est-btn:hover { opacity: 0.9; }
   .est-btn:active { transform: scale(0.98); }
@@ -305,28 +271,28 @@
   .est-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px 16px; color: #fca5a5; font-size: 13px; margin-top: 16px; }
 
   .est-result { margin-top: 24px; }
-  .est-result-hero { text-align: center; padding: 28px 0 20px; border-bottom: 1px solid var(--sep); margin-bottom: 20px; }
-  .est-result-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .est-result-hero { text-align: center; padding: 28px 0 20px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; }
+  .est-result-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
   .est-result-date { font-size: 32px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .est-result-days { font-size: 14px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
+  .est-result-days { font-size: 14px; color: #94a3b8; margin-top: 4px; font-weight: 500; }
 
   .est-confidence { margin: 20px 0; }
-  .est-conf-bar-track { height: 8px; background: var(--card-border); border-radius: 4px; position: relative; overflow: hidden; }
+  .est-conf-bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; position: relative; overflow: hidden; }
   .est-conf-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.6s ease; }
-  .est-conf-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+  .est-conf-labels { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; margin-top: 6px; }
 
   .est-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .est-stat { background: var(--card-bg); border-radius: 10px; padding: 14px 16px; }
-  .est-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
-  .est-stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .est-stat { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 14px 16px; }
+  .est-stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+  .est-stat-value { font-size: 18px; font-weight: 700; color: #f0f0f8; }
   .est-stat-value.accent { color: #3b82f6; }
   .est-stat-value.warning { color: #f59e0b; }
   .est-stat-value.success { color: #22c55e; }
 
-  .est-case-info { background: var(--card-bg); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .est-case-info { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
   .est-case-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
-  .est-case-label { color: var(--text-muted); }
-  .est-case-value { color: var(--text-primary); font-weight: 500; }
+  .est-case-label { color: #64748b; }
+  .est-case-value { color: #f0f0f8; font-weight: 500; }
   .est-case-status { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 
   @media (max-width: 480px) {
@@ -336,273 +302,6 @@
     .est-input[type="date"] { font-size: 16px; padding: 10px 12px; }
     .est-btn { font-size: 14px; padding: 12px; }
     .est-input-group label { font-size: 11px; }
-  }
-
-  /* ── NAV SEARCH ── */
-  .nav-right { display: flex; align-items: center; gap: 24px; }
-  .nav-search { display: flex; align-items: center; position: relative; }
-  .nav-search-icon {
-    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-    color: var(--text-dim); pointer-events: none; display: flex; align-items: center;
-  }
-  .nav-search-input {
-    width: 260px; padding: 8px 32px 8px 34px;
-    border: 1px solid var(--input-border);
-    background: var(--input-bg);
-    color: var(--text-primary); font-size: 13px; font-family: inherit;
-    border-radius: 10px; outline: none;
-    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-  }
-  .nav-search-input::placeholder { color: var(--text-dim); }
-  .nav-search-clear {
-    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-    width: 20px; height: 20px; border: none; background: var(--tab-active);
-    color: var(--text-secondary); font-size: 14px; line-height: 1; cursor: pointer;
-    border-radius: 50%; display: none; align-items: center; justify-content: center;
-    transition: background 0.15s, color 0.15s;
-  }
-  .nav-search-clear:hover { background: var(--card-border-hover); color: var(--text-primary); }
-  .nav-search-clear.visible { display: flex; }
-  .nav-search-input:focus {
-    border-color: var(--input-focus);
-    background: var(--input-bg);
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
-  }
-
-  .nav-search-dropdown {
-    position: absolute; top: 100%; right: 24px; margin-top: 6px;
-    width: 360px; max-height: 400px; overflow-y: auto;
-    background: var(--bg-card);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    z-index: 1000; display: none;
-  }
-  .nav-search-dropdown.open { display: block; }
-  .nav-search-item {
-    padding: 10px 14px; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    border-bottom: 1px solid var(--sep);
-    transition: background 0.12s;
-  }
-  .nav-search-item:last-child { border-bottom: none; }
-  .nav-search-item:hover, .nav-search-item.active { background: rgba(59,130,246,0.14); }
-  .nav-search-item-name {
-    font-size: 13px; color: var(--text-primary); font-weight: 500;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    min-width: 0; flex: 1;
-  }
-  .nav-search-item-count {
-    font-size: 12px; color: var(--text-secondary); font-weight: 700; flex-shrink: 0;
-  }
-  .nav-search-empty {
-    padding: 18px 14px; color: var(--text-muted); font-size: 13px; text-align: center;
-  }
-
-  /* ── EMPLOYER MODAL ── */
-  .emp-modal-backdrop {
-    position: fixed; inset: 0;
-    background: var(--modal-backdrop);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    z-index: 1500;
-    opacity: 0; visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
-  }
-  .emp-modal-backdrop.open { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
-  .emp-modal {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -48%);
-    width: calc(100% - 40px); max-width: 720px;
-    max-height: calc(100vh - 40px);
-    background: var(--modal-bg);
-    border: 1px solid var(--modal-border);
-    border-radius: 18px;
-    padding: 28px;
-    z-index: 1510;
-    overflow-y: auto;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-    opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
-  }
-  .emp-modal.open {
-    opacity: 1; visibility: visible; pointer-events: auto;
-    transform: translate(-50%, -50%);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  .emp-modal-header {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 16px; margin-bottom: 22px;
-  }
-  .emp-modal-title {
-    font-size: 20px; font-weight: 700; color: var(--text-primary);
-    letter-spacing: -0.3px; flex: 1; min-width: 0; line-height: 1.3;
-    margin: 0;
-  }
-  .emp-modal-close {
-    background: var(--tab-bg);
-    border: 1px solid var(--card-border);
-    color: var(--text-secondary);
-    width: 32px; height: 32px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    transition: all 0.2s;
-  }
-  .emp-modal-close:hover { background: var(--tab-active); color: var(--text-primary); }
-
-  .emp-modal-grid {
-    display: grid; grid-template-columns: 280px 1fr;
-    gap: 14px; margin-bottom: 14px;
-  }
-  .emp-modal-cards {
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  .emp-stat-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 16px 14px;
-    position: relative; overflow: hidden;
-  }
-  .emp-stat-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent);
-    opacity: 0.6;
-  }
-  .emp-stat-label {
-    font-size: 11px; color: var(--text-muted); text-transform: uppercase;
-    letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 500;
-  }
-  .emp-stat-value {
-    font-size: 28px; font-weight: 800; letter-spacing: -1px;
-    line-height: 1.1; color: var(--text-primary);
-  }
-  .emp-stat-value.period { font-size: 16px; letter-spacing: -0.3px; }
-  .emp-stat-sub {
-    font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.55;
-    word-break: break-word;
-  }
-  .emp-stat-value.cr-good { color: #22c55e; }
-  .emp-stat-value.cr-med  { color: #f59e0b; }
-  .emp-stat-value.cr-bad  { color: #ef4444; }
-  .emp-stat-value.cr-na   { color: var(--text-muted); }
-  .emp-stat-disclaimer {
-    font-size: 10px; color: var(--text-dim); margin-top: 10px;
-    font-style: italic; line-height: 1.4;
-  }
-  .emp-stat-card .stat-details {
-    margin-top: 10px; padding-top: 10px;
-    border-top: 1px solid var(--sep);
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .emp-stat-card .stat-detail-row {
-    display: flex; justify-content: space-between; font-size: 11px;
-  }
-  .emp-stat-card .stat-detail-label { color: var(--text-muted); }
-  .emp-stat-card .stat-detail-value { color: var(--text-secondary); font-weight: 600; }
-
-  .emp-modal-section {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 14px;
-  }
-  .emp-modal-section-title {
-    font-size: 13px; font-weight: 600; color: var(--text-primary);
-    margin-bottom: 14px; letter-spacing: -0.2px;
-  }
-  .emp-modal .donut-container { flex-direction: column; align-items: center; gap: 16px; }
-  .emp-modal .legend { flex-wrap: wrap; justify-content: center; gap: 8px 20px; }
-  .emp-modal .legend-item { white-space: nowrap; }
-  .emp-modal .legend-value { margin-left: 4px; }
-
-  .emp-loading {
-    padding: 60px 20px; text-align: center; color: var(--text-secondary); font-size: 13px;
-  }
-  .emp-loading-spinner {
-    width: 30px; height: 30px; margin: 0 auto 14px;
-    border: 3px solid var(--card-border);
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  .emp-error {
-    padding: 40px 20px; text-align: center; color: #fca5a5; font-size: 14px;
-  }
-
-  @media (max-width: 768px) {
-    .nav-right { gap: 12px; order: 2; margin-left: auto; }
-    .nav-search-input { width: 200px !important; }
-    .nav-search-dropdown { width: calc(100vw - 28px); right: 14px; max-height: 60vh; }
-    .emp-modal {
-      width: 100%; max-width: 100%;
-      height: 100%; max-height: 100%;
-      border-radius: 0;
-      top: 0; left: 0;
-      transform: translate(0,20px);
-      padding: 20px;
-    }
-    .emp-modal.open { transform: translate(0,0); }
-    .emp-modal-grid { grid-template-columns: 1fr; }
-    .emp-stat-value { font-size: 24px; }
-  }
-  @media (max-width: 480px) {
-    .nav-search-input { width: 150px !important; padding: 8px 10px 8px 30px !important; font-size: 12px; }
-  }
-
-  /* ── THEME TOGGLE ── */
-  .theme-toggle {
-    width: 40px; height: 22px; border-radius: 11px; border: none; cursor: pointer;
-    background: rgba(255,255,255,0.1); position: relative; transition: background 0.3s;
-    display: flex; align-items: center; padding: 0 3px; flex-shrink: 0;
-  }
-  .theme-toggle::after {
-    content: ''; width: 16px; height: 16px; border-radius: 50%;
-    background: #f0f0f8; transition: transform 0.3s, background 0.3s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  }
-  html.light .theme-toggle { background: rgba(0,0,0,0.1); }
-  html.light .theme-toggle::after { transform: translateX(18px); background: #1a1a2e; }
-  .theme-toggle-icon { position: absolute; font-size: 11px; top: 50%; transform: translateY(-50%); pointer-events: none; line-height: 1; }
-  .theme-toggle-icon.sun  { right: 5px; }
-  .theme-toggle-icon.moon { left: 5px; }
-  html:not(.light) .theme-toggle-icon.sun  { opacity: 0.4; }
-  html:not(.light) .theme-toggle-icon.moon { opacity: 0; }
-  html.light .theme-toggle-icon.sun  { opacity: 0; }
-  html.light .theme-toggle-icon.moon { opacity: 0.4; }
-
-  /* ── FEEDBACK WIDGET ── */
-  .fb-trigger { position: fixed; bottom: 24px; right: 24px; z-index: 900; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; border: none; border-radius: 14px; padding: 12px 20px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; box-shadow: 0 4px 20px rgba(59,130,246,0.4); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 8px; }
-  .fb-trigger:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.5); }
-  .fb-trigger svg { width: 16px; height: 16px; }
-  .fb-backdrop { display: none; position: fixed; inset: 0; background: var(--modal-backdrop); z-index: 950; }
-  .fb-backdrop.open { display: block; }
-  .fb-modal { display: none; position: fixed; bottom: 80px; right: 24px; z-index: 960; width: 380px; max-width: calc(100vw - 32px); background: var(--modal-bg); border: 1px solid var(--modal-border); border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.4); padding: 24px; }
-  .fb-modal.open { display: block; }
-  .fb-modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-  .fb-modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  .fb-close { position: absolute; top: 14px; right: 14px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
-  .fb-close:hover { color: var(--text-primary); }
-  .fb-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-  .fb-field { margin-bottom: 14px; }
-  .fb-select, .fb-textarea, .fb-input { width: 100%; font-family: inherit; font-size: 13px; color: var(--text-primary); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; padding: 10px 12px; transition: border-color 0.2s; outline: none; }
-  .fb-select:focus, .fb-textarea:focus, .fb-input:focus { border-color: var(--input-focus); }
-  .fb-textarea { resize: vertical; min-height: 90px; max-height: 200px; }
-  .fb-select { cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-  .fb-select option { background: var(--modal-bg); color: var(--text-primary); }
-  .fb-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
-  .fb-submit { width: 100%; padding: 11px; border: none; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
-  .fb-submit:hover { opacity: 0.9; }
-  .fb-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .fb-success { text-align: center; padding: 20px 0; }
-  .fb-success-icon { font-size: 36px; margin-bottom: 8px; }
-  .fb-success-msg { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-  .fb-success-sub { font-size: 12px; color: var(--text-muted); }
-  .fb-error { font-size: 12px; color: #ef4444; margin-bottom: 10px; display: none; }
-  @media (max-width: 480px) {
-    .fb-trigger { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 12px; border-radius: 12px; }
-    .fb-modal { bottom: 70px; right: 16px; padding: 20px; }
   }
 </style>
 </head>
@@ -619,26 +318,10 @@
 
 <nav>
   <div class="logo"><div class="logo-icon">🏛️</div>PERM Tracker</div>
-  <div class="nav-right">
-    <ul class="nav-links">
-      <li><a href="#" class="active">Dashboard</a></li>
-    </ul>
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode"><span class="theme-toggle-icon moon">🌙</span><span class="theme-toggle-icon sun">☀️</span></button>
-    <div class="nav-search" id="nav-search">
-      <div class="nav-search-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </div>
-      <input type="text" class="nav-search-input" id="nav-search-input" placeholder="Search your employer" autocomplete="off" spellcheck="false" aria-label="Search your employer">
-      <button type="button" class="nav-search-clear" id="nav-search-clear" aria-label="Clear search">&times;</button>
-    </div>
-  </div>
-  <div class="nav-search-dropdown" id="nav-search-dropdown"></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Dashboard</a></li>
+  </ul>
 </nav>
-
-<div class="emp-modal-backdrop" id="emp-modal-backdrop"></div>
-<div class="emp-modal" id="emp-modal" role="dialog" aria-modal="true" aria-labelledby="emp-modal-title">
-  <div id="emp-modal-body"></div>
-</div>
 
 <div class="container">
   <div class="hero">
@@ -674,7 +357,7 @@
             <button class="card-tab active" data-range="day">D</button>
             <button class="card-tab" data-range="week">W</button>
           </div>
-          <div id="rate-avg-stat" style="font-size:11px;color:var(--text-secondary);font-weight:600;white-space:nowrap;"></div>
+          <div id="rate-avg-stat" style="font-size:11px;color:#94a3b8;font-weight:600;white-space:nowrap;"></div>
         </div>
       </div>
       <div class="rate-chart-wrap" id="rate-chart"></div>
@@ -743,93 +426,93 @@
 <script>
 /* ===== DASHBOARD_DATA START ===== */
 window.DASHBOARD_DATA = {
-  "updatedAt": "2026-05-06T15:08:41-04:00",
+  "updatedAt": "2026-04-23T15:08:42-04:00",
   "backlog": {
-    "total": 136153,
-    "startOfMonth": 137608,
+    "total": 139197,
+    "startOfMonth": 139197,
     "thisMonth": {
-      "name": "May 2026",
-      "processed": 2678,
-      "intake": 1223
+      "name": "Apr 2026",
+      "processed": 11510,
+      "intake": 5492
     },
     "lastMonth": {
-      "name": "Apr 2026",
-      "processed": 15133,
-      "intake": 7555
+      "name": "Mar 2026",
+      "processed": 888,
+      "intake": 7128
     }
   },
   "avgDays": {
-    "current": 481,
+    "current": 487,
     "deltaFromLastMonth": 0,
-    "certified": 480,
-    "rfi": 487,
-    "denied": 491,
+    "certified": 486,
+    "rfi": 492,
+    "denied": 497,
     "trend90Day": 0
   },
   "today": {
-    "total": 491,
-    "certified": 455,
-    "rfi": 11,
-    "denied": 24,
-    "withdrawn": 1,
+    "total": 650,
+    "certified": 567,
+    "rfi": 19,
+    "denied": 64,
+    "withdrawn": 0,
     "stillUpdating": false,
     "yesterday": {
-      "total": 818,
-      "certified": 704,
-      "rfi": 53,
-      "denied": 61,
-      "withdrawn": 0
+      "total": 691,
+      "certified": 638,
+      "rfi": 4,
+      "denied": 22,
+      "withdrawn": 27
     }
   },
   "dol": {
-    "label": "Feb '25",
-    "monthFull": "February",
-    "day": 16,
+    "label": "Jan '25",
+    "monthFull": "January",
+    "day": 11,
     "daysInMonth": 100,
-    "estFinish": "May 20",
-    "movementPerWeek": 11.7,
-    "casesRemaining": 5463,
-    "latestLetter": "Z",
-    "pctProcessed": 16
+    "estFinish": "May 1",
+    "movementPerWeek": 24.6,
+    "casesRemaining": 5571,
+    "latestLetter": "W",
+    "pctProcessed": 11
   },
   "timeline": [
     {
       "label": "Nov '24",
       "total": 10623,
-      "certified": 9083,
-      "review": 143,
+      "certified": 9078,
+      "review": 155,
       "withdrawn": 508,
-      "denied": 859,
+      "denied": 852,
       "status": "done"
     },
     {
       "label": "Dec '24",
       "total": 10512,
-      "certified": 8928,
-      "review": 164,
+      "certified": 8323,
+      "review": 982,
       "withdrawn": 524,
-      "denied": 893,
+      "denied": 680,
       "status": "done"
     },
     {
       "label": "Jan '25",
       "total": 6699,
-      "certified": 4756,
-      "review": 1235,
-      "withdrawn": 372,
-      "denied": 335,
-      "status": "done"
+      "certified": 755,
+      "review": 5571,
+      "withdrawn": 369,
+      "denied": 3,
+      "status": "active",
+      "dolDay": 11,
+      "dolDays": 100
     },
     {
       "label": "Feb '25",
       "total": 6929,
-      "certified": 1105,
-      "review": 5463,
-      "withdrawn": 325,
-      "denied": 33,
-      "status": "active",
-      "dolDay": 16,
-      "dolDays": 100
+      "certified": 13,
+      "review": 6598,
+      "withdrawn": 311,
+      "denied": 4,
+      "status": "pending"
     },
     {
       "label": "Mar '25",
@@ -950,24 +633,119 @@ window.DASHBOARD_DATA = {
     },
     {
       "label": "Apr '26",
-      "total": 7555,
+      "total": 5492,
       "certified": 0,
-      "review": 7498,
-      "withdrawn": 53,
-      "denied": 1,
-      "status": "pending"
-    },
-    {
-      "label": "May '26",
-      "total": 1223,
-      "certified": 0,
-      "review": 1213,
-      "withdrawn": 10,
+      "review": 5454,
+      "withdrawn": 37,
       "denied": 0,
       "status": "pending"
     }
   ],
   "rateDays": [
+    {
+      "date": "2026-03-25",
+      "total": 0,
+      "certified": 0,
+      "rfi": 0,
+      "denied": 0,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-03-26",
+      "total": 0,
+      "certified": 0,
+      "rfi": 0,
+      "denied": 0,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-03-27",
+      "total": 0,
+      "certified": 0,
+      "rfi": 0,
+      "denied": 0,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-03-28",
+      "total": 13,
+      "certified": 13,
+      "rfi": 0,
+      "denied": 0,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-03-29",
+      "total": 48,
+      "certified": 47,
+      "rfi": 0,
+      "denied": 0,
+      "withdrawn": 1
+    },
+    {
+      "date": "2026-03-30",
+      "total": 644,
+      "certified": 565,
+      "rfi": 28,
+      "denied": 43,
+      "withdrawn": 8
+    },
+    {
+      "date": "2026-03-31",
+      "total": 183,
+      "certified": 151,
+      "rfi": 9,
+      "denied": 23,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-04-01",
+      "total": 992,
+      "certified": 843,
+      "rfi": 55,
+      "denied": 92,
+      "withdrawn": 2
+    },
+    {
+      "date": "2026-04-02",
+      "total": 534,
+      "certified": 498,
+      "rfi": 17,
+      "denied": 19,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-04-03",
+      "total": 481,
+      "certified": 427,
+      "rfi": 7,
+      "denied": 47,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-04-04",
+      "total": 106,
+      "certified": 91,
+      "rfi": 1,
+      "denied": 14,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-04-05",
+      "total": 115,
+      "certified": 104,
+      "rfi": 2,
+      "denied": 9,
+      "withdrawn": 0
+    },
+    {
+      "date": "2026-04-06",
+      "total": 590,
+      "certified": 533,
+      "rfi": 28,
+      "denied": 28,
+      "withdrawn": 1
+    },
     {
       "date": "2026-04-07",
       "total": 623,
@@ -1098,118 +876,30 @@ window.DASHBOARD_DATA = {
     },
     {
       "date": "2026-04-23",
-      "total": 849,
-      "certified": 749,
-      "rfi": 35,
-      "denied": 65,
+      "total": 650,
+      "certified": 567,
+      "rfi": 19,
+      "denied": 64,
       "withdrawn": 0
-    },
+    }
+  ],
+  "rateWeeks": [
     {
-      "date": "2026-04-24",
-      "total": 518,
-      "certified": 480,
-      "rfi": 6,
-      "denied": 32,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-04-25",
-      "total": 194,
-      "certified": 177,
-      "rfi": 4,
-      "denied": 13,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-04-26",
-      "total": 222,
-      "certified": 208,
-      "rfi": 3,
-      "denied": 11,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-04-27",
-      "total": 655,
-      "certified": 591,
-      "rfi": 31,
-      "denied": 33,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-04-28",
-      "total": 660,
-      "certified": 578,
-      "rfi": 29,
-      "denied": 52,
-      "withdrawn": 1
-    },
-    {
-      "date": "2026-04-29",
-      "total": 589,
-      "certified": 540,
-      "rfi": 13,
-      "denied": 36,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-04-30",
-      "total": 586,
-      "certified": 534,
-      "rfi": 34,
-      "denied": 18,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-05-01",
-      "total": 521,
-      "certified": 482,
-      "rfi": 20,
-      "denied": 17,
-      "withdrawn": 2
-    },
-    {
-      "date": "2026-05-02",
-      "total": 71,
-      "certified": 71,
+      "weekStart": "2026-02-02",
+      "total": 0,
+      "certified": 0,
       "rfi": 0,
       "denied": 0,
       "withdrawn": 0
     },
     {
-      "date": "2026-05-03",
-      "total": 149,
-      "certified": 117,
-      "rfi": 2,
-      "denied": 17,
-      "withdrawn": 13
-    },
-    {
-      "date": "2026-05-04",
-      "total": 628,
-      "certified": 584,
-      "rfi": 21,
-      "denied": 23,
+      "weekStart": "2026-02-09",
+      "total": 0,
+      "certified": 0,
+      "rfi": 0,
+      "denied": 0,
       "withdrawn": 0
     },
-    {
-      "date": "2026-05-05",
-      "total": 818,
-      "certified": 704,
-      "rfi": 53,
-      "denied": 61,
-      "withdrawn": 0
-    },
-    {
-      "date": "2026-05-06",
-      "total": 491,
-      "certified": 455,
-      "rfi": 11,
-      "denied": 24,
-      "withdrawn": 1
-    }
-  ],
-  "rateWeeks": [
     {
       "weekStart": "2026-02-16",
       "total": 0,
@@ -1284,57 +974,128 @@ window.DASHBOARD_DATA = {
     },
     {
       "weekStart": "2026-04-20",
-      "total": 3479,
-      "certified": 3199,
-      "rfi": 79,
-      "denied": 173,
-      "withdrawn": 28
-    },
-    {
-      "weekStart": "2026-04-27",
-      "total": 3231,
-      "certified": 2913,
-      "rfi": 129,
-      "denied": 173,
-      "withdrawn": 16
-    },
-    {
-      "weekStart": "2026-05-04",
-      "total": 1937,
-      "certified": 1743,
-      "rfi": 85,
-      "denied": 108,
-      "withdrawn": 1,
+      "total": 2346,
+      "certified": 2152,
+      "rfi": 50,
+      "denied": 116,
+      "withdrawn": 28,
       "partial": true
     }
   ],
   "statusDistribution": [
     {
       "tabKey": "active",
-      "tabLabel": "Jan",
-      "subtitle": "January 2025 filings \u00b7 6,698 total",
-      "certified": 4756,
-      "review": 1235,
-      "withdrawn": 372,
-      "rfi": 131,
-      "denied": 204
+      "tabLabel": "Dec",
+      "subtitle": "December 2024 filings \u00b7 10,509 total",
+      "certified": 8323,
+      "review": 982,
+      "withdrawn": 524,
+      "rfi": 252,
+      "denied": 428
     },
     {
       "tabKey": "next",
-      "tabLabel": "Feb",
-      "subtitle": "February 2025 filings \u00b7 6,926 total",
-      "certified": 1105,
-      "review": 5463,
-      "withdrawn": 325,
-      "rfi": 18,
-      "denied": 15
+      "tabLabel": "Jan",
+      "subtitle": "January 2025 filings \u00b7 6,698 total",
+      "certified": 755,
+      "review": 5571,
+      "withdrawn": 369,
+      "rfi": 1,
+      "denied": 2
     }
   ],
   "employers": [
     {
       "tabKey": "active",
+      "tabLabel": "Dec '24",
+      "subtitle": "December 2024 \u00b7 REAL DATA",
+      "list": [
+        {
+          "name": "Microsoft Corporation",
+          "count": 176
+        },
+        {
+          "name": "Skilled In Management Co LLC",
+          "count": 139
+        },
+        {
+          "name": "THE BOSTON CONSULTING GROUP, INC. ",
+          "count": 117
+        },
+        {
+          "name": "Stoughton Trailers, LLC",
+          "count": 112
+        },
+        {
+          "name": "FMR LLC",
+          "count": 92
+        },
+        {
+          "name": "JPMORGAN CHASE & CO.",
+          "count": 86
+        },
+        {
+          "name": "Deloitte Consulting LLP",
+          "count": 79
+        },
+        {
+          "name": "ByteDance Inc.",
+          "count": 78
+        },
+        {
+          "name": "Government Employees Insurance Company (GEICO)",
+          "count": 66
+        },
+        {
+          "name": "Ernst & Young U.S. LLP",
+          "count": 64
+        },
+        {
+          "name": "Wayfair LLC",
+          "count": 59
+        },
+        {
+          "name": "Robison Venture Group, LLC",
+          "count": 55
+        },
+        {
+          "name": "TW Services, Inc",
+          "count": 52
+        },
+        {
+          "name": "Salesforce, Inc.",
+          "count": 51
+        },
+        {
+          "name": "PECO FOODS, INC",
+          "count": 51
+        },
+        {
+          "name": "Fogo de Chao Holdings Inc",
+          "count": 47
+        },
+        {
+          "name": "Delight VA Beach Management, LLC",
+          "count": 46
+        },
+        {
+          "name": "COMPUNNEL SOFTWARE GROUP INC.",
+          "count": 46
+        },
+        {
+          "name": "SPACE COAST SERVICES MANAGEMENT, INC.",
+          "count": 44
+        },
+        {
+          "name": "T-Mobile USA, Inc.",
+          "count": 42
+        }
+      ]
+    },
+    {
+      "tabKey": "next",
       "tabLabel": "Jan '25",
-      "subtitle": "January 2025",
+      "subtitle": "January 2025 \u00b7 REAL DATA",
       "list": [
         {
           "name": "Management Health Systems, LLC",
@@ -1415,93 +1176,6 @@ window.DASHBOARD_DATA = {
         {
           "name": "Labor Guys, LLC",
           "count": 27
-        }
-      ]
-    },
-    {
-      "tabKey": "next",
-      "tabLabel": "Feb '25",
-      "subtitle": "February 2025",
-      "list": [
-        {
-          "name": "Management Health Systems, LLC",
-          "count": 137
-        },
-        {
-          "name": "Abbyland Foods, Inc",
-          "count": 108
-        },
-        {
-          "name": "JCG Foods of Georgia, LLC",
-          "count": 97
-        },
-        {
-          "name": "Stoughton Trailers, LLC",
-          "count": 84
-        },
-        {
-          "name": "Microsoft Corporation",
-          "count": 70
-        },
-        {
-          "name": "WAL-MART ASSOCIATES, INC.",
-          "count": 69
-        },
-        {
-          "name": " Koch Foods of Gadsden, LLC",
-          "count": 65
-        },
-        {
-          "name": "NATURE'S WAY FARMS, LLC",
-          "count": 62
-        },
-        {
-          "name": "North Cape Post Acute Nursing and Rehabilitation, Inc.",
-          "count": 59
-        },
-        {
-          "name": "JPMORGAN CHASE & CO.",
-          "count": 58
-        },
-        {
-          "name": "Deloitte Consulting LLP",
-          "count": 53
-        },
-        {
-          "name": "Tesla, Inc.",
-          "count": 50
-        },
-        {
-          "name": "Dallas Independent School District",
-          "count": 45
-        },
-        {
-          "name": "Case Farms Processing, Inc",
-          "count": 39
-        },
-        {
-          "name": "ByteDance Inc.",
-          "count": 39
-        },
-        {
-          "name": "NEW CANEY INC",
-          "count": 37
-        },
-        {
-          "name": "Expedia, Inc. ",
-          "count": 36
-        },
-        {
-          "name": "Cummins Inc.",
-          "count": 35
-        },
-        {
-          "name": "Salesforce, Inc.",
-          "count": 34
-        },
-        {
-          "name": "MCKINSEY & COMPANY, INC. UNITED STATES",
-          "count": 34
         }
       ]
     }
@@ -1634,10 +1308,10 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
           <div class="tt-row"><span class="tt-label">Net change</span><span class="tt-val" style="color:${ntThis.color};">${ntThis.str}</span></div>
         </span></span>
       </div>
-      <div class="stat-value" style="color:var(--text-primary);">${n(backlog.total)}</div>
+      <div class="stat-value" style="color:#f0f0f8;">${n(backlog.total)}</div>
       <div class="stat-trend trend-neutral">Backlog at start of month: ${n(backlog.startOfMonth)}</div>
       <div class="stat-details">
-        <div class="stat-detail-row"><span class="stat-detail-label" style="color:var(--text-secondary);font-weight:500;">Last month (${backlog.lastMonth.name})</span></div>
+        <div class="stat-detail-row"><span class="stat-detail-label" style="color:#94a3b8;font-weight:500;">Last month (${backlog.lastMonth.name})</span></div>
         <div class="stat-detail-row"><span class="stat-detail-label">Processed</span><span class="stat-detail-value">${n(backlog.lastMonth.processed)}</span></div>
         <div class="stat-detail-row"><span class="stat-detail-label">New intake</span><span class="stat-detail-value">+${n(backlog.lastMonth.intake)}</span></div>
         <div class="stat-detail-row"><span class="stat-detail-label">Net change</span><span class="stat-detail-value" style="color:${ntLast.color};">${ntLast.str}</span></div>
@@ -1698,13 +1372,7 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
 // ═══════════════════════════════════════════════════════
 (function renderCombo() {
   const el = document.getElementById('combo-chart');
-  // Show only 2 most recent completed months + active + pending
-  const allMonths = D.timeline;
-  const activeIdx = allMonths.findIndex(m => m.status === 'active');
-  const doneMonths = allMonths.filter(m => m.status === 'done');
-  const keep2Done = doneMonths.slice(-2);
-  const cutoff = keep2Done.length ? allMonths.indexOf(keep2Done[0]) : 0;
-  const months = allMonths.slice(cutoff);
+  const months = D.timeline;
   const maxT = Math.max(...months.map(m => m.total));
   const maxH = 140, n2 = months.length;
   const ai = months.findIndex(m => m.status === 'active');
@@ -1915,12 +1583,10 @@ setupTabs('rate-tabs', t => renderRate(t.dataset.range));
 // STATUS DISTRIBUTION (donut)
 // ═══════════════════════════════════════════════════════
 // Build tabs dynamically from D.statusDistribution
-// Default to the currently-processing month (tabKey "next") instead of first tab
-const statusDefaultIdx = Math.max(0, D.statusDistribution.findIndex(s => s.tabKey === 'next'));
 (function() {
   const tabsEl = document.getElementById('status-tabs');
   tabsEl.innerHTML = D.statusDistribution.map((s,i) =>
-    '<button class="card-tab'+(i===statusDefaultIdx?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
+    '<button class="card-tab'+(i===0?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
   ).join('');
 })();
 
@@ -1942,7 +1608,7 @@ function renderDonut(idx) {
   const pctEl   = document.getElementById('donut-pct');
   const subtitle = s.tabKey === '1y' ? 'Last 12 months: '+last12MonthsRange(D.updatedAt) : s.subtitle;
   document.getElementById('status-subtitle').textContent = subtitle;
-  totalEl.textContent = totalStr; totalEl.style.color = 'var(--text-primary)';
+  totalEl.textContent = totalStr; totalEl.style.color = '#f0f0f8';
   subEl.textContent = 'Total Cases'; pctEl.style.display = 'none';
 
   const svg = document.getElementById('donut-svg');
@@ -1969,22 +1635,21 @@ function renderDonut(idx) {
     });
     seg.addEventListener('mouseleave', () => {
       svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = '1'; });
-      totalEl.textContent = totalStr; totalEl.style.color = 'var(--text-primary)';
+      totalEl.textContent = totalStr; totalEl.style.color = '#f0f0f8';
       subEl.textContent = 'Total Cases'; pctEl.style.display = 'none';
     });
   });
 }
-renderDonut(statusDefaultIdx);
+renderDonut(0);
 setupTabs('status-tabs', t => renderDonut(parseInt(t.dataset.si)));
 
 // ═══════════════════════════════════════════════════════
 // TOP EMPLOYERS
 // ═══════════════════════════════════════════════════════
-const employerDefaultIdx = Math.max(0, D.employers.findIndex(e => e.tabKey === 'next'));
 (function() {
   const tabsEl = document.getElementById('employer-tabs');
   tabsEl.innerHTML = D.employers.map((e,i) =>
-    '<button class="card-tab'+(i===employerDefaultIdx?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
+    '<button class="card-tab'+(i===0?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
   ).join('');
 })();
 
@@ -2003,16 +1668,16 @@ function renderEmployers(idx) {
     '</div>'
   ).join('');
 }
-renderEmployers(employerDefaultIdx);
+renderEmployers(0);
 setupTabs('employer-tabs', t => renderEmployers(parseInt(t.dataset.ei)));
 
 // ═══════════════════════════════════════════════════════
 // ESTIMATE TAB
 // ═══════════════════════════════════════════════════════
 const API_BASE = 'https://api.immilane.com';
+const API_VERSION = '2';
 
 (function initEstimate() {
-  // Sub-tabs
   const tabCase = document.getElementById('est-tab-case');
   const tabDate = document.getElementById('est-tab-date');
   const formCase = document.getElementById('est-form-case');
@@ -2022,16 +1687,15 @@ const API_BASE = 'https://api.immilane.com';
     tabCase.classList.add('active'); tabDate.classList.remove('active');
     formCase.style.display = ''; formDate.style.display = 'none';
     clearEstResult();
-    if (typeof gtag === 'function') gtag('event', 'estimate_tab_switch', { method: 'case_number' });
+    gtag('event', 'estimate_tab_switch', { method: 'case_number' });
   });
   tabDate.addEventListener('click', () => {
     tabDate.classList.add('active'); tabCase.classList.remove('active');
     formDate.style.display = ''; formCase.style.display = 'none';
     clearEstResult();
-    if (typeof gtag === 'function') gtag('event', 'estimate_tab_switch', { method: 'filing_date' });
+    gtag('event', 'estimate_tab_switch', { method: 'filing_date' });
   });
 
-  // Set max date on date input
   document.getElementById('est-date-input').max = new Date().toISOString().split('T')[0];
 
   const errorEl  = document.getElementById('est-error');
@@ -2090,8 +1754,16 @@ const API_BASE = 'https://api.immilane.com';
       html += '<div class="est-case-row"><span class="est-case-label">Status</span><span class="est-case-status" style="background:' + sc.bg + ';color:' + sc.color + ';">' + esc(data.current_status) + '</span></div>';
       html += '</div>';
 
-      if (data.current_status !== 'ANALYST REVIEW') {
+      var terminalStatuses = ['CERTIFIED', 'DENIED', 'WITHDRAWN'];
+      var statusUpper = (data.current_status || '').toUpperCase();
+      if (terminalStatuses.indexOf(statusUpper) !== -1) {
         html += '<div style="text-align:center;padding:20px 0;color:#94a3b8;font-size:14px;">This case has already been processed — no estimate needed.</div>';
+        resultEl.innerHTML = html;
+        resultEl.style.display = '';
+        return;
+      }
+      if (!data.estimate) {
+        html += '<div style="text-align:center;padding:20px 0;color:#94a3b8;font-size:14px;">No estimate available for this case at the moment.</div>';
         resultEl.innerHTML = html;
         resultEl.style.display = '';
         return;
@@ -2120,31 +1792,39 @@ const API_BASE = 'https://api.immilane.com';
       return;
     }
 
-    // Hero date
     html += '<div class="est-result-hero">';
     html += '<div class="est-result-label">Estimated Completion</div>';
     html += '<div class="est-result-date">' + fmtEstDate(est.estimated_date) + '</div>';
-    html += '<div class="est-result-days">~' + n(est.days_remaining) + ' days remaining</div>';
+    var daysUnit = est.days_remaining_unit === 'calendar' ? 'calendar days' : 'days';
+    html += '<div class="est-result-days">~' + n(est.days_remaining) + ' ' + daysUnit + ' remaining';
+    if (est.business_days_remaining != null) {
+      html += ' <span style="color:#94a3b8;font-weight:500;">(~' + n(est.business_days_remaining) + ' business days)</span>';
+    }
+    html += '</div>';
     html += '</div>';
 
-    // Confidence range
-    var totalRange = est.days_remaining * 0.3;
-    var lowDays = Math.round(est.days_remaining * 0.85);
-    var highDays = Math.round(est.days_remaining * 1.15);
-    var midPct = totalRange > 0 ? Math.round((est.days_remaining - lowDays) / (highDays - lowDays) * 100) : 50;
+    var lowISO = est.confidence_low, highISO = est.confidence_high, midISO = est.estimated_date;
+    var midPct = 50;
+    if (lowISO && highISO && midISO) {
+      var lo = Date.parse(lowISO + 'T12:00:00Z');
+      var hi = Date.parse(highISO + 'T12:00:00Z');
+      var mi = Date.parse(midISO  + 'T12:00:00Z');
+      if (hi > lo) midPct = Math.max(0, Math.min(100, Math.round((mi - lo) / (hi - lo) * 100)));
+    }
 
     html += '<div class="est-confidence">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
     html += '<span style="font-size:12px;color:#64748b;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Confidence Range</span>';
     html += '</div>';
     html += '<div class="est-conf-bar-track"><div class="est-conf-bar-fill" style="width:' + midPct + '%;"></div></div>';
-    html += '<div class="est-conf-labels"><span>' + fmtShortDate(est.confidence_low) + '</span><span style="color:#94a3b8;font-weight:600;">' + fmtShortDate(est.estimated_date) + '</span><span>' + fmtShortDate(est.confidence_high) + '</span></div>';
+    html += '<div class="est-conf-labels"><span>' + fmtShortDate(lowISO) + '</span><span style="color:#94a3b8;font-weight:600;">' + fmtShortDate(midISO) + '</span><span>' + fmtShortDate(highISO) + '</span></div>';
     html += '</div>';
 
-    // Stats grid
     html += '<div class="est-stats">';
     html += '<div class="est-stat"><div class="est-stat-label">Filing Month</div><div class="est-stat-value">' + esc(est.filing_month) + '</div></div>';
-    html += '<div class="est-stat"><div class="est-stat-label">DOL Position</div><div class="est-stat-value warning">' + esc(est.dol_current) + '</div></div>';
+    var dolPosLabel = esc(est.dol_current);
+    if (est.dol_letter) dolPosLabel += ' <span style="color:#94a3b8;font-weight:600;">(letter ' + esc(est.dol_letter) + ')</span>';
+    html += '<div class="est-stat"><div class="est-stat-label">DOL Position</div><div class="est-stat-value warning">' + dolPosLabel + '</div></div>';
     html += '<div class="est-stat"><div class="est-stat-label">Months Ahead</div><div class="est-stat-value accent">' + est.months_ahead + '</div></div>';
     html += '<div class="est-stat"><div class="est-stat-label">Cases in Queue</div><div class="est-stat-value">' + n(est.cases_ahead) + '</div></div>';
     html += '<div class="est-stat"><div class="est-stat-label">Processing Speed</div><div class="est-stat-value success">' + n(est.processing_speed_per_week) + '/wk</div></div>';
@@ -2155,18 +1835,14 @@ const API_BASE = 'https://api.immilane.com';
     resultEl.style.display = '';
   }
 
-  async function fetchEstimate(url, btn, isLookup, queryVal) {
+  async function fetchEstimate(url, btn, isLookup) {
     setLoading(btn, true);
     clearEstResult();
     try {
       const resp = await fetch(url);
       const data = await resp.json();
       if (!resp.ok) { showEstError(data.error || 'Request failed'); return; }
-      if (typeof gtag === 'function') {
-        const props = { method: isLookup ? 'case_number' : 'filing_date' };
-        if (isLookup) props.case_number = queryVal; else props.filing_date = queryVal;
-        gtag('event', 'estimate_result', props);
-      }
+      gtag('event', 'estimate_result', { method: isLookup ? 'case_number' : 'filing_date' });
       renderEstResult(data, isLookup);
     } catch (err) {
       showEstError('Unable to reach the estimate API. Please try again later.');
@@ -2175,7 +1851,6 @@ const API_BASE = 'https://api.immilane.com';
     }
   }
 
-  // Case lookup
   const btnCase = document.getElementById('est-btn-case');
   const inputCase = document.getElementById('est-case-input');
   btnCase.addEventListener('click', () => {
@@ -2184,614 +1859,30 @@ const API_BASE = 'https://api.immilane.com';
       showEstError('Invalid case number format. Expected: G-100-XXXXX-XXXXXX');
       return;
     }
-    if (typeof gtag === 'function') gtag('event', 'estimate_submit', { method: 'case_number', case_number: val });
-    fetchEstimate(API_BASE + '/api/lookup?case=' + encodeURIComponent(val), btnCase, true, val);
+    gtag('event', 'estimate_submit', { method: 'case_number' });
+    fetchEstimate(API_BASE + '/api/lookup?case=' + encodeURIComponent(val) + '&v=' + API_VERSION, btnCase, true);
   });
   inputCase.addEventListener('keydown', e => { if (e.key === 'Enter') btnCase.click(); });
 
-  // Date estimate
   const btnDate = document.getElementById('est-btn-date');
   const inputDate = document.getElementById('est-date-input');
   btnDate.addEventListener('click', () => {
     const val = inputDate.value;
     if (!val) { showEstError('Please select a filing date.'); return; }
-    if (typeof gtag === 'function') gtag('event', 'estimate_submit', { method: 'filing_date', filing_date: val });
-    fetchEstimate(API_BASE + '/api/estimate?date=' + encodeURIComponent(val), btnDate, false, val);
+    gtag('event', 'estimate_submit', { method: 'filing_date' });
+    fetchEstimate(API_BASE + '/api/estimate?date=' + encodeURIComponent(val) + '&v=' + API_VERSION, btnDate, false);
   });
   inputDate.addEventListener('keydown', e => { if (e.key === 'Enter') btnDate.click(); });
 
 })();
 </script>
 
-<!-- Feedback Widget -->
-<button class="fb-trigger" id="fb-trigger" aria-label="Send feedback">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  Feedback
-</button>
-<div class="fb-backdrop" id="fb-backdrop"></div>
-<div class="fb-modal" id="fb-modal" role="dialog" aria-modal="true">
-  <button class="fb-close" id="fb-close" aria-label="Close feedback">&times;</button>
-  <div id="fb-form-view">
-    <div class="fb-modal-title">Send Feedback</div>
-    <div class="fb-modal-sub">We value your feedback and will work on every suggestion to improve how we serve you.</div>
-    <div class="fb-error" id="fb-error"></div>
-    <div class="fb-field">
-      <label class="fb-label" for="fb-type">Category</label>
-      <select class="fb-select" id="fb-type">
-        <option value="">Select a category...</option>
-        <option value="feature_request">New Feature Request</option>
-        <option value="bug_report">Bug Report</option>
-        <option value="incorrect_data">Incorrect Data</option>
-        <option value="general">General Feedback</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-    <div class="fb-field">
-      <label class="fb-label" for="fb-message">Your feedback</label>
-      <textarea class="fb-textarea" id="fb-message" placeholder="Tell us what's on your mind..." maxlength="2000"></textarea>
-    </div>
-    <div class="fb-field">
-      <label class="fb-label" for="fb-email">Email <span style="font-weight:400;color:var(--text-dim)">(optional)</span></label>
-      <input class="fb-input" id="fb-email" type="email" placeholder="you@example.com">
-      <div class="fb-hint">Only needed if you'd like us to follow up.</div>
-    </div>
-    <button class="fb-submit" id="fb-submit">Submit Feedback</button>
-  </div>
-  <div id="fb-success-view" class="fb-success" style="display:none">
-    <div class="fb-success-icon">&#10003;</div>
-    <div class="fb-success-msg">Thank you!</div>
-    <div class="fb-success-sub">Your feedback has been received.</div>
-  </div>
-</div>
-
 <footer>
   Data sourced from <a href="https://flag.dol.gov/programs/lca" target="_blank" rel="noopener">FLAG.DOL.GOV</a> &middot; Updated daily &middot; &copy; 2026 ImmiLane
 </footer>
-
-<script>
-// ═══════════════════════════════════════════════════════
-// THEME TOGGLE
-// ═══════════════════════════════════════════════════════
-document.getElementById('theme-toggle').addEventListener('click', function() {
-  document.documentElement.classList.toggle('light');
-  localStorage.setItem('theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
-});
-</script>
-
-<script>
-(function() {
-  var h = window.location.hostname;
-  var API = h === 'localhost' || h === '127.0.0.1' ? 'http://127.0.0.1:8787'
-    : h === 'immilane.com' || h === 'www.immilane.com' ? 'https://immilane-api.younusahamad.workers.dev'
-    : 'https://immilane-api-staging.younusahamad.workers.dev';
-
-  var trigger = document.getElementById('fb-trigger');
-  var backdrop = document.getElementById('fb-backdrop');
-  var modal = document.getElementById('fb-modal');
-  var closeBtn = document.getElementById('fb-close');
-  var submitBtn = document.getElementById('fb-submit');
-  var formView = document.getElementById('fb-form-view');
-  var successView = document.getElementById('fb-success-view');
-  var errorEl = document.getElementById('fb-error');
-
-  function open() { backdrop.classList.add('open'); modal.classList.add('open'); }
-  function close() { backdrop.classList.remove('open'); modal.classList.remove('open'); }
-  function reset() {
-    formView.style.display = '';
-    successView.style.display = 'none';
-    errorEl.style.display = 'none';
-    document.getElementById('fb-type').value = '';
-    document.getElementById('fb-message').value = '';
-    document.getElementById('fb-email').value = '';
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Submit Feedback';
-  }
-
-  trigger.addEventListener('click', function() { reset(); open(); });
-  backdrop.addEventListener('click', close);
-  closeBtn.addEventListener('click', close);
-
-  submitBtn.addEventListener('click', function() {
-    errorEl.style.display = 'none';
-    var type = document.getElementById('fb-type').value;
-    var message = document.getElementById('fb-message').value.trim();
-    var email = document.getElementById('fb-email').value.trim();
-
-    if (!type) { showErr('Please select a category.'); return; }
-    if (!message) { showErr('Please enter your feedback.'); return; }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Please enter a valid email.'); return; }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting...';
-
-    fetch(API + '/api/feedback', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: type, message: message, email: email || undefined })
-    })
-    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
-    .then(function(res) {
-      if (!res.ok) { showErr(res.data.error ? res.data.error.message : 'Something went wrong.'); submitBtn.disabled = false; submitBtn.textContent = 'Submit Feedback'; return; }
-      formView.style.display = 'none';
-      successView.style.display = '';
-      setTimeout(close, 2500);
-    })
-    .catch(function() {
-      showErr('Network error. Please try again.');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Feedback';
-    });
-  });
-
-  function showErr(msg) { errorEl.textContent = msg; errorEl.style.display = 'block'; }
-})();
-</script>
-
-<script>
-// ═══════════════════════════════════════════════════════
-// GA ENGAGEMENT TRACKING
-// ═══════════════════════════════════════════════════════
-(function() {
-  if (typeof gtag !== 'function') return;
-  var scrollFired = {};
-  window.addEventListener('scroll', function() {
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    if (max <= 0) return;
-    var pct = Math.round(100 * window.scrollY / max);
-    [25, 50, 75, 90].forEach(function(t) {
-      if (pct >= t && !scrollFired[t]) {
-        scrollFired[t] = true;
-        gtag('event', 'scroll_depth', { percent: t });
-      }
-    });
-  }, { passive: true });
-
-  [10, 30, 60, 180].forEach(function(s) {
-    setTimeout(function() {
-      if (!document.hidden) gtag('event', 'time_on_page', { seconds: s });
-    }, s * 1000);
-  });
-
-  var sections = ['est-form-case', 'combo-chart', 'employer-list', 'stats-grid'];
-  var seen = {};
-  if (window.IntersectionObserver) {
-    var obs = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting && !seen[e.target.id]) {
-          seen[e.target.id] = true;
-          gtag('event', 'section_view', { section: e.target.id });
-        }
-      });
-    }, { threshold: 0.3 });
-    sections.forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-  }
-})();
-</script>
-
-<script>
-// ═══════════════════════════════════════════════════════
-// EMPLOYER SEARCH (nav icon + typeahead + modal overlay)
-// ═══════════════════════════════════════════════════════
-//
-// Backend: Cloudflare Worker (immilane-api). Override the base URL with
-// `window.IMMILANE_API_BASE` before this script runs to point staging at a
-// different worker (e.g. the *-staging deployment).
-const EMPLOYER_API_BASE = (typeof window !== 'undefined' && window.IMMILANE_API_BASE)
-  ? String(window.IMMILANE_API_BASE).replace(/\/+$/, '')
-  : 'https://immilane-api.younusahamad.workers.dev';
-const EMPLOYER_API_DEBOUNCE_MS = 200;
-const EMPLOYER_API_LIMIT = 8;
-
-function employerSlug(name) {
-  if (!name) return '';
-  return String(name)
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 200);
-}
-
-(function initEmployerSearch() {
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const STATUS_COLORS = {
-    'CERTIFIED':              '#22c55e',
-    'ANALYST REVIEW':         '#f59e0b',
-    'DENIED':                 '#ef4444',
-    'WITHDRAWN':              '#6b7280',
-    'RFI ISSUED':             '#f97316',
-    'AUDIT REVIEW':           '#dc2626',
-    'PENDING AUDIT RESPONSE': '#b91c1c',
-    'CERTIFIED - EXPIRED':    '#15803d',
-    'SUPERVISED RECRUITMENT': '#7c3aed'
-  };
-  const DEFAULT_COLOR = '#475569';
-  const PENDING_STATUSES = new Set([
-    'ANALYST REVIEW','AUDIT REVIEW','PENDING AUDIT RESPONSE','RFI ISSUED','SUPERVISED RECRUITMENT'
-  ]);
-
-  const navSearch     = document.getElementById('nav-search');
-  const searchInput   = document.getElementById('nav-search-input');
-  const clearBtn      = document.getElementById('nav-search-clear');
-  const dropdown      = document.getElementById('nav-search-dropdown');
-  const modal         = document.getElementById('emp-modal');
-  const modalBackdrop = document.getElementById('emp-modal-backdrop');
-  const modalBody     = document.getElementById('emp-modal-body');
-
-  if (!navSearch || !searchInput || !dropdown || !modal || !modalBackdrop || !modalBody) return;
-
-  function toggleClearBtn() {
-    if (clearBtn) clearBtn.classList.toggle('visible', searchInput.value.length > 0);
-  }
-  if (clearBtn) {
-    clearBtn.addEventListener('click', function() {
-      searchInput.value = '';
-      toggleClearBtn();
-      closeDropdown();
-      searchInput.focus();
-    });
-  }
-
-  let globalLastFiling = null;
-  let activeIdx     = -1;
-  let lastMatches   = [];
-  let debounceTimer = null;
-  let searchSeq     = 0;
-  const detailCache = new Map(); // slug -> employer detail object
-  let metaPromise   = null;
-
-  function loadMeta() {
-    if (metaPromise) return metaPromise;
-    metaPromise = fetch(EMPLOYER_API_BASE + '/api/meta')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(m => {
-        if (m && m.lastFiling) globalLastFiling = m.lastFiling;
-        return m;
-      })
-      .catch(() => null);
-    return metaPromise;
-  }
-  loadMeta();
-
-  function loadEmployer(name) {
-    const slug = employerSlug(name);
-    if (!slug) return Promise.reject(new Error('invalid employer name'));
-    if (detailCache.has(slug)) return Promise.resolve(detailCache.get(slug));
-    return fetch(EMPLOYER_API_BASE + '/api/employers/' + encodeURIComponent(slug))
-      .then(r => {
-        if (!r.ok) throw new Error('employer fetch failed: ' + r.status);
-        return r.json();
-      })
-      .then(emp => {
-        detailCache.set(slug, emp);
-        return emp;
-      });
-  }
-
-  function titleCase(s) {
-    return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()).replace(/Rfi/g, 'RFI');
-  }
-
-  function closeDropdown() {
-    dropdown.classList.remove('open');
-    dropdown.innerHTML = '';
-    activeIdx = -1;
-    lastMatches = [];
-  }
-
-  document.addEventListener('click', (e) => {
-    if (!navSearch.contains(e.target) && !dropdown.contains(e.target)) {
-      closeDropdown();
-    }
-  });
-
-  searchInput.addEventListener('input', () => {
-    toggleClearBtn();
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runSearch, 200);
-  });
-
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeDropdown();
-      searchInput.blur();
-      return;
-    }
-    if (!lastMatches.length) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      activeIdx = Math.min(activeIdx + 1, lastMatches.length - 1);
-      updateActive();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      activeIdx = Math.max(activeIdx - 1, 0);
-      updateActive();
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      const pick = activeIdx >= 0 ? lastMatches[activeIdx] : lastMatches[0];
-      if (pick) selectEmployer(pick.n);
-    }
-  });
-
-  function updateActive() {
-    const items = dropdown.querySelectorAll('.nav-search-item');
-    items.forEach((el, i) => {
-      el.classList.toggle('active', i === activeIdx);
-      if (i === activeIdx) el.scrollIntoView({ block: 'nearest' });
-    });
-  }
-
-  function runSearch() {
-    const q = searchInput.value.trim();
-    if (!q) {
-      closeDropdown();
-      return;
-    }
-    const seq = ++searchSeq;
-    dropdown.innerHTML = '<div class="nav-search-empty">Searching…</div>';
-    dropdown.classList.add('open');
-    const url = EMPLOYER_API_BASE + '/api/employers'
-      + '?q=' + encodeURIComponent(q)
-      + '&limit=' + EMPLOYER_API_LIMIT;
-    fetch(url)
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(payload => {
-        // Drop stale responses if the user kept typing.
-        if (seq !== searchSeq) return;
-        const results = (payload && Array.isArray(payload.results)) ? payload.results : [];
-        // Map API shape {name,total} to the {n,t} shape the renderer expects.
-        lastMatches = results.map(r => ({ n: r.name, t: r.total }));
-        activeIdx = lastMatches.length > 0 ? 0 : -1;
-        renderDropdown();
-        if (typeof gtag === 'function') {
-          try { gtag('event', 'employer_search', { search_term: q, results_count: results.length }); } catch(e){}
-        }
-      })
-      .catch(() => {
-        if (seq !== searchSeq) return;
-        lastMatches = [];
-        activeIdx = -1;
-        dropdown.innerHTML = '<div class="nav-search-empty">Search unavailable. Try again.</div>';
-        dropdown.classList.add('open');
-      });
-  }
-
-  function renderDropdown() {
-    if (!lastMatches.length) {
-      dropdown.innerHTML = '<div class="nav-search-empty">No employers found.</div>';
-    } else {
-      dropdown.innerHTML = lastMatches.map((m, i) =>
-        '<div class="nav-search-item' + (i === activeIdx ? ' active' : '') + '" data-idx="' + i + '">' +
-          '<span class="nav-search-item-name">' + esc(m.n) + '</span>' +
-          '<span class="nav-search-item-count">' + n(m.t) + '</span>' +
-        '</div>'
-      ).join('');
-      dropdown.querySelectorAll('.nav-search-item').forEach((el) => {
-        el.addEventListener('mousedown', (ev) => { ev.preventDefault(); });
-        el.addEventListener('click', () => {
-          const idx = parseInt(el.dataset.idx, 10);
-          if (!isNaN(idx) && lastMatches[idx]) selectEmployer(lastMatches[idx].n);
-        });
-      });
-    }
-    dropdown.classList.add('open');
-  }
-
-  function selectEmployer(name) {
-    searchInput.value = name.trim();
-    closeDropdown();
-    searchInput.blur();
-    openModal(name);
-    if (typeof gtag === 'function') {
-      try { gtag('event', 'employer_selected', { employer_name: name }); } catch (e) {}
-    }
-  }
-
-  function openModal(name) {
-    modalBackdrop.classList.add('open');
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    modalBody.innerHTML = '<div class="emp-loading"><div class="emp-loading-spinner"></div>Loading employer data…</div>';
-
-    // Make sure globalLastFiling is populated before we render the modal.
-    Promise.all([loadEmployer(name), loadMeta()])
-      .then(([emp]) => {
-        if (!emp) {
-          modalBody.innerHTML = '<div class="emp-error">Employer data not found.</div>';
-          return;
-        }
-        renderEmployerModal(emp);
-      })
-      .catch((err) => {
-        if (err && (err.message || '').includes('404')) {
-          modalBody.innerHTML = '<div class="emp-error">Employer data not found.</div>';
-        } else {
-          modalBody.innerHTML = '<div class="emp-error">Failed to load employer data. Please try again.</div>';
-        }
-      });
-  }
-
-  function closeModal() {
-    modalBackdrop.classList.remove('open');
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  modalBackdrop.addEventListener('click', closeModal);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
-  });
-
-  function renderEmployerModal(emp) {
-    const statuses = emp.statuses || {};
-    const total = emp.total || Object.values(statuses).reduce((s,v) => s+v, 0);
-
-    // Filing period from employer data
-    const fmtDate = (d) => { if(!d) return ''; const p=d.split('-'); return MONTHS[parseInt(p[1],10)-1]+' '+p[0]; };
-    const firstStr = fmtDate(emp.firstFiling);
-    const lastStr = fmtDate(globalLastFiling || emp.lastFiling);
-    const filingPeriod = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
-
-    // Pending count
-    let pendingCount = 0;
-    Object.entries(statuses).forEach(([k, v]) => {
-      if (PENDING_STATUSES.has(k)) pendingCount += v;
-    });
-
-    // Resolved cases
-    const certCount = statuses['CERTIFIED'] || 0;
-    const deniedCount = statuses['DENIED'] || 0;
-    const withdrawnCount = statuses['WITHDRAWN'] || 0;
-    const adjudicated = certCount + deniedCount;
-    const resolved = adjudicated + withdrawnCount;
-
-    let certRateDisplay, certClass;
-    if (adjudicated > 0) {
-      const cr = certCount / adjudicated * 100;
-      certRateDisplay = cr.toFixed(1) + '%';
-      certClass = cr > 80 ? 'cr-good' : cr >= 60 ? 'cr-med' : 'cr-bad';
-    } else {
-      certRateDisplay = '—';
-      certClass = 'cr-na';
-    }
-
-    // Certification breakdown rows
-    const crRows = [];
-    if (certCount) crRows.push({label:'Certified', val:certCount, color:'#22c55e'});
-    if (deniedCount) crRows.push({label:'Denied', val:deniedCount, color:'#ef4444'});
-    if (withdrawnCount) crRows.push({label:'Withdrawn', val:withdrawnCount, color:'#6b7280'});
-    const crBreakdownHtml = crRows.map(r =>
-      '<div class="stat-detail-row">' +
-        '<span class="stat-detail-label" style="color:'+r.color+'">' + r.label + '</span>' +
-        '<span class="stat-detail-value">' + n(r.val) + '</span>' +
-      '</div>'
-    ).join('');
-
-    // Donut items
-    const donutItems = Object.entries(statuses)
-      .map(([k, v]) => ({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR }))
-      .sort((a, b) => b.value - a.value);
-    const donutTotal = donutItems.reduce((s, i) => s + i.value, 0);
-    donutItems.forEach(i => { i.pct = donutTotal ? +(i.value / donutTotal * 100).toFixed(1) : 0; });
-
-    // Donut SVG
-    const r = 70, circ = 2 * Math.PI * r;
-    let off = 0, segs = '';
-    donutItems.forEach((item, i) => {
-      const len = item.pct / 100 * circ;
-      segs += '<circle class="donut-seg" data-i="' + i + '" cx="90" cy="90" r="' + r +
-              '" fill="none" stroke="' + item.color + '" stroke-width="30" stroke-dasharray="' +
-              len + ' ' + (circ - len) + '" stroke-dashoffset="' + (-off) + '" />';
-      off += len;
-    });
-
-    const legend = donutItems.map(item =>
-      '<div class="legend-item"><div class="legend-dot" style="background:' + item.color +
-      ';"></div>' + esc(item.label) +
-      '<span class="legend-value">' + n(item.value) + ' (' + item.pct + '%)</span></div>'
-    ).join('');
-
-    // Top 10 titles
-    const titles = (emp.topTitles || []).slice(0, 10);
-    const maxTitle = titles.length ? titles[0].count : 1;
-    const titlesHtml = titles.map((t, i) =>
-      '<div class="employer-row">' +
-        '<span class="employer-rank">' + (i + 1) + '</span>' +
-        '<span class="employer-name">' + esc(t.title) + '</span>' +
-        '<span class="employer-count">' + n(t.count) + '</span>' +
-        '<div class="employer-bar"><div class="employer-bar-fill" style="width:' +
-          Math.round(t.count / maxTitle * 100) + '%;"></div></div>' +
-      '</div>'
-    ).join('');
-
-    modalBody.innerHTML =
-      '<div class="emp-modal-header">' +
-        '<h2 class="emp-modal-title" id="emp-modal-title">' + esc(emp.name) + '</h2>' +
-        '<button class="emp-modal-close" id="emp-modal-close-btn" aria-label="Close">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-        '</button>' +
-      '</div>' +
-      '<div class="emp-modal-grid">' +
-        '<div class="emp-modal-cards">' +
-          '<div class="emp-stat-card">' +
-            '<div class="emp-stat-label">Total Filings</div>' +
-            '<div class="emp-stat-value">' + n(total) + '</div>' +
-            '<div class="emp-stat-sub">' + esc(filingPeriod) + '</div>' +
-            '<div class="stat-details">' +
-              '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(pendingCount) + '</span></div>' +
-              '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(resolved) + '</span></div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="emp-stat-card">' +
-            '<div class="emp-stat-label">Certification Rate</div>' +
-            '<div class="emp-stat-value ' + certClass + '">' + certRateDisplay + '</div>' +
-            '<div class="emp-stat-sub">' + (adjudicated > 0 ? n(certCount) + ' certified of ' + n(adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
-            (crRows.length ? '<div class="stat-details">' + crBreakdownHtml + '</div>' : '') +
-            '<div class="emp-stat-disclaimer">Based on filings since ' + esc(firstStr || '—') + '</div>' +
-          '</div>' +
-        '</div>' +
-        (donutTotal > 0 ?
-        '<div class="emp-modal-section" style="margin-bottom:0;">' +
-          '<div class="emp-modal-section-title">Status Distribution <span style="color:#475569;font-weight:400;font-size:11px;">· ' + esc(filingPeriod) + '</span></div>' +
-          '<div class="donut-container">' +
-            '<div class="donut-wrap">' +
-              '<svg class="donut-svg" viewBox="0 0 180 180" id="emp-donut-svg">' + segs + '</svg>' +
-              '<div class="donut-center">' +
-                '<div class="donut-number" id="emp-donut-num">' + n(donutTotal) + '</div>' +
-                '<div class="donut-label" id="emp-donut-lbl">Total Cases</div>' +
-                '<div class="donut-pct" id="emp-donut-pct" style="display:none;"></div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="legend">' + legend + '</div>' +
-          '</div>' +
-        '</div>' : '') +
-      '</div>' +
-      (titles.length ?
-      '<div class="emp-modal-section">' +
-        '<div class="emp-modal-section-title">Top ' + Math.min(titles.length, 10) + ' Job Titles</div>' +
-        titlesHtml +
-      '</div>' : '');
-
-    const closeBtn = document.getElementById('emp-modal-close-btn');
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-    // Donut hover interactions
-    const svg = document.getElementById('emp-donut-svg');
-    if (svg) {
-      const numEl = document.getElementById('emp-donut-num');
-      const lblEl = document.getElementById('emp-donut-lbl');
-      const pctEl = document.getElementById('emp-donut-pct');
-      const origNum = n(donutTotal);
-      svg.querySelectorAll('.donut-seg').forEach(seg => {
-        seg.addEventListener('mouseenter', () => {
-          const item = donutItems[parseInt(seg.dataset.i, 10)];
-          svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = s === seg ? '1' : '0.2'; });
-          numEl.textContent = n(item.value);
-          numEl.style.color = item.color;
-          lblEl.textContent = item.label;
-          pctEl.textContent = item.pct + '%';
-          pctEl.style.color = item.color;
-          pctEl.style.display = '';
-        });
-        seg.addEventListener('mouseleave', () => {
-          svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = '1'; });
-          numEl.textContent = origNum;
-          numEl.style.color = 'var(--text-primary)';
-          lblEl.textContent = 'Total Cases';
-          pctEl.style.display = 'none';
-        });
-      });
-    }
-  }
-})();
-</script>
-
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G8NXS7DNX1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-G8NXS7DNX1');</script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "aa22dbee0e9b4144965de16be0ccbae4"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
