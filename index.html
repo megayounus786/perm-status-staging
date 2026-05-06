@@ -2127,9 +2127,6 @@ const API_VERSION = '2';
     html += '<div class="est-result-label">Estimated Completion</div>';
     html += '<div class="est-result-date">' + fmtEstDate(est.estimated_date) + '</div>';
     html += '<div class="est-result-days">~' + n(est.days_remaining) + ' days remaining';
-    if (est.business_days_remaining != null) {
-      html += ' <span style="color:#94a3b8;font-weight:500;">(~' + n(est.business_days_remaining) + ' business days)</span>';
-    }
     html += '</div>';
     html += '</div>';
 
