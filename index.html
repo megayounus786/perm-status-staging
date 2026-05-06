@@ -1527,7 +1527,7 @@ function renderRate(range) {
   document.getElementById('rate-subtitle').textContent = subtitle;
 
   const chartH = 190;
-  const avgVal = Math.round((() => { const obs = bars.filter(b => b.total > 0); return obs.length ? obs.reduce((s,b) => s+b.total,0) / obs.length : 0; })());
+  const avgVal = Math.round((() => { const nonZero = bars.filter(b => b.total > 0); if (!nonZero.length) return 0; const peak = Math.max(...nonZero.map(b => b.total)); const obs = nonZero.filter(b => b.total >= peak * 0.1); return obs.length ? obs.reduce((s,b) => s+b.total,0) / obs.length : 0; })());
   const avgH   = Math.round(avgVal / niceMax * (chartH-4));
   const avgLabel = range === 'day' ? 'Daily avg: '+n(avgVal) : 'Weekly avg: '+n(avgVal);
   document.getElementById('rate-avg-stat').textContent = avgLabel;
