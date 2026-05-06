@@ -1822,9 +1822,7 @@ const API_VERSION = '2';
 
     html += '<div class="est-stats">';
     html += '<div class="est-stat"><div class="est-stat-label">Filing Month</div><div class="est-stat-value">' + esc(est.filing_month) + '</div></div>';
-    var dolPosLabel = esc(est.dol_current);
-    if (est.dol_letter) dolPosLabel += ' <span style="color:#94a3b8;font-weight:600;">(letter ' + esc(est.dol_letter) + ')</span>';
-    html += '<div class="est-stat"><div class="est-stat-label">DOL Position</div><div class="est-stat-value warning">' + dolPosLabel + '</div></div>';
+    html += '<div class="est-stat"><div class="est-stat-label">DOL Position</div><div class="est-stat-value warning">' + esc(est.dol_current) + '</div></div>';
     html += '<div class="est-stat"><div class="est-stat-label">Months Ahead</div><div class="est-stat-value accent">' + est.months_ahead + '</div></div>';
     html += '<div class="est-stat"><div class="est-stat-label">Cases in Queue</div><div class="est-stat-value">' + n(est.cases_ahead) + '</div></div>';
     html += '<div class="est-stat"><div class="est-stat-label">Processing Speed</div><div class="est-stat-value success">' + n(est.processing_speed_per_week) + '/wk</div></div>';
