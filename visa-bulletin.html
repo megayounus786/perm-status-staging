@@ -20,6 +20,7 @@
 <meta name="twitter:description" content="Current U.S. Department of State Visa Bulletin Employment-Based Final Action Dates and Dates for Filing.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"ImmiLane Visa Bulletin","url":"https://immilane.com/visa-bulletin.html","description":"Employment-Based Visa Bulletin Final Action Dates and Dates for Filing.","provider":{"@type":"Organization","name":"ImmiLane","url":"https://immilane.com"}}</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9676532944307230" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-G8NXS7DNX1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-G8NXS7DNX1');</script>
 <script>if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');</script>
@@ -173,6 +174,85 @@
   .ad-container.ad-loaded.ad-mid { margin: 20px auto; padding: 8px 0; }
   .ad-container.ad-loaded.ad-footer { margin: 24px auto 0; padding: 8px 0; }
   .ad-container ins { display: block; }
+
+  /* ── Jump nav ── */
+  .jump-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 6px; }
+  .jump-nav a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 12px; font-weight: 500; text-decoration: none; transition: color 0.2s, background 0.2s; }
+  .jump-nav a:hover { color: var(--text-primary); background: var(--card-hover); }
+  .section-anchor { scroll-margin-top: 80px; }
+
+  /* ── Form / inputs (matches estimate page) ── */
+  .vb-input-group { margin-bottom: 14px; }
+  .vb-input-group label { display: block; font-size: 11.5px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .vb-input { width: 100%; padding: 11px 14px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-primary); font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
+  .vb-input:focus { border-color: #3b82f6; }
+  select.vb-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+  html.light select.vb-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); }
+  .vb-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .vb-btn { width: 100%; padding: 13px; border: none; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; font-family: inherit; }
+  .vb-btn:hover { opacity: 0.9; }
+  .vb-btn:active { transform: scale(0.98); }
+
+  /* ── Priority Date Tracker results ── */
+  .pd-result { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--sep); }
+  .pd-status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+  .pd-pill-current { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  html.light .pd-pill-current { background: rgba(34,197,94,0.1); color: #15803d; }
+  .pd-pill-filing { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  html.light .pd-pill-filing { background: rgba(245,158,11,0.1); color: #b45309; }
+  .pd-pill-not { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  html.light .pd-pill-not { background: rgba(239,68,68,0.1); color: #b91c1c; }
+  .pd-line { font-size: 13.5px; color: var(--text-secondary); line-height: 1.7; margin-top: 10px; }
+  .pd-line strong { color: var(--text-primary); font-weight: 600; }
+  .pd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .pd-stat { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; }
+  .pd-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .pd-stat-value { font-size: 15px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  /* ── Trend chart controls ── */
+  .vb-chart-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; align-items: center; }
+  .vb-toggle { display: inline-flex; padding: 3px; background: var(--tab-bg); border-radius: 8px; gap: 2px; }
+  .vb-toggle button { padding: 7px 12px; border: none; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; font-family: inherit; transition: background 0.2s, color 0.2s; }
+  .vb-toggle button.active { background: var(--tab-active); color: var(--text-primary); }
+  .vb-chart-wrap { position: relative; height: 360px; width: 100%; }
+
+  /* ── PERM-to-GC Timeline ── */
+  .tl-row { margin-top: 24px; }
+  .tl-step { display: grid; grid-template-columns: 28px 1fr auto; gap: 14px; padding: 12px 0; border-bottom: 1px dashed var(--sep); align-items: center; }
+  .tl-step:last-child { border-bottom: none; }
+  .tl-num { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .tl-step.tl-total .tl-num { background: linear-gradient(135deg, #22c55e, #10b981); }
+  .tl-info { min-width: 0; }
+  .tl-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+  .tl-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
+  .tl-dur { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tl-step.tl-total .tl-dur, .tl-step.tl-total .tl-title { color: #22c55e; }
+  .tl-progress { margin-top: 18px; }
+  .tl-progress-bar { display: flex; height: 14px; border-radius: 8px; overflow: hidden; background: var(--card-bg); border: 1px solid var(--card-border); }
+  .tl-progress-seg { flex-shrink: 0; }
+  .tl-progress-seg:nth-child(1) { background: #3b82f6; }
+  .tl-progress-seg:nth-child(2) { background: #6366f1; }
+  .tl-progress-seg:nth-child(3) { background: #8b5cf6; }
+  .tl-progress-seg:nth-child(4) { background: #a855f7; }
+  .tl-progress-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--text-muted); }
+  .tl-progress-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tl-progress-legend span::before { content: ''; width: 10px; height: 10px; border-radius: 2px; }
+  .tl-progress-legend span:nth-child(1)::before { background: #3b82f6; }
+  .tl-progress-legend span:nth-child(2)::before { background: #6366f1; }
+  .tl-progress-legend span:nth-child(3)::before { background: #8b5cf6; }
+  .tl-progress-legend span:nth-child(4)::before { background: #a855f7; }
+  .tl-disclaimer { font-size: 11.5px; color: var(--text-muted); margin-top: 18px; line-height: 1.6; padding: 10px 12px; background: var(--card-bg); border: 1px solid var(--card-border); border-left: 3px solid #f59e0b; border-radius: 8px; }
+
+  .vb-error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px 16px; color: #fca5a5; font-size: 13px; margin-top: 12px; }
+  html.light .vb-error-msg { color: #b91c1c; }
+
+  @media (max-width: 768px) {
+    .vb-input-row { grid-template-columns: 1fr; }
+    .pd-grid { grid-template-columns: 1fr; }
+    .vb-chart-wrap { height: 300px; }
+    .tl-step { grid-template-columns: 26px 1fr; }
+    .tl-step .tl-dur { grid-column: 2; padding-left: 0; margin-top: 4px; }
+  }
 </style>
 </head>
 <body>
@@ -204,7 +284,15 @@
       <span class="meta-pill"><span class="dot"></span>Bulletin: <strong id="bulletin-month">—</strong></span>
       <span class="meta-pill">Updated: <strong id="last-updated">—</strong></span>
     </div>
+    <nav class="jump-nav" aria-label="On-page sections">
+      <a href="#tracker">🎯 Priority Date Tracker</a>
+      <a href="#trends">📈 Historical Trends</a>
+      <a href="#timeline">🛤️ PERM → Green Card Timeline</a>
+      <a href="#tables">📋 Current Bulletin Tables</a>
+    </nav>
   </div>
+
+  <div id="tables" class="section-anchor"></div>
 
   <div class="info-grid">
     <div class="info-card">
@@ -280,6 +368,137 @@
         <span class="legend-item"><span class="badge-c">C</span> Current — no backlog</span>
         <span class="legend-item"><span class="badge-u">U</span> Unauthorized — no visas this month</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── Priority Date Tracker ─── -->
+  <div id="tracker" class="section-anchor"></div>
+  <div class="table-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-title">🎯 Priority Date Tracker</span>
+          <div class="card-subtitle">Check if your priority date is current and how far behind the cutoff you are</div>
+        </div>
+      </div>
+      <div class="vb-input-row">
+        <div class="vb-input-group">
+          <label for="pd-cat">Employment-Based Category</label>
+          <select id="pd-cat" class="vb-input">
+            <option value="1st">EB-1 — Priority Workers</option>
+            <option value="2nd" selected>EB-2 — Advanced Degrees / Exceptional Ability</option>
+            <option value="3rd">EB-3 — Skilled Workers / Professionals</option>
+            <option value="Other Workers">EB-3 Other Workers</option>
+            <option value="4th">EB-4 — Special Immigrants</option>
+            <option value="5th Unreserved">EB-5 — Unreserved</option>
+          </select>
+        </div>
+        <div class="vb-input-group">
+          <label for="pd-country">Country of Chargeability</label>
+          <select id="pd-country" class="vb-input">
+            <option value="all_other" selected>All Other Countries</option>
+            <option value="china">China (mainland born)</option>
+            <option value="india">India</option>
+            <option value="mexico">Mexico</option>
+            <option value="philippines">Philippines</option>
+          </select>
+        </div>
+      </div>
+      <div class="vb-input-group">
+        <label for="pd-date">Priority Date</label>
+        <input type="date" id="pd-date" class="vb-input" max="">
+      </div>
+      <button class="vb-btn" id="pd-btn">Check Status</button>
+      <div id="pd-error" class="vb-error-msg" style="display:none;"></div>
+      <div id="pd-result" class="pd-result" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ─── Historical Trend Charts ─── -->
+  <div id="trends" class="section-anchor"></div>
+  <div class="table-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-title">📈 Historical Cutoff Date Movement</span>
+          <div class="card-subtitle">How priority date cutoffs have moved over the last 12 months</div>
+        </div>
+      </div>
+      <div class="vb-chart-controls">
+        <div class="vb-toggle" role="tablist" aria-label="Chart type">
+          <button id="trend-tab-fa" class="active" aria-pressed="true">Final Action Dates</button>
+          <button id="trend-tab-df" aria-pressed="false">Dates for Filing</button>
+        </div>
+        <div style="flex:1; min-width:160px;">
+          <select id="trend-cat" class="vb-input" style="padding:7px 32px 7px 12px; font-size:12px;">
+            <option value="1st">EB-1</option>
+            <option value="2nd" selected>EB-2</option>
+            <option value="3rd">EB-3</option>
+            <option value="Other Workers">EB-3 Other Workers</option>
+            <option value="5th Unreserved">EB-5 Unreserved</option>
+          </select>
+        </div>
+      </div>
+      <div class="vb-chart-wrap">
+        <canvas id="trend-chart"></canvas>
+      </div>
+      <div class="legend" style="margin-top: 14px;">
+        <span class="legend-item">Each line tracks one country's cutoff date.</span>
+        <span class="legend-item">"C" (Current) plots at the top.</span>
+        <span class="legend-item">Hover for the exact cutoff.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ad: Mid-content (between trends and timeline) -->
+  <div class="ad-container ad-mid">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9676532944307230" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <!-- ─── PERM → Green Card Timeline ─── -->
+  <div id="timeline" class="section-anchor"></div>
+  <div class="table-section">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-title">🛤️ PERM → Green Card Timeline</span>
+          <div class="card-subtitle">Estimate your full immigration journey from PERM filing to green card</div>
+        </div>
+      </div>
+      <div class="vb-input-group">
+        <label for="tl-perm-date">PERM Filing Date</label>
+        <input type="date" id="tl-perm-date" class="vb-input" max="">
+      </div>
+      <div class="vb-input-row">
+        <div class="vb-input-group">
+          <label for="tl-cat">Employment-Based Category</label>
+          <select id="tl-cat" class="vb-input">
+            <option value="1st">EB-1</option>
+            <option value="2nd" selected>EB-2</option>
+            <option value="3rd">EB-3</option>
+            <option value="Other Workers">EB-3 Other Workers</option>
+            <option value="5th Unreserved">EB-5 Unreserved</option>
+          </select>
+        </div>
+        <div class="vb-input-group">
+          <label for="tl-country">Country of Chargeability</label>
+          <select id="tl-country" class="vb-input">
+            <option value="all_other" selected>All Other</option>
+            <option value="china">China</option>
+            <option value="india">India</option>
+            <option value="mexico">Mexico</option>
+            <option value="philippines">Philippines</option>
+          </select>
+        </div>
+      </div>
+      <div class="vb-input-group">
+        <label for="tl-perm-approval">PERM Approval Date <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:400;">— optional, defaults to ~16 months after filing</span></label>
+        <input type="date" id="tl-perm-approval" class="vb-input" max="">
+      </div>
+      <button class="vb-btn" id="tl-btn">Estimate Timeline</button>
+      <div id="tl-error" class="vb-error-msg" style="display:none;"></div>
+      <div id="tl-result" style="display:none;"></div>
     </div>
   </div>
 
@@ -426,6 +645,555 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
       if (df) df.innerHTML = msg;
       console.error('Visa bulletin fetch failed', err);
     });
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// PRIORITY DATE TRACKER + TRENDS + PERM→GC TIMELINE
+// ═══════════════════════════════════════════════════════
+(function() {
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MON_IDX = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
+  const COUNTRY_LABELS = {
+    all_other: 'All Other',
+    china: 'China',
+    india: 'India',
+    mexico: 'Mexico',
+    philippines: 'Philippines'
+  };
+  const COUNTRY_COLORS = {
+    all_other: '#3b82f6',
+    china: '#ef4444',
+    india: '#f59e0b',
+    mexico: '#22c55e',
+    philippines: '#8b5cf6'
+  };
+  // "Current" plots above any real cutoff. Use a far-future date as the marker.
+  const CURRENT_MARKER_MS = Date.UTC(2099, 11, 31);
+
+  // ─── Date helpers ─────────────────────────────────────
+  function parseDosDate(raw) {
+    if (raw == null) return null;
+    const v = String(raw).trim().toUpperCase();
+    if (v === 'C') return { current: true };
+    if (v === 'U' || v === '') return { unauthorized: true };
+    const m = /^(\d{2})([A-Z]{3})(\d{2})$/.exec(v);
+    if (!m) return null;
+    const day = parseInt(m[1], 10);
+    const monIdx = MON_IDX[m[2]];
+    if (monIdx == null) return null;
+    const yrInt = parseInt(m[3], 10);
+    const year = yrInt >= 90 ? 1900 + yrInt : 2000 + yrInt;
+    return { date: new Date(Date.UTC(year, monIdx, day)) };
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    return MONTHS_SHORT[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
+  }
+
+  function monthsBetween(earlier, later) {
+    if (!earlier || !later) return 0;
+    let months = (later.getUTCFullYear() - earlier.getUTCFullYear()) * 12;
+    months += later.getUTCMonth() - earlier.getUTCMonth();
+    if (later.getUTCDate() < earlier.getUTCDate()) months -= 1;
+    return months;
+  }
+
+  function fmtMonths(m) {
+    if (m < 1) return 'less than a month';
+    if (m === 1) return '1 month';
+    if (m < 12) return m + ' months';
+    const yrs = Math.floor(m / 12);
+    const rem = m % 12;
+    let s = yrs + (yrs === 1 ? ' year' : ' years');
+    if (rem) s += ' ' + rem + (rem === 1 ? ' month' : ' months');
+    return s;
+  }
+
+  function todayUTC() {
+    const n = new Date();
+    return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()));
+  }
+
+  // Pre-fill the date inputs' max attribute so users can't pick the future.
+  (function initDateMax() {
+    const today = todayUTC().toISOString().slice(0, 10);
+    ['pd-date', 'tl-perm-date', 'tl-perm-approval'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('max', today);
+    });
+  })();
+
+  // ─── Bulletin data load ──────────────────────────────
+  const dataPromise = fetch('data/visa_bulletin.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)));
+  const historyPromise = fetch('data/visa_bulletin_history.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null);
+
+  // ─── FEATURE 1: Priority Date Tracker ────────────────
+  const pdBtn = document.getElementById('pd-btn');
+  const pdCat = document.getElementById('pd-cat');
+  const pdCountry = document.getElementById('pd-country');
+  const pdDateInput = document.getElementById('pd-date');
+  const pdResult = document.getElementById('pd-result');
+  const pdError = document.getElementById('pd-error');
+
+  function showPdError(msg) {
+    pdError.textContent = msg;
+    pdError.style.display = 'block';
+    pdResult.style.display = 'none';
+  }
+  function clearPdError() { pdError.style.display = 'none'; }
+
+  function checkPriorityDate() {
+    clearPdError();
+    const dateStr = pdDateInput.value;
+    if (!dateStr) { showPdError('Please pick a priority date.'); return; }
+    const parts = dateStr.split('-');
+    const priorityDate = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+    const cat = pdCat.value;
+    const country = pdCountry.value;
+
+    dataPromise.then(function(data) {
+      const fa = (data.final_action_dates || {})[cat];
+      const df = (data.dates_for_filing || {})[cat];
+      if (!fa || !df) { showPdError('No bulletin data for that category.'); return; }
+      const faVal = parseDosDate(fa[country]);
+      const dfVal = parseDosDate(df[country]);
+
+      function evalEligibility(parsed) {
+        if (!parsed) return { kind: 'unknown' };
+        if (parsed.current) return { kind: 'current' };
+        if (parsed.unauthorized) return { kind: 'unauthorized' };
+        const cutoff = parsed.date;
+        const eligible = priorityDate < cutoff;
+        const months = monthsBetween(priorityDate, cutoff);
+        return { kind: eligible ? 'eligible' : 'behind', cutoff: cutoff, months: months };
+      }
+      const faE = evalEligibility(faVal);
+      const dfE = evalEligibility(dfVal);
+
+      let pillClass, pillText;
+      if (faE.kind === 'current' || faE.kind === 'eligible') {
+        pillClass = 'pd-pill-current';
+        pillText = '✓ Current — eligible to file I-485';
+      } else if (dfE.kind === 'current' || dfE.kind === 'eligible') {
+        pillClass = 'pd-pill-filing';
+        pillText = '⚡ Eligible under Dates for Filing';
+      } else if (faE.kind === 'unauthorized' && dfE.kind === 'unauthorized') {
+        pillClass = 'pd-pill-not';
+        pillText = '✗ Unauthorized — no visas this month';
+      } else {
+        pillClass = 'pd-pill-not';
+        pillText = '✗ Not yet eligible';
+      }
+
+      function explainLine(label, ev) {
+        if (ev.kind === 'current') {
+          return '<strong>' + label + ':</strong> Current. Any priority date qualifies.';
+        }
+        if (ev.kind === 'unauthorized') {
+          return '<strong>' + label + ':</strong> Unauthorized — no visas available this month.';
+        }
+        if (ev.kind === 'unknown') {
+          return '<strong>' + label + ':</strong> No data available for this combination.';
+        }
+        if (ev.kind === 'eligible') {
+          return '<strong>' + label + ':</strong> Your priority date is <strong>before</strong> the cutoff of ' +
+            fmtDate(ev.cutoff) + ' — eligible.';
+        }
+        // behind
+        return '<strong>' + label + ':</strong> Your priority date is <strong>' +
+          fmtMonths(ev.months) + '</strong> behind the cutoff of ' + fmtDate(ev.cutoff) + '.';
+      }
+
+      function fmtCutoff(ev) {
+        if (ev.kind === 'current') return 'Current';
+        if (ev.kind === 'unauthorized') return 'U';
+        if (ev.kind === 'eligible' || ev.kind === 'behind') return fmtDate(ev.cutoff);
+        return '—';
+      }
+
+      pdResult.innerHTML =
+        '<div style="text-align:center; margin-bottom: 14px;">' +
+          '<span class="pd-status-pill ' + pillClass + '">' + pillText + '</span>' +
+        '</div>' +
+        '<div class="pd-line">' + explainLine('Final Action', faE) + '</div>' +
+        '<div class="pd-line">' + explainLine('Dates for Filing', dfE) + '</div>' +
+        '<div class="pd-grid">' +
+          '<div class="pd-stat"><div class="pd-stat-label">Final Action Cutoff</div>' +
+            '<div class="pd-stat-value">' + fmtCutoff(faE) + '</div></div>' +
+          '<div class="pd-stat"><div class="pd-stat-label">Dates for Filing Cutoff</div>' +
+            '<div class="pd-stat-value">' + fmtCutoff(dfE) + '</div></div>' +
+        '</div>';
+      pdResult.style.display = 'block';
+      if (typeof gtag === 'function') {
+        gtag('event', 'priority_date_check', { category: cat, country: country, status: pillText });
+      }
+    }).catch(function(err) {
+      showPdError('Could not load bulletin data. Please try again.');
+      console.error(err);
+    });
+  }
+  pdBtn.addEventListener('click', checkPriorityDate);
+
+  // ─── FEATURE 2: Historical Trend Charts ──────────────
+  let trendChart = null;
+  let trendChartType = 'final_action_dates';
+  const trendCatSel = document.getElementById('trend-cat');
+  const trendTabFa = document.getElementById('trend-tab-fa');
+  const trendTabDf = document.getElementById('trend-tab-df');
+  const trendCanvas = document.getElementById('trend-chart');
+
+  function buildTrendDataset(history, type, cat) {
+    // Walk history oldest → newest for natural left-to-right reading.
+    const months = history.months.slice().reverse();
+    const labels = months.map(m => m.bulletin_date);
+    const countries = ['all_other', 'china', 'india', 'mexico', 'philippines'];
+    const datasets = countries.map(function(country) {
+      const points = months.map(function(m) {
+        const tbl = m[type] || {};
+        const row = tbl[cat];
+        if (!row) return null;
+        const parsed = parseDosDate(row[country]);
+        if (!parsed) return null;
+        if (parsed.current) return CURRENT_MARKER_MS;
+        if (parsed.unauthorized) return null;
+        return parsed.date.getTime();
+      });
+      return {
+        label: COUNTRY_LABELS[country],
+        data: points,
+        borderColor: COUNTRY_COLORS[country],
+        backgroundColor: COUNTRY_COLORS[country] + '33',
+        spanGaps: true,
+        tension: 0.25,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        borderWidth: 2
+      };
+    });
+    return { labels: labels, datasets: datasets };
+  }
+
+  function tickLabel(v) {
+    if (v >= CURRENT_MARKER_MS) return 'Current';
+    const d = new Date(v);
+    return MONTHS_SHORT[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  }
+
+  function isLight() { return document.documentElement.classList.contains('light'); }
+
+  function renderTrendChart(history) {
+    if (typeof Chart === 'undefined') {
+      // Chart.js not loaded yet — try again shortly.
+      setTimeout(function() { renderTrendChart(history); }, 200);
+      return;
+    }
+    const cat = trendCatSel.value;
+    const ds = buildTrendDataset(history, trendChartType, cat);
+    const textColor = isLight() ? '#475569' : '#94a3b8';
+    const gridColor = isLight() ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+
+    if (trendChart) { trendChart.destroy(); }
+    trendChart = new Chart(trendCanvas, {
+      type: 'line',
+      data: ds,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: textColor, font: { size: 12, family: 'Inter' } } },
+          tooltip: {
+            backgroundColor: isLight() ? '#fff' : '#0e0e1a',
+            titleColor: isLight() ? '#1a1a2e' : '#f0f0f8',
+            bodyColor: isLight() ? '#475569' : '#94a3b8',
+            borderColor: isLight() ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed.y;
+                if (v == null) return ctx.dataset.label + ': —';
+                if (v >= CURRENT_MARKER_MS) return ctx.dataset.label + ': Current';
+                return ctx.dataset.label + ': ' + fmtDate(new Date(v));
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: textColor }, grid: { color: gridColor } },
+          y: {
+            type: 'linear',
+            ticks: { color: textColor, callback: function(v) { return tickLabel(v); } },
+            grid: { color: gridColor }
+          }
+        }
+      }
+    });
+  }
+
+  function setTrendType(type) {
+    trendChartType = type;
+    trendTabFa.classList.toggle('active', type === 'final_action_dates');
+    trendTabDf.classList.toggle('active', type === 'dates_for_filing');
+    trendTabFa.setAttribute('aria-pressed', type === 'final_action_dates');
+    trendTabDf.setAttribute('aria-pressed', type === 'dates_for_filing');
+    historyPromise.then(function(h) { if (h) renderTrendChart(h); });
+  }
+  trendTabFa.addEventListener('click', function() { setTrendType('final_action_dates'); });
+  trendTabDf.addEventListener('click', function() { setTrendType('dates_for_filing'); });
+  trendCatSel.addEventListener('change', function() {
+    historyPromise.then(function(h) { if (h) renderTrendChart(h); });
+  });
+  // Re-render on theme change so colors stay readable.
+  document.getElementById('theme-toggle').addEventListener('click', function() {
+    historyPromise.then(function(h) { if (h) setTimeout(function() { renderTrendChart(h); }, 50); });
+  });
+
+  historyPromise.then(function(h) {
+    if (!h || !h.months || !h.months.length) {
+      trendCanvas.parentElement.innerHTML =
+        '<div class="vb-error-msg" style="display:block;">Historical bulletin data is not yet available.</div>';
+      return;
+    }
+    renderTrendChart(h);
+  });
+
+  // ─── FEATURE 3: PERM → Green Card Timeline ───────────
+  const tlBtn = document.getElementById('tl-btn');
+  const tlPermDate = document.getElementById('tl-perm-date');
+  const tlPermApproval = document.getElementById('tl-perm-approval');
+  const tlCat = document.getElementById('tl-cat');
+  const tlCountry = document.getElementById('tl-country');
+  const tlResult = document.getElementById('tl-result');
+  const tlError = document.getElementById('tl-error');
+
+  // Defaults are configurable here so they're easy to tune.
+  const DEFAULTS = {
+    permMonths: 16,        // PERM filing → approval
+    i140Months: 8,         // I-140 filing → approval
+    i485Months: 14,        // I-485 filing → green card
+    minVisaWaitMonths: 0,
+    maxVisaWaitMonths: 480 // 40 years sanity cap
+  };
+
+  function showTlError(msg) {
+    tlError.textContent = msg;
+    tlError.style.display = 'block';
+    tlResult.style.display = 'none';
+  }
+  function clearTlError() { tlError.style.display = 'none'; }
+
+  function avgMonthlyMovementDays(history, type, cat, country) {
+    if (!history || !history.months || history.months.length < 2) return null;
+    const months = history.months.slice().reverse(); // oldest → newest
+    let prev = null;
+    let totalDays = 0;
+    let samples = 0;
+    let anyCurrent = false;
+    for (const m of months) {
+      const row = (m[type] || {})[cat];
+      if (!row) continue;
+      const parsed = parseDosDate(row[country]);
+      if (!parsed) continue;
+      if (parsed.current) { anyCurrent = true; prev = null; continue; }
+      if (parsed.unauthorized) { prev = null; continue; }
+      if (prev) {
+        totalDays += (parsed.date.getTime() - prev.getTime()) / 86400000;
+        samples += 1;
+      }
+      prev = parsed.date;
+    }
+    if (anyCurrent) return { current: true };
+    if (samples === 0) return null;
+    return { daysPerMonth: totalDays / samples };
+  }
+
+  function estimateVisaWaitMonths(priorityDate, currentCutoff, movement) {
+    // priorityDate: when PERM was filed (= priority date for EB-2/EB-3)
+    // currentCutoff: Date or null/'current'
+    // movement: { current: true } | { daysPerMonth: number } | null
+    if (!currentCutoff || currentCutoff === 'current') {
+      return { months: 0, note: 'Category is currently Current — no wait expected.' };
+    }
+    if (currentCutoff === 'unauthorized') {
+      return { months: null, note: 'Category is Unauthorized this month; wait time cannot be estimated.' };
+    }
+    if (priorityDate <= currentCutoff) {
+      return { months: 0, note: 'Your priority date is already past the current cutoff.' };
+    }
+    const gapDays = (priorityDate.getTime() - currentCutoff.getTime()) / 86400000;
+    if (movement && movement.current) {
+      return { months: 0, note: 'History shows the cutoff has been Current — minimal wait expected.' };
+    }
+    if (!movement || movement.daysPerMonth <= 0) {
+      return { months: null, note: 'Cutoff has been stalled or retrogressed in recent history; visa wait is many years and not reliably estimable.' };
+    }
+    const months = Math.round(gapDays / movement.daysPerMonth);
+    if (months > DEFAULTS.maxVisaWaitMonths) {
+      return { months: null, note: 'Estimated wait exceeds 40 years at the current pace; likely a multi-decade backlog.' };
+    }
+    const rate = movement.daysPerMonth.toFixed(0);
+    return {
+      months: Math.max(DEFAULTS.minVisaWaitMonths, months),
+      note: 'Based on the cutoff advancing about ' + rate + ' days per month over the last 12 months.'
+    };
+  }
+
+  function addMonths(date, months) {
+    const d = new Date(date.getTime());
+    d.setUTCMonth(d.getUTCMonth() + months);
+    return d;
+  }
+
+  function estimateTimeline() {
+    clearTlError();
+    if (!tlPermDate.value) { showTlError('Please enter your PERM filing date.'); return; }
+    const parts = tlPermDate.value.split('-');
+    const permFile = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+    if (isNaN(permFile.getTime())) { showTlError('Invalid PERM filing date.'); return; }
+
+    let permApproval = null;
+    if (tlPermApproval.value) {
+      const ap = tlPermApproval.value.split('-');
+      permApproval = new Date(Date.UTC(+ap[0], +ap[1] - 1, +ap[2]));
+      if (permApproval < permFile) {
+        showTlError('PERM approval date cannot be before filing date.');
+        return;
+      }
+    }
+    const cat = tlCat.value;
+    const country = tlCountry.value;
+
+    Promise.all([dataPromise, historyPromise]).then(function(results) {
+      const data = results[0];
+      const history = results[1];
+      const fa = ((data.final_action_dates || {})[cat] || {})[country];
+      const parsed = parseDosDate(fa);
+      let cutoffArg;
+      if (!parsed) cutoffArg = null;
+      else if (parsed.current) cutoffArg = 'current';
+      else if (parsed.unauthorized) cutoffArg = 'unauthorized';
+      else cutoffArg = parsed.date;
+
+      const movement = avgMonthlyMovementDays(history, 'final_action_dates', cat, country);
+
+      // Step 1: PERM
+      const permMonths = permApproval
+        ? Math.max(0, monthsBetween(permFile, permApproval))
+        : DEFAULTS.permMonths;
+      const permApprovalEst = permApproval || addMonths(permFile, permMonths);
+
+      // Step 2: I-140 filing → approval (assume filed shortly after PERM approval)
+      const i140Months = DEFAULTS.i140Months;
+      const i140Approval = addMonths(permApprovalEst, i140Months);
+
+      // Step 3: Visa-number wait. Anchor "today" against the bulletin so that
+      // an applicant whose priority date is already current doesn't keep waiting.
+      const today = todayUTC();
+      const visaWait = estimateVisaWaitMonths(permFile, cutoffArg, movement);
+      // From "now" until visa is available; cannot be earlier than I-140 approval.
+      let visaAvailableDate;
+      let visaWaitMonths;
+      if (visaWait.months == null) {
+        visaWaitMonths = null;
+        visaAvailableDate = null;
+      } else {
+        const baseline = i140Approval > today ? i140Approval : today;
+        // visa-wait is measured from today; if the I-140 approval lands later,
+        // pick the later milestone.
+        const fromToday = addMonths(today, visaWait.months);
+        visaAvailableDate = fromToday > baseline ? fromToday : baseline;
+        visaWaitMonths = Math.max(0, monthsBetween(i140Approval, visaAvailableDate));
+      }
+
+      // Step 4: I-485 filing → green card
+      const i485Months = DEFAULTS.i485Months;
+      const greenCardDate = visaAvailableDate ? addMonths(visaAvailableDate, i485Months) : null;
+
+      const totalMonths = greenCardDate
+        ? Math.max(0, monthsBetween(permFile, greenCardDate))
+        : null;
+
+      function dur(m) { return m == null ? '—' : '~' + fmtMonths(m); }
+
+      const segs = [];
+      if (permMonths > 0) segs.push(permMonths);
+      if (i140Months > 0) segs.push(i140Months);
+      if (visaWaitMonths != null && visaWaitMonths > 0) segs.push(visaWaitMonths);
+      if (i485Months > 0) segs.push(i485Months);
+      const segTotal = segs.reduce(function(a, b) { return a + b; }, 0) || 1;
+      const segHtml = segs.map(function(m) {
+        return '<div class="tl-progress-seg" style="width:' + ((m / segTotal) * 100).toFixed(2) + '%"></div>';
+      }).join('');
+
+      tlResult.innerHTML =
+        '<div class="tl-row">' +
+          '<div class="tl-step"><div class="tl-num">1</div>' +
+            '<div class="tl-info"><div class="tl-title">PERM Filing → Approval</div>' +
+              '<div class="tl-sub">' + (permApproval ? 'Using your supplied approval date.' : 'Default ~' + DEFAULTS.permMonths + ' months — see the Dashboard for live DOL processing data.') +
+              ' Approval target: <strong>' + fmtDate(permApprovalEst) + '</strong></div></div>' +
+            '<div class="tl-dur">' + dur(permMonths) + '</div></div>' +
+
+          '<div class="tl-step"><div class="tl-num">2</div>' +
+            '<div class="tl-info"><div class="tl-title">Priority Date Established</div>' +
+              '<div class="tl-sub">Your priority date is the day USCIS received your PERM application: <strong>' + fmtDate(permFile) + '</strong></div></div>' +
+            '<div class="tl-dur">instant</div></div>' +
+
+          '<div class="tl-step"><div class="tl-num">3</div>' +
+            '<div class="tl-info"><div class="tl-title">I-140 Filing → Approval</div>' +
+              '<div class="tl-sub">USCIS approves I-140 and confirms the priority date. Default estimate; premium processing can shorten this.</div></div>' +
+            '<div class="tl-dur">' + dur(i140Months) + '</div></div>' +
+
+          '<div class="tl-step"><div class="tl-num">4</div>' +
+            '<div class="tl-info"><div class="tl-title">Visa Number Available</div>' +
+              '<div class="tl-sub">' + visaWait.note +
+              (visaAvailableDate ? ' Estimated availability: <strong>' + fmtDate(visaAvailableDate) + '</strong>' : '') +
+              '</div></div>' +
+            '<div class="tl-dur">' + (visaWaitMonths == null ? 'unknown' : dur(visaWaitMonths)) + '</div></div>' +
+
+          '<div class="tl-step"><div class="tl-num">5</div>' +
+            '<div class="tl-info"><div class="tl-title">I-485 Filing → Green Card</div>' +
+              '<div class="tl-sub">After I-485 is filed, USCIS adjudicates and issues the green card.' +
+              (greenCardDate ? ' Estimated green card: <strong>' + fmtDate(greenCardDate) + '</strong>' : '') +
+              '</div></div>' +
+            '<div class="tl-dur">' + dur(i485Months) + '</div></div>' +
+
+          '<div class="tl-step tl-total"><div class="tl-num">∑</div>' +
+            '<div class="tl-info"><div class="tl-title">Total estimated timeline</div>' +
+              '<div class="tl-sub">From PERM filing on ' + fmtDate(permFile) + (greenCardDate ? ' to green card around ' + fmtDate(greenCardDate) + '.' : '. Visa wait could not be estimated; total cannot be computed.') + '</div></div>' +
+            '<div class="tl-dur">' + (totalMonths == null ? 'unknown' : dur(totalMonths)) + '</div></div>' +
+        '</div>' +
+
+        (segs.length ? '<div class="tl-progress">' +
+          '<div class="tl-progress-bar">' + segHtml + '</div>' +
+          '<div class="tl-progress-legend">' +
+            (permMonths > 0 ? '<span>PERM (' + fmtMonths(permMonths) + ')</span>' : '') +
+            (i140Months > 0 ? '<span>I-140 (' + fmtMonths(i140Months) + ')</span>' : '') +
+            (visaWaitMonths != null && visaWaitMonths > 0 ? '<span>Visa wait (' + fmtMonths(visaWaitMonths) + ')</span>' : '') +
+            (i485Months > 0 ? '<span>I-485 (' + fmtMonths(i485Months) + ')</span>' : '') +
+          '</div></div>' : '') +
+
+        '<div class="tl-disclaimer">⚠️ This is an estimate using current bulletin data, the average cutoff movement over the last 12 months, and typical USCIS processing windows. Real timelines vary widely — premium processing, retrogression, country-specific demand spikes, and policy changes can all shift this materially. Always confirm against the official USCIS and DOS sources before making decisions.</div>';
+
+      tlResult.style.display = 'block';
+      if (typeof gtag === 'function') {
+        gtag('event', 'gc_timeline_estimate', {
+          category: cat,
+          country: country,
+          total_months: totalMonths == null ? -1 : totalMonths
+        });
+      }
+    }).catch(function(err) {
+      showTlError('Could not load bulletin data. Please try again.');
+      console.error(err);
+    });
+  }
+  tlBtn.addEventListener('click', estimateTimeline);
 })();
 </script>
 

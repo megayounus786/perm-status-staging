@@ -7,6 +7,7 @@ for the Employment-Based preference categories.
 Usage:
     python3 scrape_visa_bulletin.py            # current bulletin
     python3 scrape_visa_bulletin.py <url>      # explicit bulletin URL
+    python3 scrape_visa_bulletin.py --history  # also build 12-month history
 
 The DOS site occasionally changes table layouts; if the parser cannot find
 the expected EB tables it exits non-zero so a human can intervene.
@@ -219,33 +220,108 @@ def find_eb_tables(html: str) -> tuple[dict, dict]:
     return final_action, dates_filing
 
 
-def main() -> int:
-    if len(sys.argv) > 1:
-        bulletin_url = sys.argv[1]
-    else:
-        index_html = fetch(DOS_INDEX)
-        bulletin_url = find_current_bulletin_url(index_html)
+MONTH_NAMES_FULL = [
+    "january", "february", "march", "april", "may", "june",
+    "july", "august", "september", "october", "november", "december",
+]
 
-    print(f"Fetching: {bulletin_url}", file=sys.stderr)
-    html = fetch(bulletin_url)
-    bulletin_month = parse_bulletin_month(html)
+
+def fiscal_year_dir(year: int, month_idx: int) -> int:
+    # DOS files bulletins under the fiscal year (Oct-Dec roll forward).
+    return year + 1 if month_idx >= 10 else year
+
+
+def historical_bulletin_url(year: int, month_idx: int) -> str:
+    fy = fiscal_year_dir(year, month_idx)
+    month_name = MONTH_NAMES_FULL[month_idx - 1]
+    return (
+        f"https://travel.state.gov/content/travel/en/legal/visa-law0/"
+        f"visa-bulletin/{fy}/visa-bulletin-for-{month_name}-{year}.html"
+    )
+
+
+def scrape_one(url: str) -> dict:
+    html = fetch(url)
+    month = parse_bulletin_month(html)
     final_action, dates_filing = find_eb_tables(html)
-
-    payload = {
-        "bulletin_date": bulletin_month,
-        "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "source_url": bulletin_url,
+    return {
+        "bulletin_date": month,
+        "source_url": url,
         "final_action_dates": final_action,
         "dates_for_filing": dates_filing,
     }
 
+
+def build_history(months_back: int = 12) -> list[dict]:
+    """Walk backwards from the current month and collect parseable bulletins."""
+    today = datetime.now(timezone.utc)
+    year, month = today.year, today.month
+    out: list[dict] = []
+    attempts = 0
+    while len(out) < months_back and attempts < months_back + 6:
+        url = historical_bulletin_url(year, month)
+        try:
+            entry = scrape_one(url)
+            out.append(entry)
+            print(
+                f"  + {entry['bulletin_date']:>14}  "
+                f"({len(entry['final_action_dates'])} categories)",
+                file=sys.stderr,
+            )
+        except Exception as exc:  # noqa: BLE001 — best-effort archive walk
+            print(f"  ! skip {year}-{month:02d}: {exc}", file=sys.stderr)
+        month -= 1
+        if month == 0:
+            month = 12
+            year -= 1
+        attempts += 1
+    return out
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    do_history = False
+    if "--history" in args:
+        do_history = True
+        args.remove("--history")
+
+    if args:
+        bulletin_url = args[0]
+    else:
+        index_html = fetch(DOS_INDEX)
+        bulletin_url = find_current_bulletin_url(index_html)
+
     here = os.path.dirname(os.path.abspath(__file__))
     out_dir = os.path.join(here, "data")
     os.makedirs(out_dir, exist_ok=True)
+
+    print(f"Fetching: {bulletin_url}", file=sys.stderr)
+    current = scrape_one(bulletin_url)
+
+    payload = {
+        "bulletin_date": current["bulletin_date"],
+        "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_url": current["source_url"],
+        "final_action_dates": current["final_action_dates"],
+        "dates_for_filing": current["dates_for_filing"],
+    }
     out_path = os.path.join(out_dir, "visa_bulletin.json")
     with open(out_path, "w") as f:
         json.dump(payload, f, indent=2)
-    print(f"Wrote {out_path} ({bulletin_month})", file=sys.stderr)
+    print(f"Wrote {out_path} ({current['bulletin_date']})", file=sys.stderr)
+
+    if do_history:
+        print("Building 12-month history…", file=sys.stderr)
+        history = build_history(12)
+        hist_payload = {
+            "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "months": history,
+        }
+        hist_path = os.path.join(out_dir, "visa_bulletin_history.json")
+        with open(hist_path, "w") as f:
+            json.dump(hist_payload, f, indent=2)
+        print(f"Wrote {hist_path} ({len(history)} months)", file=sys.stderr)
+
     return 0
 
 
