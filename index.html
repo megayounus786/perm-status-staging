@@ -1684,9 +1684,8 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     h += tipRow('Withdrawn',  n(m.withdrawn)+' ('+wdPct  +'%)', '#64748b');
     h += tipRow('Denied/RFI', n(m.denied)   +' ('+denPct +'%)', '#ef4444');
     h += '<div class="gt-sep"></div>';
-    h += tipRow('Status', m.status==='done'?'✅ Complete':m.status==='processing'?'🟠 Processing':m.status==='active'?'🔶 Frontier':'⏳ Pending');
-    if (m.status==='active') h += tipRow('Progress', Math.round(m.dolDay/m.dolDays*100)+'%');
-    if (m.status==='processing') h += tipRow('Processed', Math.round(m.processedPct)+'%');
+    h += tipRow('Status', m.status==='done'?'✅ Complete':(m.status==='processing'||m.status==='active')?'🔶 Processing':'⏳ Pending');
+    if (m.status==='active' || m.status==='processing') h += tipRow('Processed', Math.round(m.processedPct||0)+'%');
     return h;
   }
 
@@ -1707,11 +1706,11 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     if (i === 0)     lc = 'transparent';
     if (i === n2-1)  rc = 'transparent';
 
-    html += '<div class="combo-col'+(m.status==='active'?' active-month':'')+'" data-ci="'+i+'">';
+    html += '<div class="combo-col'+((m.status==='active'||m.status==='processing')?' active-month':'')+'" data-ci="'+i+'">';
     html += '<div class="tl-row">';
     html += '<div class="tl-left"  style="background:'+lc+';"></div>';
     html += '<div class="tl-right" style="background:'+rc+';"></div>';
-    if (m.status==='active') {
+    if (m.status==='active' || m.status==='processing') {
       html += '<div class="tl-dot-wrap"><div class="tl-spin-ring"></div><div class="tl-dot active"></div></div>';
     } else {
       html += '<div class="tl-dot '+m.status+'"></div>';
