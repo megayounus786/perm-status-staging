@@ -85,6 +85,7 @@
   @keyframes pulse    { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
   @keyframes dotpulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.6),0 0 12px rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0),0 0 20px rgba(245,158,11,0.6)} }
   @keyframes spin     { to { transform: rotate(360deg); } }
+  @keyframes procpulse { 0%,100%{opacity:1;box-shadow:0 0 8px rgba(245,158,11,0.5)} 50%{opacity:0.65;box-shadow:0 0 14px rgba(245,158,11,0.7)} }
   @keyframes radar1   { 0%{transform:scale(1);opacity:0.7} 100%{transform:scale(3.5);opacity:0} }
   @keyframes radar2   { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(2.8);opacity:0} }
 
@@ -170,6 +171,7 @@
   .tl-row  { height: 52px; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; }
   .tl-dot  { width: 16px; height: 16px; border-radius: 50%; border: 3px solid; z-index: 4; position: relative; flex-shrink: 0; }
   .tl-dot.done    { border-color: #22c55e; background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+  .tl-dot.processing { border-color: #f59e0b; background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.5); animation: procpulse 2.5s ease-in-out infinite; }
   .tl-dot.active  { border-color: #f59e0b; background: var(--dot-pending-bg); animation: dotpulse 2s infinite; }
   .tl-dot.pending { border-color: #2d3748; background: var(--dot-pending-bg); }
   .tl-dot-wrap { position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -682,7 +684,7 @@
 <script>
 /* ===== DASHBOARD_DATA START ===== */
 window.DASHBOARD_DATA = {
-  "updatedAt": "2026-05-13T08:16:15-04:00",
+  "updatedAt": "2026-05-13T08:31:59-04:00",
   "backlog": {
     "total": 134633,
     "startOfMonth": 137591,
@@ -740,8 +742,8 @@ window.DASHBOARD_DATA = {
       "withdrawn": 508,
       "denied": 859,
       "status": "done",
-      "processedPct": 96.0,
-      "stable": false
+      "processedPct": 94.3,
+      "stable": true
     },
     {
       "label": "Dec '24",
@@ -751,8 +753,8 @@ window.DASHBOARD_DATA = {
       "withdrawn": 524,
       "denied": 916,
       "status": "done",
-      "processedPct": 95.8,
-      "stable": false
+      "processedPct": 94.2,
+      "stable": true
     },
     {
       "label": "Jan '25",
@@ -762,8 +764,8 @@ window.DASHBOARD_DATA = {
       "withdrawn": 373,
       "denied": 393,
       "status": "done",
-      "processedPct": 88.6,
-      "stable": false
+      "processedPct": 85.1,
+      "stable": true
     },
     {
       "label": "Feb '25",
@@ -772,9 +774,9 @@ window.DASHBOARD_DATA = {
       "review": 2607,
       "withdrawn": 326,
       "denied": 175,
-      "status": "done",
-      "processedPct": 61.0,
-      "stable": false
+      "status": "processing",
+      "processedPct": 57.6,
+      "stable": true
     },
     {
       "label": "Mar '25",
@@ -784,7 +786,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 333,
       "denied": 0,
       "status": "active",
-      "processedPct": 5.1,
+      "processedPct": 0.6,
       "dolDay": 1,
       "dolDays": 100
     },
@@ -796,7 +798,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 400,
       "denied": 0,
       "status": "pending",
-      "processedPct": 5.0
+      "processedPct": 0.2
     },
     {
       "label": "May '25",
@@ -806,7 +808,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 361,
       "denied": 3,
       "status": "pending",
-      "processedPct": 4.3
+      "processedPct": 0.2
     },
     {
       "label": "Jun '25",
@@ -816,7 +818,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 472,
       "denied": 1,
       "status": "pending",
-      "processedPct": 4.7
+      "processedPct": 0.3
     },
     {
       "label": "Jul '25",
@@ -826,7 +828,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 313,
       "denied": 7,
       "status": "pending",
-      "processedPct": 3.2
+      "processedPct": 0.1
     },
     {
       "label": "Aug '25",
@@ -836,7 +838,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 316,
       "denied": 3,
       "status": "pending",
-      "processedPct": 3.2
+      "processedPct": 0.0
     },
     {
       "label": "Sep '25",
@@ -846,7 +848,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 380,
       "denied": 5,
       "status": "pending",
-      "processedPct": 2.8
+      "processedPct": 0.0
     },
     {
       "label": "Oct '25",
@@ -856,7 +858,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 23,
       "denied": 0,
       "status": "pending",
-      "processedPct": 4.5
+      "processedPct": 0.0
     },
     {
       "label": "Nov '25",
@@ -866,7 +868,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 428,
       "denied": 1,
       "status": "pending",
-      "processedPct": 2.8
+      "processedPct": 0.0
     },
     {
       "label": "Dec '25",
@@ -876,7 +878,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 323,
       "denied": 1,
       "status": "pending",
-      "processedPct": 2.1
+      "processedPct": 0.0
     },
     {
       "label": "Jan '26",
@@ -886,7 +888,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 234,
       "denied": 1,
       "status": "pending",
-      "processedPct": 2.0
+      "processedPct": 0.0
     },
     {
       "label": "Feb '26",
@@ -896,7 +898,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 122,
       "denied": 2,
       "status": "pending",
-      "processedPct": 2.2
+      "processedPct": 0.0
     },
     {
       "label": "Mar '26",
@@ -906,7 +908,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 119,
       "denied": 0,
       "status": "pending",
-      "processedPct": 1.7
+      "processedPct": 0.0
     },
     {
       "label": "Apr '26",
@@ -916,7 +918,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 53,
       "denied": 1,
       "status": "pending",
-      "processedPct": 0.7
+      "processedPct": 0.0
     },
     {
       "label": "May '26",
@@ -926,7 +928,7 @@ window.DASHBOARD_DATA = {
       "withdrawn": 27,
       "denied": 0,
       "status": "pending",
-      "processedPct": 0.8
+      "processedPct": 0.0
     }
   ],
   "rateDays": [
@@ -1663,7 +1665,7 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
   // Show only 2 most recent completed months + active + pending
   const allMonths = D.timeline;
   const activeIdx = allMonths.findIndex(m => m.status === 'active');
-  const doneMonths = allMonths.filter(m => m.status === 'done');
+  const doneMonths = allMonths.filter(m => m.status === 'done' || m.status === 'processing');
   const keep2Done = doneMonths.slice(-2);
   const cutoff = keep2Done.length ? allMonths.indexOf(keep2Done[0]) : 0;
   const months = allMonths.slice(cutoff);
@@ -1682,8 +1684,9 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     h += tipRow('Withdrawn',  n(m.withdrawn)+' ('+wdPct  +'%)', '#64748b');
     h += tipRow('Denied/RFI', n(m.denied)   +' ('+denPct +'%)', '#ef4444');
     h += '<div class="gt-sep"></div>';
-    h += tipRow('Status', m.status==='done'?'✅ Complete':m.status==='active'?'🔶 Processing':'⏳ Pending');
+    h += tipRow('Status', m.status==='done'?'✅ Complete':m.status==='processing'?'🟠 Processing':m.status==='active'?'🔶 Frontier':'⏳ Pending');
     if (m.status==='active') h += tipRow('Progress', Math.round(m.dolDay/m.dolDays*100)+'%');
+    if (m.status==='processing') h += tipRow('Processed', Math.round(m.processedPct)+'%');
     return h;
   }
 
@@ -1698,8 +1701,9 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     const pctLbl  = certPct > 0 ? certPct+'%' : '';
 
     let lc = 'rgba(255,255,255,0.07)', rc = 'rgba(255,255,255,0.07)';
-    if (m.status==='done')   { lc = '#22c55e'; rc = '#22c55e'; }
-    if (m.status==='active') { lc = '#22c55e'; rc = 'rgba(255,255,255,0.07)'; }
+    if (m.status==='done')       { lc = '#22c55e'; rc = '#22c55e'; }
+    if (m.status==='processing') { lc = '#22c55e'; rc = '#22c55e'; }
+    if (m.status==='active')     { lc = '#22c55e'; rc = 'rgba(255,255,255,0.07)'; }
     if (i === 0)     lc = 'transparent';
     if (i === n2-1)  rc = 'transparent';
 
@@ -1726,7 +1730,7 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
     html += '<div class="ml-row"><span class="ml-label">'+m.label+'</span></div>';
     if (m.status !== 'pending') {
       const pctColor = m.status==='done' ? '#22c55e' : '#f59e0b';
-      const pctTxt   = m.status==='done' ? certPct+'%' : Math.round(m.dolDay/m.dolDays*100)+'%';
+      const pctTxt   = m.status==='done' ? certPct+'%' : m.status==='processing' ? Math.round(m.processedPct)+'%' : Math.round(m.dolDay/m.dolDays*100)+'%';
       html += '<div style="font-size:8px;color:'+pctColor+';font-weight:600;">'+pctTxt+'</div>';
     }
     html += '</div>';
