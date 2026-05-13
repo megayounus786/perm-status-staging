@@ -79,7 +79,7 @@
     --avg-color: #b45309;
   }
 
-  html { background: var(--bg-html); }
+  html { background: var(--bg-html); overflow-x: hidden; }
   body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-body); color: var(--text-primary); min-height: 100vh; min-width: 100%; overflow-x: hidden; }
   body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, var(--gradient-start) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, var(--gradient-end) 0%, transparent 50%); z-index: 0; }
   .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
