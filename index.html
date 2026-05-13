@@ -1870,10 +1870,13 @@ function renderRate(range) {
     h += '<div class="bar-group"><div class="bar'+wk+'" data-ri="'+i+'" style="height:'+bH+'px;"></div></div>';
   });
   h += '</div><div class="bar-labels">';
-  bars.forEach(b => {
+  const isMobile = window.innerWidth < 768;
+  const labelStep = isMobile ? (bars.length > 20 ? 4 : 3) : 1;
+  bars.forEach((b, i) => {
+    const show = (i % labelStep === 0) || !isMobile;
     const lbl = range==='day' ? fmtDayLabel(b.date) : fmtWeekLabel(b.weekStart);
     const lines = lbl.split('\n');
-    h += '<div class="bar-label-slot"><span class="bar-label">'+lines.map(l=>'<span>'+l+'</span>').join('<br>')+'</span></div>';
+    h += '<div class="bar-label-slot"><span class="bar-label" style="'+(show?'':'visibility:hidden')+'">'+lines.map(l=>'<span>'+l+'</span>').join('<br>')+'</span></div>';
   });
   h += '</div></div>';
   wrap.innerHTML = h;
