@@ -311,8 +311,8 @@ def main() -> int:
     print(f"Wrote {out_path} ({current['bulletin_date']})", file=sys.stderr)
 
     if do_history:
-        print("Building 12-month history…", file=sys.stderr)
-        history = build_history(12)
+        print("Building 24-month history…", file=sys.stderr)
+        history = build_history(24)
         hist_payload = {
             "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "months": history,

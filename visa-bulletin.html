@@ -537,7 +537,7 @@
       <div class="card-header">
         <div>
           <span class="card-title">📈 Historical Cutoff Date Movement</span>
-          <div class="card-subtitle">How priority date cutoffs have moved over the last 12 months</div>
+          <div class="card-subtitle">How priority date cutoffs have moved over the last 24 months</div>
         </div>
       </div>
       <div class="vb-chart-controls">
@@ -545,6 +545,7 @@
           <button id="trend-tab-fa" class="active" aria-pressed="true">Final Action Dates</button>
           <button id="trend-tab-df" aria-pressed="false">Dates for Filing</button>
         </div>
+        <!-- toggle removed: always backlog mode -->
         <div style="flex:1; min-width:140px;">
           <select id="trend-cat" class="vb-input" aria-label="Category" style="padding:7px 32px 7px 12px; font-size:12px;">
             <option value="1st">EB-1</option>
@@ -992,11 +993,13 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
   // ─── FEATURE 2: Historical Trend Charts ──────────────
   let trendChart = null;
   let trendChartType = 'final_action_dates';
+  let trendViewMode = 'backlog'; // always backlog
   const trendCatSel = document.getElementById('trend-cat');
   const trendCountrySel = document.getElementById('trend-country');
   const trendTabFa = document.getElementById('trend-tab-fa');
   const trendTabDf = document.getElementById('trend-tab-df');
   const trendCanvas = document.getElementById('trend-chart');
+  // toggle removed: always backlog mode
 
   function buildTrendDataset(history, type, cat, countryFilter) {
     // Walk history oldest → newest for natural left-to-right reading.
@@ -1006,6 +1009,7 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
     const countries = (countryFilter && countryFilter !== 'all')
       ? allCountries.filter(function(c) { return c === countryFilter; })
       : allCountries;
+    const now = todayUTC();
     const datasets = countries.map(function(country) {
       const points = months.map(function(m) {
         const tbl = m[type] || {};
@@ -1013,8 +1017,12 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
         if (!row) return null;
         const parsed = parseDosDate(row[country]);
         if (!parsed) return null;
-        if (parsed.current) return CURRENT_MARKER_MS;
         if (parsed.unauthorized) return null;
+        if (trendViewMode === 'backlog') {
+          if (parsed.current) return 0;
+          return monthsBetween(parsed.date, now);
+        }
+        if (parsed.current) return CURRENT_MARKER_MS;
         return parsed.date.getTime();
       });
       return {
@@ -1033,6 +1041,13 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
   }
 
   function tickLabel(v) {
+    if (trendViewMode === 'backlog') {
+      if (v === 0) return 'Current';
+      if (v < 12) return v + ' mo';
+      var y = Math.floor(v / 12);
+      var rm = v % 12;
+      return rm ? y + 'y ' + rm + 'm' : y + 'y';
+    }
     if (v >= CURRENT_MARKER_MS) return 'Current';
     const d = new Date(v);
     return MONTHS_SHORT[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
@@ -1072,6 +1087,10 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
               label: function(ctx) {
                 const v = ctx.parsed.y;
                 if (v == null) return ctx.dataset.label + ': —';
+                if (trendViewMode === 'backlog') {
+                  if (v === 0) return ctx.dataset.label + ': Current (no backlog)';
+                  return ctx.dataset.label + ': ' + fmtMonths(v) + ' backlog';
+                }
                 if (v >= CURRENT_MARKER_MS) return ctx.dataset.label + ': Current';
                 return ctx.dataset.label + ': ' + fmtDate(new Date(v));
               }
@@ -1082,6 +1101,8 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
           x: { ticks: { color: textColor }, grid: { color: gridColor } },
           y: {
             type: 'linear',
+            reverse: false,
+            beginAtZero: true,
             ticks: { color: textColor, callback: function(v) { return tickLabel(v); } },
             grid: { color: gridColor }
           }
@@ -1106,6 +1127,7 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
   trendCountrySel.addEventListener('change', function() {
     historyPromise.then(function(h) { if (h) renderTrendChart(h); });
   });
+  // toggle removed: always backlog mode
   // Re-render on theme change so colors stay readable.
   document.getElementById('theme-toggle').addEventListener('click', function() {
     historyPromise.then(function(h) { if (h) setTimeout(function() { renderTrendChart(h); }, 50); });
