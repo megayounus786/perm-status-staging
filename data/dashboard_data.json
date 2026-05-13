@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-13T14:45:57-04:00",
+  "updatedAt": "2026-05-13T14:50:33-04:00",
   "backlog": {
     "total": 134217,
     "startOfMonth": 137591,
@@ -58,7 +58,8 @@
       "denied": 860,
       "status": "done",
       "processedPct": 94.4,
-      "stable": true
+      "stable": true,
+      "todayProcessed": 15
     },
     {
       "label": "Dec '24",
@@ -69,7 +70,8 @@
       "denied": 924,
       "status": "done",
       "processedPct": 94.5,
-      "stable": true
+      "stable": true,
+      "todayProcessed": 38
     },
     {
       "label": "Jan '25",
@@ -80,7 +82,8 @@
       "denied": 410,
       "status": "done",
       "processedPct": 85.8,
-      "stable": true
+      "stable": true,
+      "todayProcessed": 50
     },
     {
       "label": "Feb '25",
@@ -91,7 +94,8 @@
       "denied": 202,
       "status": "processing",
       "processedPct": 60.9,
-      "stable": false
+      "stable": false,
+      "todayProcessed": 232
     },
     {
       "label": "Mar '25",
@@ -103,7 +107,8 @@
       "status": "active",
       "processedPct": 1.8,
       "dolDay": 2,
-      "dolDays": 100
+      "dolDays": 100,
+      "todayProcessed": 86
     },
     {
       "label": "Apr '25",

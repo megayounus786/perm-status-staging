@@ -684,7 +684,7 @@
 <script>
 /* ===== DASHBOARD_DATA START ===== */
 window.DASHBOARD_DATA = {
-  "updatedAt": "2026-05-13T14:45:57-04:00",
+  "updatedAt": "2026-05-13T14:50:33-04:00",
   "backlog": {
     "total": 134217,
     "startOfMonth": 137591,
@@ -743,7 +743,8 @@ window.DASHBOARD_DATA = {
       "denied": 860,
       "status": "done",
       "processedPct": 94.4,
-      "stable": true
+      "stable": true,
+      "todayProcessed": 15
     },
     {
       "label": "Dec '24",
@@ -754,7 +755,8 @@ window.DASHBOARD_DATA = {
       "denied": 924,
       "status": "done",
       "processedPct": 94.5,
-      "stable": true
+      "stable": true,
+      "todayProcessed": 38
     },
     {
       "label": "Jan '25",
@@ -765,7 +767,8 @@ window.DASHBOARD_DATA = {
       "denied": 410,
       "status": "done",
       "processedPct": 85.8,
-      "stable": true
+      "stable": true,
+      "todayProcessed": 50
     },
     {
       "label": "Feb '25",
@@ -776,7 +779,8 @@ window.DASHBOARD_DATA = {
       "denied": 202,
       "status": "processing",
       "processedPct": 60.9,
-      "stable": false
+      "stable": false,
+      "todayProcessed": 232
     },
     {
       "label": "Mar '25",
@@ -788,7 +792,8 @@ window.DASHBOARD_DATA = {
       "status": "active",
       "processedPct": 1.8,
       "dolDay": 2,
-      "dolDays": 100
+      "dolDays": 100,
+      "todayProcessed": 86
     },
     {
       "label": "Apr '25",
@@ -1737,6 +1742,9 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
       const pctColor = m.status==='done' ? '#22c55e' : '#f59e0b';
       const pctTxt   = m.status==='done' ? certPct+'%' : m.status==='processing' ? Math.round(m.processedPct)+'%' : Math.round(m.dolDay/m.dolDays*100)+'%';
       html += '<div style="font-size:8px;color:'+pctColor+';font-weight:600;">'+pctTxt+'</div>';
+    }
+    if (m.todayProcessed > 0) {
+      html += '<div style="font-size:7px;color:var(--text-muted);font-weight:500;margin-top:1px;" title="Processed today">+'+m.todayProcessed+' today</div>';
     }
     html += '</div>';
   });
