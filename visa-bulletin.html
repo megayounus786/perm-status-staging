@@ -424,8 +424,8 @@
           <button id="trend-tab-df" aria-pressed="false">Dates for Filing</button>
         </div>
         <div class="vb-toggle" role="tablist" aria-label="Duration" style="margin-left:8px;">
-          <button class="trend-duration active" data-months="12">1Y</button>
-          <button class="trend-duration" data-months="24">2Y</button>
+          <button class="trend-duration" data-months="12">1Y</button>
+          <button class="trend-duration active" data-months="24">2Y</button>
           <button class="trend-duration" data-months="60">5Y</button>
           <button class="trend-duration" data-months="0">All</button>
         </div>
@@ -1007,7 +1007,7 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
   const trendCanvas = document.getElementById('trend-chart');
   // toggle removed: always backlog mode
 
-  let trendDurationMonths = 12;
+  let trendDurationMonths = 24;
 
   function buildTrendDataset(history, type, cat, countryFilter) {
     // Walk history oldest → newest for natural left-to-right reading.
@@ -1154,7 +1154,7 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
         if (trendDurationMonths === 0) {
           subtitleEl.textContent = 'How priority date cutoffs have moved over all available months';
         } else if (trendDurationMonths === 12) {
-          subtitleEl.textContent = 'How priority date cutoffs have moved over the last 12 months';
+          subtitleEl.textContent = 'How priority date cutoffs have moved over the last 24 months';
         } else if (trendDurationMonths === 24) {
           subtitleEl.textContent = 'How priority date cutoffs have moved over the last 24 months';
         } else if (trendDurationMonths === 60) {
