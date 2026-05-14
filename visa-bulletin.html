@@ -648,7 +648,7 @@ document.getElementById('theme-toggle').addEventListener('click', function() {
       }
       if (data.source_url) {
         const link = document.getElementById('source-link');
-        link.href = data.source_url;
+        if (link) link.href = data.source_url;
       }
       renderTable(
         document.querySelector('#tbl-final-action tbody'),
