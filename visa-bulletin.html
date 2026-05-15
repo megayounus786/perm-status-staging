@@ -66,6 +66,17 @@
   .nav-links { display: flex; gap: 32px; list-style: none; }
   .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
   .nav-links a.active, .nav-links a:hover { color: var(--text-primary); }
+  .nav-toggle { display: none; background: none; border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-primary); font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1; }
+  @media (max-width: 768px) {
+    .nav-toggle { display: flex; align-items: center; justify-content: center; order: -1; }
+    nav .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--nav-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--nav-border); padding: 8px 0; z-index: 99; }
+    nav .nav-links li { width: 100%; }
+    nav .nav-links a { display: block; padding: 12px 24px; font-size: 15px; border-radius: 0; min-height: auto; white-space: normal; }
+    nav .nav-links a:hover, nav .nav-links a.active { background: rgba(59,130,246,0.1); }
+    nav.nav-open .nav-links { display: flex; }
+    .hero h1 { font-size: 12px; letter-spacing: 1px; }
+    .hero h2 { font-size: 20px; }
+  }
   footer { text-align: center; padding: 32px 24px; color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--sep); margin-top: 0; position: relative; z-index: 1; }
   footer a { color: var(--text-muted); text-decoration: none; }
   footer a:hover { color: var(--text-secondary); }
@@ -148,15 +159,7 @@
     }
     .logo { font-size: 18px; }
     .logo-icon { width: 28px; height: 28px; font-size: 14px; }
-    .nav-links { gap: 8px; }
-    .nav-links li { flex: 0 0 auto; }
-    .nav-links a {
-      display: inline-flex; align-items: center;
-      min-height: 36px; padding: 0 8px;
-      border-radius: 8px; font-size: 13px;
-    }
     .hero { padding: 24px 0 14px; }
-    .hero h2 { font-size: 24px; }
     .card { padding: 18px; border-radius: 14px; }
     .info-grid { grid-template-columns: 1fr; gap: 12px; }
     table.vb th, table.vb td { padding: 10px 12px; font-size: 12px; }
@@ -375,6 +378,7 @@
 
 <nav>
   <div class="logo"><a href="./"><div class="logo-icon">🏛️</div>PERM Tracker</a></div>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">&#9776;</button>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="./">Dashboard</a></li>
@@ -554,6 +558,9 @@
 document.getElementById('theme-toggle').addEventListener('click', function() {
   document.documentElement.classList.toggle('light');
   localStorage.setItem('theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
+});
+document.getElementById('nav-toggle').addEventListener('click', function() {
+  document.querySelector('nav').classList.toggle('nav-open');
 });
 </script>
 
