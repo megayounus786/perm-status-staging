@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Enriched Employer Profile — REAL DATA (staging)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-body:#0a0a12; --text-primary:#f0f0f8; --text-secondary:#94a3b8; --text-muted:#64748b; --text-dim:#475569;
+    --card-bg:rgba(255,255,255,0.04); --card-border:rgba(255,255,255,0.06); --card-hover:rgba(255,255,255,0.07);
+    --sep:rgba(255,255,255,0.06); --accent:#6366f1;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-body); color:var(--text-primary); padding:32px 16px 80px; }
+  .wrap { max-width:760px; margin:0 auto; }
+  .banner { background:rgba(34,197,94,0.10); border:1px solid rgba(34,197,94,0.35); color:#86efac; font-size:12px; padding:10px 14px; border-radius:10px; margin-bottom:20px; line-height:1.5; }
+  .banner b { color:#bbf7d0; }
+  .picker { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .picker input { flex:1; min-width:220px; background:rgba(255,255,255,0.05); border:1px solid var(--card-border); color:var(--text-primary); padding:10px 12px; border-radius:10px; font-size:14px; font-family:inherit; }
+  .picker button { background:var(--accent); color:#fff; border:none; padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+  .chip { font-size:11px; background:rgba(255,255,255,0.05); border:1px solid var(--card-border); color:var(--text-secondary); padding:5px 11px; border-radius:999px; cursor:pointer; }
+  .chip:hover { background:var(--card-hover); color:var(--text-primary); }
+  h1 { font-size:26px; font-weight:800; letter-spacing:-0.5px; margin-bottom:2px; }
+  .sub { color:var(--text-muted); font-size:13px; margin-bottom:24px; }
+  .section { background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:22px 22px 20px; margin-bottom:18px; position:relative; }
+  .section::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0.6; }
+  .section-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-primary); margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .pill { font-size:10px; font-weight:600; text-transform:none; letter-spacing:0; padding:2px 8px; border-radius:999px; }
+  .pill.perm { background:rgba(99,102,241,0.15); color:#a5b4fc; }
+  .pill.lca  { background:rgba(34,197,94,0.15); color:#86efac; }
+  .pill.uscis{ background:rgba(59,130,246,0.15); color:#93c5fd; }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:4px; }
+  .stat { background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; padding:16px; }
+  .stat-label { font-size:11px; color:var(--text-muted); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+  .stat-value { font-size:26px; font-weight:800; letter-spacing:-0.5px; }
+  .stat-value.good { color:#22c55e; } .stat-value.med { color:#f59e0b; }
+  .stat-sub { font-size:11px; color:var(--text-dim); margin-top:4px; }
+  .detail-row { display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px solid var(--sep); }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-label { color:var(--text-muted); } .detail-value { color:var(--text-secondary); font-weight:600; }
+  table.sal { width:100%; border-collapse:collapse; margin-top:6px; font-size:12.5px; }
+  table.sal th { text-align:right; color:var(--text-muted); font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:0.4px; padding:6px 8px; border-bottom:1px solid var(--sep); }
+  table.sal th:first-child { text-align:left; }
+  table.sal td { padding:9px 8px; border-bottom:1px solid var(--sep); text-align:right; color:var(--text-secondary); }
+  table.sal td:first-child { text-align:left; color:var(--text-primary); font-weight:500; }
+  table.sal td .n { color:var(--text-dim); font-size:10.5px; }
+  .median { color:#22c55e; font-weight:700; }
+  .rangebar { position:relative; height:6px; background:var(--card-border); border-radius:3px; margin-top:7px; }
+  .rangebar .fill { position:absolute; height:100%; border-radius:3px; background:linear-gradient(90deg,#3b82f6,#22c55e); }
+  .pw-note { font-size:11px; color:var(--text-dim); margin-top:12px; line-height:1.5; border-top:1px solid var(--sep); padding-top:10px; }
+  .pw-note b { color:var(--text-secondary); }
+  .foot { color:var(--text-dim); font-size:11px; line-height:1.6; margin-top:8px; }
+  .src { color:var(--text-muted); font-size:10.5px; margin-top:10px; }
+  .soon { color:var(--text-dim); font-size:12px; font-style:italic; }
+  .err { color:#f87171; font-size:13px; }
+  .loading { color:var(--text-muted); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="banner">
+    <b>✓ STAGING · REAL DATA.</b> Live PERM (DOL ETA-9089) from the staging worker +
+    real H-1B salaries (DOL LCA ETA-9035, <b>FY2025</b>) from a separate staging store.
+    Not linked from the site; production is untouched. USCIS sponsorship data is Slice&nbsp;2 (not yet wired).
+  </div>
+
+  <div class="picker">
+    <input id="emp-input" placeholder="Employer name (e.g. NVIDIA Corporation)" />
+    <button id="emp-go">Load</button>
+  </div>
+  <div class="chips" id="chips"></div>
+
+  <div id="content"><div class="loading">Loading…</div></div>
+
+  <div class="src" style="text-align:center;margin-top:24px">
+    Real-data sample · perm-status-staging · enriched employer profile (Slice 1: salaries)
+  </div>
+</div>
+
+<script>
+(function () {
+  var h = window.location.hostname;
+  var API = (h === 'localhost' || h === '127.0.0.1') ? 'http://127.0.0.1:8787'
+    : (h === 'immilane.com' || h === 'www.immilane.com') ? 'https://immilane-api.younusahamad.workers.dev'
+    : 'https://immilane-api-staging.younusahamad.workers.dev';
+
+  var EXAMPLES = ['NVIDIA Corporation', 'Microsoft Corporation', 'Apple Inc.',
+                  'Amazon.com Services LLC', 'Meta Platforms, Inc.', 'Tesla, Inc.',
+                  'Cognizant Technology Solutions US Corporation', 'JPMORGAN CHASE & CO.'];
+
+  var content = document.getElementById('content');
+  var input = document.getElementById('emp-input');
+  var chipsEl = document.getElementById('chips');
+
+  EXAMPLES.forEach(function (n) {
+    var c = document.createElement('span');
+    c.className = 'chip'; c.textContent = n;
+    c.onclick = function () { load(n); };
+    chipsEl.appendChild(c);
+  });
+
+  function fmtUSD(v) {
+    if (v == null) return '—';
+    return '$' + Math.round(v).toLocaleString('en-US');
+  }
+  function fmtK(v) {
+    if (v == null) return '—';
+    return '$' + Math.round(v / 1000) + 'k';
+  }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+
+  function load(name) {
+    name = (name || '').trim();
+    if (!name) return;
+    input.value = name;
+    history.replaceState(null, '', '?e=' + encodeURIComponent(name));
+    content.innerHTML = '<div class="loading">Loading ' + esc(name) + '…</div>';
+
+    var permP = fetch(API + '/api/employers/' + encodeURIComponent(name)).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    var h1bP = fetch(API + '/api/employers/' + encodeURIComponent(name) + '/h1b').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+
+    Promise.all([permP, h1bP]).then(function (res) {
+      render(name, res[0], res[1]);
+    });
+  }
+
+  function render(name, perm, h1b) {
+    if (!perm && !h1b) {
+      content.innerHTML = '<div class="err">No PERM or H-1B data found for “' + esc(name) + '”. Try one of the examples above.</div>';
+      return;
+    }
+    var html = '';
+    var title = (perm && perm.name) || (h1b && h1b.name) || name;
+    var period = perm && perm.firstFiling && perm.lastFiling ? (perm.firstFiling + ' → ' + perm.lastFiling) : '';
+    html += '<h1>' + esc(title) + '</h1>';
+    html += '<div class="sub">' + (period ? 'PERM filing period ' + esc(period) : 'H-1B salary profile') + '</div>';
+
+    // ---- PERM ----
+    if (perm) {
+      var adjudicated = (perm.certified || 0) + (perm.denied || 0);
+      html += '<div class="section">';
+      html += '<div class="section-title">PERM (Green Card) Filings <span class="pill perm">DOL ETA-9089 · staging worker</span></div>';
+      html += '<div class="cards">';
+      html += '<div class="stat"><div class="stat-label">Total Filings</div><div class="stat-value">' + (perm.total || 0).toLocaleString() + '</div><div class="stat-sub">' + esc(period) + '</div></div>';
+      var cr = perm.certRate;
+      var crClass = cr == null ? '' : (cr >= 85 ? 'good' : (cr >= 60 ? 'med' : ''));
+      html += '<div class="stat"><div class="stat-label">Certification Rate</div><div class="stat-value ' + crClass + '">' + (cr == null ? '—' : cr + '%') + '</div><div class="stat-sub">' + (perm.certified || 0).toLocaleString() + ' certified of ' + adjudicated.toLocaleString() + ' adjudicated</div></div>';
+      html += '</div>';
+      if (perm.topTitles && perm.topTitles.length) {
+        html += '<div style="margin-top:10px">';
+        perm.topTitles.slice(0, 3).forEach(function (t) {
+          html += '<div class="detail-row"><span class="detail-label">Top title · ' + esc(t.title) + '</span><span class="detail-value">' + t.count + '</span></div>';
+        });
+        html += '</div>';
+      }
+      html += '<div class="src">Live from the staging employer API (KV-backed PERM dataset).</div>';
+      html += '</div>';
+    }
+
+    // ---- H-1B SALARIES ----
+    html += '<div class="section">';
+    html += '<div class="section-title">H-1B Salaries <span class="pill lca">DOL LCA ETA-9035 · ' + (h1b ? esc(h1b.fy) : 'FY2025') + '</span></div>';
+    if (h1b && h1b.socs && h1b.socs.length) {
+      var socs = h1b.socs.slice(0, 8);
+      var lo = Math.min.apply(null, socs.map(function (s) { return s.wage_p10 || s.wage_median; }));
+      var hi = Math.max.apply(null, socs.map(function (s) { return s.wage_p90 || s.wage_median; }));
+      var span = Math.max(1, hi - lo);
+      var aboveCount = 0, cmpCount = 0;
+      html += '<table class="sal"><thead><tr><th>Job category (SOC)</th><th>Median offered</th><th>Range (10th–90th)</th><th>Prevailing</th></tr></thead><tbody>';
+      socs.forEach(function (s) {
+        var left = ((s.wage_p10 != null ? s.wage_p10 : s.wage_median) - lo) / span * 100;
+        var width = (((s.wage_p90 != null ? s.wage_p90 : s.wage_median) - (s.wage_p10 != null ? s.wage_p10 : s.wage_median)) / span) * 100;
+        if (s.wage_median != null && s.pw_median != null) { cmpCount++; if (s.wage_median >= s.pw_median) aboveCount++; }
+        html += '<tr><td>' + esc(s.title) + ' <span class="n">· ' + s.n + ' LCAs</span>';
+        html += '<div class="rangebar"><span class="fill" style="left:' + Math.max(0, left).toFixed(1) + '%;width:' + Math.max(2, width).toFixed(1) + '%"></span></div></td>';
+        html += '<td><span class="median">' + fmtUSD(s.wage_median) + '</span></td>';
+        html += '<td>' + fmtK(s.wage_p10) + ' – ' + fmtK(s.wage_p90) + '</td>';
+        html += '<td>' + fmtUSD(s.pw_median) + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      html += '<div class="pw-note"><b>Overall median offered: ' + fmtUSD(h1b.wage_median_all) + '</b> across ' + h1b.total.toLocaleString() + ' certified LCAs. ';
+      if (cmpCount) {
+        html += aboveCount + ' of ' + cmpCount + ' top job categories were offered <b>at or above</b> the DOL prevailing-wage floor — a signal of competitive pay.';
+      }
+      html += '</div>';
+      html += '<div class="src">Source: DOL OFLC LCA Disclosure Data (Form ETA-9035), ' + esc(h1b.fy) + ' (Oct 2024–Sep 2025). Certified LCAs only; wages annualized.</div>';
+    } else {
+      html += '<div class="soon">No H-1B LCA salary records for this employer in FY2025 (they may sponsor green cards but filed few/no H-1B LCAs).</div>';
+    }
+    html += '</div>';
+
+    // ---- USCIS (Slice 2 placeholder, no mock numbers) ----
+    html += '<div class="section">';
+    html += '<div class="section-title">Sponsorship Strength <span class="pill uscis">USCIS H-1B Data Hub · Slice 2</span></div>';
+    html += '<div class="soon">Petition approval volume & rate (USCIS Employer Data Hub) lands in Slice 2 — not yet wired. No placeholder numbers shown.</div>';
+    html += '</div>';
+
+    content.innerHTML = html;
+  }
+
+  document.getElementById('emp-go').onclick = function () { load(input.value); };
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') load(input.value); });
+
+  var initial = new URLSearchParams(window.location.search).get('e') || 'NVIDIA Corporation';
+  load(initial);
+})();
+</script>
+</body>
+</html>
