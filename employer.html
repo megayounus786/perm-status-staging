@@ -156,25 +156,33 @@
   .trend-legend { font-size: 11px; color: var(--text-muted); margin-top: 14px; }
 
   /* Filings by Year — grouped annual bar chart (replaces sparse monthly trend) */
-  .fy-chart { display: flex; align-items: flex-end; justify-content: space-around; gap: 28px; height: 188px; padding: 20px 6px 0; }
-  .fy-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; max-width: 280px; }
-  .fy-bars { display: flex; align-items: flex-end; justify-content: center; gap: 16px; height: 100%; width: 100%; }
-  .fy-bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1; max-width: 68px; }
+  .fy-chart { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; height: 188px; padding: 22px 4px 0; border-bottom: 1px solid var(--card-border); }
+  .fy-group { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; min-width: 0; }
+  .fy-bars { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 100%; width: 100%; }
+  .fy-bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1 1 0; max-width: 40px; }
   .fy-val { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 7px; white-space: nowrap; letter-spacing: -0.2px; }
   .fy-bar { width: 100%; border-radius: 7px 7px 2px 2px; min-height: 4px; transition: opacity 0.15s, transform 0.15s; cursor: default; }
   .fy-bar:hover { opacity: 0.86; }
-  .fy-bar.fy-perm { background: linear-gradient(180deg, #a855f7, #ec4899); box-shadow: 0 2px 10px rgba(168,85,247,0.22); }
-  .fy-bar.fy-h1b { background: linear-gradient(180deg, #3b82f6, #8b5cf6); box-shadow: 0 2px 10px rgba(59,130,246,0.22); }
+  .fy-bar.fy-perm { background: linear-gradient(180deg, #8079c4, #6f68b0); }
+  .fy-bar.fy-h1b { background: linear-gradient(180deg, #6189bd, #54789f); }
   .fy-year { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
   .fy-tag { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-dim); border: 1px solid var(--card-border); border-radius: 5px; padding: 1px 5px; }
   .fy-legend { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 16px; }
   .fy-li { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--text-secondary); }
   .fy-sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; flex-shrink: 0; }
-  .fy-sw.fy-perm { background: linear-gradient(135deg, #a855f7, #ec4899); }
-  .fy-sw.fy-h1b { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+  .fy-sw.fy-perm { background: #7770ba; }
+  .fy-sw.fy-h1b { background: #5a82ae; }
 
   /* ── ROWS (Top Titles + occupations) ── */
   .rowlist { display: flex; flex-direction: column; }
+  /* Fixed-height scroll container: ~10 rows visible, rest scrollable. */
+  .scroll-rows { max-height: 348px; overflow-y: auto; overflow-x: hidden; padding-right: 6px; }
+  .scroll-sal { max-height: 492px; overflow-y: auto; overflow-x: hidden; padding-right: 6px; }
+  .scroll-rows::-webkit-scrollbar, .scroll-sal::-webkit-scrollbar { width: 8px; }
+  .scroll-rows::-webkit-scrollbar-thumb, .scroll-sal::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+  .scroll-rows::-webkit-scrollbar-track, .scroll-sal::-webkit-scrollbar-track { background: transparent; }
+  .scroll-rows, .scroll-sal { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+  .scroll-hint { font-size: 10.5px; color: var(--text-dim); margin-top: 8px; font-weight: 500; }
   .employer-row { display: grid; grid-template-columns: 22px 1fr 54px 78px; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--sep); }
   .employer-row:last-child { border-bottom: none; }
   .employer-rank { font-size: 12px; font-weight: 700; color: var(--text-dim); text-align: center; }
@@ -227,10 +235,10 @@
   .placeholder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
   /* ── MULTI-YEAR (LCA/PERM/USCIS backfill) ── */
-  .fy-bar.fy-pw { background: linear-gradient(180deg, #f59e0b, #f97316); box-shadow: 0 2px 10px rgba(245,158,11,0.22); }
-  .fy-bar.fy-gc { background: linear-gradient(180deg, #a855f7, #ec4899); box-shadow: 0 2px 10px rgba(168,85,247,0.22); }
-  .fy-sw.fy-pw { background: linear-gradient(135deg, #f59e0b, #f97316); }
-  .fy-sw.fy-gc { background: linear-gradient(135deg, #a855f7, #ec4899); }
+  .fy-bar.fy-pw { background: linear-gradient(180deg, #8d96a8, #79818f); }
+  .fy-bar.fy-gc { background: linear-gradient(180deg, #8079c4, #6f68b0); }
+  .fy-sw.fy-pw { background: #858ea0; }
+  .fy-sw.fy-gc { background: #7770ba; }
   .myr-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 14px; }
   .myr-table th { text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
   .myr-table th:first-child { text-align: left; }
@@ -501,7 +509,42 @@ function permStats(emp) {
     certRate = certCount / adjudicated * 100;
     certClass = certRate > 80 ? 'cr-good' : certRate >= 60 ? 'cr-med' : 'cr-bad';
   }
-  return { statuses, total, certCount, deniedCount, withdrawnCount, adjudicated, resolved, pendingCount, certRate, certClass };
+  return { statuses, total, certCount, deniedCount, withdrawnCount, adjudicated, resolved, pendingCount, certRate, certClass,
+           disclosure: false, periodLabel: null };
+}
+
+// PERM headline stats sourced from the multi-year DOL disclosure dataset
+// (h1b.permByYear, FY2020–FY2026) so the headline TOTAL reconciles exactly with
+// the by-year PERM breakdown rendered below it. "Total PERM Filings" = the sum
+// of certified + denied + withdrawn across all fiscal years (all disclosed,
+// adjudicated filings). Returns null when no disclosure data is available, in
+// which case the caller falls back to the live-tracker permStats(emp).
+function permStatsFromDisclosure(h1b) {
+  const perm = (h1b && Array.isArray(h1b.permByYear)) ? h1b.permByYear : [];
+  if (!perm.length) return null;
+  let certCount = 0, deniedCount = 0, withdrawnCount = 0;
+  perm.forEach(y => {
+    certCount += (y.cert || 0);
+    deniedCount += (y.denied || 0);
+    withdrawnCount += (y.withdrawn || 0);
+  });
+  const total = certCount + deniedCount + withdrawnCount; // all disclosed filings
+  const adjudicated = certCount + deniedCount;
+  const resolved = total; // disclosure data is fully resolved (no pending)
+  let certRate = null, certClass = 'cr-na';
+  if (adjudicated > 0) {
+    certRate = certCount / adjudicated * 100;
+    certClass = certRate > 80 ? 'cr-good' : certRate >= 60 ? 'cr-med' : 'cr-bad';
+  }
+  // Status breakdown for the donut: only the disclosed outcomes.
+  const statuses = {};
+  if (certCount) statuses['CERTIFIED'] = certCount;
+  if (deniedCount) statuses['DENIED'] = deniedCount;
+  if (withdrawnCount) statuses['WITHDRAWN'] = withdrawnCount;
+  const fys = perm.map(y => y.fy).filter(Boolean).sort();
+  const periodLabel = fys.length ? (fys[0] + ' – ' + fys[fys.length - 1]) : null;
+  return { statuses, total, certCount, deniedCount, withdrawnCount, adjudicated, resolved,
+           pendingCount: 0, certRate, certClass, disclosure: true, periodLabel };
 }
 
 function h1bAbovePct(h1b) {
@@ -529,7 +572,7 @@ function fmtMonthYear(d) {
 function renderHero(emp, ps, h1b, rankInfo) {
   const firstStr = fmtMonthYear(emp.firstFiling);
   const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
-  const period = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
+  const period = ps.periodLabel || (firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—'));
 
   let rankBadge = '';
   if (rankInfo) {
@@ -583,7 +626,8 @@ function keystat(label, value, sub, cls) {
 function renderPermSection(emp, ps, h1b) {
   const firstStr = fmtMonthYear(emp.firstFiling);
   const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
-  const period = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
+  const period = ps.periodLabel || (firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—'));
+  const sinceLabel = ps.periodLabel || firstStr || '—';
 
   // cert-rate breakdown rows
   const crRows = [];
@@ -617,8 +661,13 @@ function renderPermSection(emp, ps, h1b) {
   // filings-by-year (replaces the old sparse monthly trend)
   const filingsByYear = renderFilingsByYear(emp, h1b);
 
-  // top titles
-  const titles = (emp.topTitles || []).slice(0, 10);
+  // PERM job titles — ALL available titles from the multi-year disclosure
+  // dataset (h1b.permTitlesAll), falling back to the live-tracker topTitles.
+  // Rendered into a fixed-height scroll container (~10 visible, rest scrolls).
+  const titlesMulti = !!(h1b && Array.isArray(h1b.permTitlesAll) && h1b.permTitlesAll.length);
+  const titles = titlesMulti
+    ? h1b.permTitlesAll.map(t => ({ title: t.title, count: t.n }))
+    : (emp.topTitles || []);
   const maxTitle = titles.length ? titles[0].count : 1;
   const titlesHtml = titles.map((t, i) =>
     '<div class="employer-row">' +
@@ -635,7 +684,7 @@ function renderPermSection(emp, ps, h1b) {
       '<div><div class="emp-section-eyebrow">Green Card</div><div class="emp-section-title">PERM Labor Certifications</div></div>' +
       '<div class="spacer"></div>' +
       '<span class="emp-section-meta">' + esc(period) + '</span>' +
-      '<span class="tag-live">● Live data</span>' +
+      '<span class="tag-live">● ' + (ps.disclosure ? 'DOL disclosure' : 'Live data') + '</span>' +
     '</div>' +
     '<div class="emp-grid-2">' +
       '<div class="emp-cards-col">' +
@@ -643,8 +692,14 @@ function renderPermSection(emp, ps, h1b) {
           '<div class="emp-stat-label">Total PERM Filings</div>' +
           '<div class="emp-stat-value">' + n(ps.total) + '</div>' +
           '<div class="stat-details">' +
-            '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(ps.pendingCount) + '</span></div>' +
-            '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(ps.resolved) + '</span></div>' +
+            (ps.disclosure ?
+              '<div class="stat-detail-row"><span class="stat-detail-label">Certified</span><span class="stat-detail-value">' + n(ps.certCount) + '</span></div>' +
+              '<div class="stat-detail-row"><span class="stat-detail-label">Denied</span><span class="stat-detail-value">' + n(ps.deniedCount) + '</span></div>' +
+              '<div class="stat-detail-row"><span class="stat-detail-label">Withdrawn</span><span class="stat-detail-value">' + n(ps.withdrawnCount) + '</span></div>'
+            :
+              '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(ps.pendingCount) + '</span></div>' +
+              '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(ps.resolved) + '</span></div>'
+            ) +
           '</div>' +
         '</div>' +
         '<div class="emp-stat-card">' +
@@ -652,7 +707,7 @@ function renderPermSection(emp, ps, h1b) {
           '<div class="emp-stat-value ' + ps.certClass + '">' + (ps.certRate != null ? ps.certRate.toFixed(1) + '%' : '—') + '</div>' +
           '<div class="emp-stat-sub">' + (ps.adjudicated > 0 ? n(ps.certCount) + ' certified of ' + n(ps.adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
           (crRows.length ? '<div class="stat-details">' + crBreakdown + '</div>' : '') +
-          '<div class="emp-stat-disclaimer">Based on filings since ' + esc(firstStr || '—') + '</div>' +
+          '<div class="emp-stat-disclaimer">Based on filings ' + (ps.disclosure ? esc(sinceLabel) : 'since ' + esc(sinceLabel)) + '</div>' +
         '</div>' +
       '</div>' +
       (donutTotal > 0 ?
@@ -674,18 +729,80 @@ function renderPermSection(emp, ps, h1b) {
     filingsByYear +
     (titles.length ?
     '<div class="panel" style="margin-top:16px;">' +
-      '<div class="panel-title">Top ' + Math.min(titles.length, 10) + ' PERM Job Titles</div>' +
-      '<div class="rowlist">' + titlesHtml + '</div>' +
+      '<div class="panel-title">PERM Job Titles ' +
+        '<span class="muted">· ' + n(titles.length) + ' titles' + (titlesMulti ? ' · FY2020–2026' : '') + '</span></div>' +
+      '<div class="' + (titles.length > 10 ? 'scroll-rows' : '') + '">' +
+        '<div class="rowlist">' + titlesHtml + '</div>' +
+      '</div>' +
+      (titles.length > 10 ? '<div class="scroll-hint">Scroll for all ' + n(titles.length) + ' job titles ↓</div>' : '') +
     '</div>' : '') +
   '</section>';
 }
 
-// Filings by Year — a clean grouped bar chart of annual filing volume.
-// Replaces the old monthly trend, which was sparse/spiky for a single employer.
-// PERM is bucketed by calendar year from monthlyFilings; H-1B is the certified
-// FY2025 LCA total. Falls back to a tasteful "coming soon" panel when there
-// aren't at least two data points to compare.
+// Filings by Year — a clean, professional grouped annual bar chart of
+// sponsorship volume. Sources the multi-year DOL disclosure dataset
+// (h1b.permByYear + h1b.lcaByYear, FY2020–FY2026): for each fiscal year, a
+// Green Card (PERM) filings bar and an H-1B (LCA) positions bar, side by side,
+// with consistent widths/spacing, a restrained palette, a baseline axis, value
+// labels and a legend. PERM filings = certified + denied + withdrawn, so the
+// bars reconcile exactly with the Total PERM Filings headline above. Falls back
+// to the legacy monthly-bucketed chart for older single-FY payloads.
 function renderFilingsByYear(emp, h1b) {
+  const perm = (h1b && Array.isArray(h1b.permByYear)) ? h1b.permByYear : [];
+  const lca  = (h1b && Array.isArray(h1b.lcaByYear)) ? h1b.lcaByYear : [];
+  if (!perm.length && !lca.length) return renderFilingsByYearLegacy(emp, h1b);
+
+  const permMap = {}, lcaMap = {};
+  perm.forEach(y => { if (y && y.fy) permMap[y.fy] = y; });
+  lca.forEach(y => { if (y && y.fy) lcaMap[y.fy] = y; });
+  const years = Array.from(new Set(perm.map(y => y.fy).concat(lca.map(y => y.fy))))
+    .filter(Boolean).sort();
+
+  // PERM bar = all disclosed filings (cert+denied+withdrawn); H-1B bar = LCA total.
+  const permVal = y => y ? ((y.cert || 0) + (y.denied || 0) + (y.withdrawn || 0)) : null;
+  const lcaVal  = y => y ? (y.total != null ? y.total : ((y.cert || 0) + (y.denied || 0) + (y.withdrawn || 0))) : null;
+
+  let maxVal = 1;
+  years.forEach(fy => {
+    const pv = permVal(permMap[fy]); if (pv != null) maxVal = Math.max(maxVal, pv);
+    const lv = lcaVal(lcaMap[fy]);   if (lv != null) maxVal = Math.max(maxVal, lv);
+  });
+
+  const hasPerm = perm.length > 0, hasLca = lca.length > 0;
+  const barFor = (val, cls, lbl, fy) => {
+    if (val == null) return '';
+    const h = Math.max(4, Math.round(val / maxVal * 84));
+    return '<div class="fy-bar-wrap">' +
+        '<div class="fy-val">' + n(val) + '</div>' +
+        '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(lbl + ' ' + fy + ': ' + n(val)) + '"></div>' +
+      '</div>';
+  };
+  const groupsHtml = years.map(fy => {
+    const pY = permMap[fy], lY = lcaMap[fy];
+    const partial = (pY && pY.partial) || (lY && lY.partial);
+    const bars = (hasPerm ? barFor(permVal(pY), 'fy-perm', 'Green Card · PERM', fy) : '') +
+                 (hasLca  ? barFor(lcaVal(lY),  'fy-h1b',  'H-1B · LCA', fy) : '');
+    return '<div class="fy-group">' +
+        '<div class="fy-bars">' + bars + '</div>' +
+        '<div class="fy-year">' + esc(fyShort(fy)) + (partial ? '<span class="fy-tag">partial</span>' : '') + '</div>' +
+      '</div>';
+  }).join('');
+
+  const legendHtml =
+    (hasPerm ? '<span class="fy-li"><span class="fy-sw fy-perm"></span> Green Card (PERM) filings</span>' : '') +
+    (hasLca  ? '<span class="fy-li"><span class="fy-sw fy-h1b"></span> H-1B (LCA) positions</span>' : '');
+
+  return '<div class="panel" style="margin-top:16px;">' +
+      '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume (FY2020–2026)</span></div>' +
+      '<div class="fy-chart">' + groupsHtml + '</div>' +
+      '<div class="fy-legend">' + legendHtml + '</div>' +
+      '<div class="trend-legend">PERM (green card) filings — certified, denied &amp; withdrawn — and certified H-1B LCA positions per fiscal year, from DOL OFLC disclosure data. FY2026 is year-to-date (partial).</div>' +
+    '</div>';
+}
+
+// Legacy fallback: monthly-bucketed calendar-year chart for older single-FY
+// payloads with no multi-year disclosure data.
+function renderFilingsByYearLegacy(emp, h1b) {
   // Bucket PERM filings into calendar years.
   const permByYear = {};
   (emp.monthlyFilings || []).forEach(m => {
@@ -773,7 +890,8 @@ function renderH1bSection(h1b) {
   } else if (!h1b || !Array.isArray(h1b.socs) || h1b.socs.length === 0) {
     inner = '<div class="soon-inner"><div class="soon-icon">📭</div><div class="soon-msg">No certified H-1B LCA salary data on file (FY2025).</div></div>';
   } else {
-    const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 12);
+    // Show ALL occupations (not just the top N); the table scrolls if long.
+    const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0));
     const abovePct = h1bAbovePct(h1b);
     // domain for range bars across shown rows (use p10/pw min and p90 max)
     let dmin = Infinity, dmax = -Infinity;
@@ -810,7 +928,8 @@ function renderH1bSection(h1b) {
         '<div class="emp-stat-card"><div class="emp-stat-label">% At/Above Prevailing</div><div class="emp-stat-value ' + (abovePct == null ? 'cr-na' : abovePct >= 80 ? 'cr-good' : abovePct >= 50 ? 'cr-med' : 'cr-bad') + '">' + (abovePct == null ? '—' : abovePct + '%') + '</div><div class="emp-stat-sub">' + (abovePct == null ? 'Prevailing wage not comparable' : 'of filings meet/exceed DOL prevailing wage') + '</div></div>' +
       '</div>' +
       '<div class="salrow head"><span>Occupation</span><span style="text-align:right;">Filings</span><span>Offered wage range (P10 – P90)</span><span style="text-align:right;">vs PW</span></div>' +
-      '<div class="saltable">' + rows + '</div>' +
+      '<div class="' + (socs.length > 10 ? 'scroll-sal' : '') + '"><div class="saltable">' + rows + '</div></div>' +
+      (socs.length > 10 ? '<div class="scroll-hint">Scroll for all ' + n(socs.length) + ' occupations ↓</div>' : '') +
       '<div class="sal-legend">' +
         '<span class="li"><span class="sw" style="background:linear-gradient(90deg,#14b8a6,#6366f1);"></span> P10–P90 offered range</span>' +
         '<span class="li"><span class="dot"></span> Median offered</span>' +
@@ -954,15 +1073,18 @@ function renderByYear(h1b) {
   }
   const lcaBars = fyBars(lca.map(y => ({ fy: y.fy, value: y.total, partial: y.partial })), 'fy-h1b');
   const lcaRows = lca.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
-  const permBars = fyBars(perm.map(y => ({ fy: y.fy, value: y.cert, partial: y.partial })), 'fy-gc');
+  // PERM bar value = all disclosed filings (cert+denied+withdrawn) so the sum of
+  // the by-year bars reconciles exactly with the Total PERM Filings headline.
+  const permFilings = y => (y.cert || 0) + (y.denied || 0) + (y.withdrawn || 0);
+  const permBars = fyBars(perm.map(y => ({ fy: y.fy, value: permFilings(y), partial: y.partial })), 'fy-gc');
   const permRows = perm.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
   const allFy = lca.concat(perm).map(y => y.fy).sort();
   const meta = allFy.length ? (allFy[0] + '–' + allFy[allFy.length - 1]) : '';
   return liveSection('History', 'H-1B LCAs & Green Card by Year',
     '<div class="placeholder-grid">' +
-      '<div class="panel"><div class="panel-title">H-1B LCAs by Year <span class="muted">· certified positions</span></div>' +
+      '<div class="panel"><div class="panel-title">H-1B LCAs by Year <span class="muted">· positions</span></div>' +
         lcaBars + (lcaRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], lcaRows) : '') + '</div>' +
-      '<div class="panel"><div class="panel-title">Green Card (PERM) by Year <span class="muted">· certified</span></div>' +
+      '<div class="panel"><div class="panel-title">Green Card (PERM) by Year <span class="muted">· filings</span></div>' +
         permBars + (permRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], permRows) : '') + '</div>' +
     '</div>' +
     '<div class="myr-note">LCA = H-1B Labor Condition Applications (certified positions, DOL OFLC ETA-9035). PERM = green-card labor certifications (DOL OFLC ETA-9089). FY2026 is partial (year-to-date).</div>',
@@ -1018,23 +1140,20 @@ function renderSalaryTrend(h1b) {
     '</div>', meta);
 }
 
-function renderWorksitesSoon() {
-  return soonCard('Worksite Locations', 'Geography',
-    'Worksite cities, states, and prevailing-wage areas are not yet ingested in this phase.',
-    '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B Work Sites</div>' + skRows(5) +
-    '</div><div class="panel"><div class="panel-title">Green Card Work Sites</div>' + skRows(5) + '</div></div>');
-}
-
 function renderMultiYear(emp, h1b) {
-  return renderByYear(h1b) + renderPetitionHistory(h1b) + renderSalaryTrend(h1b) + renderWorksitesSoon();
+  // Worksite Locations section removed per review (not yet ingested).
+  return renderByYear(h1b) + renderPetitionHistory(h1b) + renderSalaryTrend(h1b);
 }
 
 function renderFaqs(emp, ps, h1b, rankInfo) {
   const name = emp.name;
   const firstStr = fmtMonthYear(emp.firstFiling);
   const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
-  const period = firstStr && lastStr ? (firstStr + ' to ' + lastStr) : (firstStr || lastStr || 'the available period');
-  const topTitles = (emp.topTitles || []).slice(0, 3).map(t => t.title);
+  const period = ps.periodLabel ? ps.periodLabel.replace(' – ', ' to ')
+    : (firstStr && lastStr ? (firstStr + ' to ' + lastStr) : (firstStr || lastStr || 'the available period'));
+  const topTitleSrc = (h1b && Array.isArray(h1b.permTitlesAll) && h1b.permTitlesAll.length)
+    ? h1b.permTitlesAll.map(t => ({ title: t.title })) : (emp.topTitles || []);
+  const topTitles = topTitleSrc.slice(0, 3).map(t => t.title);
   const abovePct = h1bAbovePct(h1b);
   const faqs = [];
 
@@ -1044,12 +1163,12 @@ function renderFaqs(emp, ps, h1b, rankInfo) {
 
   faqs.push(["What is " + name + "'s PERM certification rate?",
     ps.adjudicated > 0
-      ? 'Its PERM certification rate is <b>' + ps.certRate.toFixed(1) + '%</b> — ' + n(ps.certCount) + ' certified out of ' + n(ps.adjudicated) + ' adjudicated cases (certified + denied). ' + n(ps.pendingCount) + ' cases are still pending.'
-      : 'No PERM cases have been adjudicated yet, so a certification rate cannot be computed. ' + n(ps.pendingCount) + ' cases are pending.']);
+      ? 'Its PERM certification rate is <b>' + ps.certRate.toFixed(1) + '%</b> — ' + n(ps.certCount) + ' certified out of ' + n(ps.adjudicated) + ' adjudicated cases (certified + denied).' + (ps.pendingCount > 0 ? ' ' + n(ps.pendingCount) + ' cases are still pending.' : '')
+      : 'No PERM cases have been adjudicated yet, so a certification rate cannot be computed.' + (ps.pendingCount > 0 ? ' ' + n(ps.pendingCount) + ' cases are pending.' : '')]);
 
   if (topTitles.length) {
     faqs.push(['What are the most common PERM job titles at ' + name + '?',
-      'The most frequently sponsored PERM job titles are <b>' + topTitles.map(esc).join('</b>, <b>') + '</b>. See the full top-10 list above.']);
+      'The most frequently sponsored PERM job titles are <b>' + topTitles.map(esc).join('</b>, <b>') + '</b>. See the full list above.']);
   }
 
   if (h1b && h1b.total != null) {
@@ -1063,7 +1182,7 @@ function renderFaqs(emp, ps, h1b, rankInfo) {
   }
 
   faqs.push(['How far back does the data for ' + name + ' go?',
-    'This profile now includes multi-year history: H-1B LCA and green-card (PERM) filings by fiscal year (FY2020–FY2026), annual salary trends, and USCIS H-1B petition approval/denial counts (FY2020–FY2023). FY2026 is year-to-date (partial). The real-time PERM case-status dashboard covers recent filings (Nov 2024 onward). Worksite-level locations are not yet ingested.']);
+    'This profile now includes multi-year history: H-1B LCA and green-card (PERM) filings by fiscal year (FY2020–FY2026), annual salary trends, and USCIS H-1B petition approval/denial counts (FY2020–FY2023). FY2026 is year-to-date (partial). The real-time PERM case-status dashboard covers recent filings (Nov 2024 onward).']);
 
   const items = faqs.map((f, i) =>
     '<div class="faq-item' + (i === 0 ? ' open' : '') + '">' +
@@ -1140,7 +1259,10 @@ function showError(msg) {
 }
 
 function renderAll(emp, h1b, rankInfo) {
-  const ps = permStats(emp);
+  // Prefer the multi-year DOL disclosure dataset (FY2020–FY2026) for the PERM
+  // headline so the total/date-range/status summary reconcile with the by-year
+  // breakdown below. Fall back to live-tracker stats for older payloads.
+  const ps = permStatsFromDisclosure(h1b) || permStats(emp);
   document.getElementById('emp-body').innerHTML =
     '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
     renderHero(emp, ps, h1b, rankInfo) +
