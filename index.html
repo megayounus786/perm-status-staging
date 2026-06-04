@@ -239,6 +239,14 @@
   .employer-count { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-align: right; }
   .employer-bar   { height: 5px; border-radius: 3px; background: var(--card-border); overflow: hidden; }
   .employer-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+  /* H-1B salary section (same dark-theme tokens / row treatment as Top Job Titles) */
+  .h1b-row { border-bottom: none; padding-bottom: 1px; }
+  .h1b-sub { grid-column: 2 / 5; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; color: var(--text-muted); padding: 0 0 6px 0; border-bottom: 1px solid var(--sep); margin-bottom: 1px; }
+  .h1b-sub .h1b-pw-above { color: #22c55e; font-weight: 600; }
+  .h1b-sub .h1b-pw-below { color: #f59e0b; font-weight: 600; }
+  .h1b-bar-fill { background: linear-gradient(90deg, #14b8a6, #6366f1); }
+  .h1b-loading, .h1b-empty { font-size: 12px; color: var(--text-muted); padding: 10px 0; }
+  .h1b-empty b { color: var(--text-secondary); font-weight: 600; }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
@@ -2320,7 +2328,13 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 // different worker (e.g. the *-staging deployment).
 const EMPLOYER_API_BASE = (typeof window !== 'undefined' && window.IMMILANE_API_BASE)
   ? String(window.IMMILANE_API_BASE).replace(/\/+$/, '')
-  : 'https://immilane-api.younusahamad.workers.dev';
+  : (function () {
+      var h = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+      if (h === 'localhost' || h === '127.0.0.1') return 'http://127.0.0.1:8787';
+      if (h === 'immilane.com' || h === 'www.immilane.com') return 'https://immilane-api.younusahamad.workers.dev';
+      // Staging (megayounus786.github.io) → staging worker, which serves PERM + H-1B salaries.
+      return 'https://immilane-api-staging.younusahamad.workers.dev';
+    })();
 const EMPLOYER_API_DEBOUNCE_MS = 200;
 const EMPLOYER_API_LIMIT = 8;
 
@@ -2383,6 +2397,7 @@ function employerSlug(name) {
   let searchSeq     = 0;
   const detailCache = new Map(); // slug -> employer detail object
   let metaPromise   = null;
+  let currentModalName = null;   // employer name of the currently-open modal (H-1B race guard)
 
   function loadMeta() {
     if (metaPromise) return metaPromise;
@@ -2533,6 +2548,7 @@ function employerSlug(name) {
   }
 
   function openModal(name) {
+    currentModalName = name;
     modalBackdrop.classList.add('open');
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -2695,10 +2711,19 @@ function employerSlug(name) {
       '<div class="emp-modal-section">' +
         '<div class="emp-modal-section-title">Top ' + Math.min(titles.length, 10) + ' Job Titles</div>' +
         titlesHtml +
-      '</div>' : '');
+      '</div>' : '') +
+      // H-1B salaries section: container only; lazy-loaded below so PERM renders instantly.
+      '<div class="emp-modal-section" id="emp-h1b-section">' +
+        '<div class="emp-modal-section-title">H-1B Salaries ' +
+          '<span style="color:#475569;font-weight:400;font-size:11px;">· FY2025 LCA (offered wages)</span></div>' +
+        '<div id="emp-h1b-body"><div class="h1b-loading">Loading H-1B salary data…</div></div>' +
+      '</div>';
 
     const closeBtn = document.getElementById('emp-modal-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    // Lazy-load the H-1B salary aggregates for this same employer (slug join).
+    loadAndRenderH1b(emp.name);
 
     // Donut hover interactions
     const svg = document.getElementById('emp-donut-svg');
@@ -2727,6 +2752,102 @@ function employerSlug(name) {
         });
       });
     }
+  }
+
+  // ── H-1B salary section (lazy-loaded, appended below Top Job Titles) ──────────
+  const h1bCache = new Map(); // slug -> payload | null (null = no data)
+  const fmtUSD = (v) => (v == null || isNaN(v)) ? '—' : '$' + Math.round(v).toLocaleString('en-US');
+  const fmtK   = (v) => (v == null || isNaN(v)) ? '—' : '$' + Math.round(v / 1000) + 'k';
+
+  function loadH1b(name) {
+    const slug = employerSlug(name);
+    if (!slug) return Promise.resolve(null);
+    if (h1bCache.has(slug)) return Promise.resolve(h1bCache.get(slug));
+    return fetch(EMPLOYER_API_BASE + '/api/employers/' + encodeURIComponent(slug) + '/h1b')
+      .then(r => {
+        if (r.status === 404) return null;      // no H-1B data for this employer
+        if (!r.ok) throw new Error('h1b fetch failed: ' + r.status);
+        return r.json();
+      })
+      .then(payload => { h1bCache.set(slug, payload); return payload; });
+  }
+
+  function renderH1bBody(h1b) {
+    const body = document.getElementById('emp-h1b-body');
+    if (!body) return;
+
+    if (!h1b || !Array.isArray(h1b.socs) || h1b.socs.length === 0) {
+      body.innerHTML = '<div class="h1b-empty">No certified <b>H-1B LCA</b> salary data on file for this employer (FY2025).</div>';
+      return;
+    }
+
+    const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 10);
+    const maxMedian = socs.reduce((m, s) => Math.max(m, s.wage_median || 0), 1);
+
+    // Overall "% above prevailing" — share of certified LCAs (by volume) in the top
+    // categories where the median offered wage met or beat the DOL prevailing floor.
+    let aboveN = 0, cmpN = 0;
+    socs.forEach(s => {
+      if (s.wage_median != null && s.pw_median != null && s.pw_median > 0) {
+        cmpN += (s.n || 0);
+        if (s.wage_median >= s.pw_median) aboveN += (s.n || 0);
+      }
+    });
+    const abovePct = cmpN > 0 ? Math.round(aboveN / cmpN * 100) : null;
+
+    const cardsHtml =
+      '<div class="emp-modal-cards" style="margin-bottom:14px;">' +
+        '<div class="emp-stat-card">' +
+          '<div class="emp-stat-label">Median Offered Salary</div>' +
+          '<div class="emp-stat-value">' + fmtUSD(h1b.wage_median_all) + '</div>' +
+          '<div class="emp-stat-sub">Across ' + n(h1b.total || 0) + ' certified LCAs · ' + esc(h1b.fy || 'FY2025') + '</div>' +
+        '</div>' +
+        '<div class="emp-stat-card">' +
+          '<div class="emp-stat-label">% Above Prevailing</div>' +
+          '<div class="emp-stat-value ' + (abovePct == null ? 'cr-na' : abovePct >= 80 ? 'cr-good' : abovePct >= 50 ? 'cr-med' : 'cr-bad') + '">' +
+            (abovePct == null ? '—' : abovePct + '%') + '</div>' +
+          '<div class="emp-stat-sub">' + (abovePct == null ? 'Prevailing wage not comparable' : 'of filings at/above DOL prevailing wage') + '</div>' +
+        '</div>' +
+      '</div>';
+
+    const rowsHtml = socs.map((s, i) => {
+      const pct = s.pw_median ? Math.round((s.wage_median - s.pw_median) / s.pw_median * 100) : null;
+      let pwTag = '';
+      if (s.pw_median != null && pct != null) {
+        pwTag = '<span class="' + (pct >= 0 ? 'h1b-pw-above' : 'h1b-pw-below') + '">' +
+                  (pct >= 0 ? '+' + pct + '% above' : pct + '% below') + ' prevailing</span>';
+      }
+      const range = (s.wage_p10 != null && s.wage_p90 != null)
+        ? '<span>P10–P90 ' + fmtK(s.wage_p10) + ' – ' + fmtK(s.wage_p90) + '</span>' : '';
+      const pw = (s.pw_median != null) ? '<span>Prevailing ' + fmtUSD(s.pw_median) + '</span>' : '';
+      return '<div class="employer-row h1b-row">' +
+          '<span class="employer-rank">' + (i + 1) + '</span>' +
+          '<span class="employer-name">' + esc(s.title || s.soc || '—') + '</span>' +
+          '<span class="employer-count">' + fmtUSD(s.wage_median) + '</span>' +
+          '<div class="employer-bar"><div class="employer-bar-fill h1b-bar-fill" style="width:' +
+            Math.round((s.wage_median || 0) / maxMedian * 100) + '%;"></div></div>' +
+        '</div>' +
+        '<div class="h1b-sub">' + range + pw + pwTag + '</div>';
+    }).join('');
+
+    body.innerHTML = cardsHtml + rowsHtml;
+  }
+
+  function loadAndRenderH1b(name) {
+    const slug = employerSlug(name);
+    loadH1b(name)
+      .then(h1b => {
+        // Guard against a newer modal having opened for a different employer.
+        const sec = document.getElementById('emp-h1b-section');
+        if (!sec || slug !== employerSlug(currentModalName)) return;
+        renderH1bBody(h1b);
+      })
+      .catch(() => {
+        const body = document.getElementById('emp-h1b-body');
+        if (body && slug === employerSlug(currentModalName)) {
+          body.innerHTML = '<div class="h1b-empty">H-1B salary data is temporarily unavailable.</div>';
+        }
+      });
   }
 })();
 </script>
