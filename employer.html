@@ -226,6 +226,20 @@
   .sk-chart .sk { flex: 1; border-radius: 5px 5px 2px 2px; }
   .placeholder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
+  /* ── MULTI-YEAR (LCA/PERM/USCIS backfill) ── */
+  .fy-bar.fy-pw { background: linear-gradient(180deg, #f59e0b, #f97316); box-shadow: 0 2px 10px rgba(245,158,11,0.22); }
+  .fy-bar.fy-gc { background: linear-gradient(180deg, #a855f7, #ec4899); box-shadow: 0 2px 10px rgba(168,85,247,0.22); }
+  .fy-sw.fy-pw { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .fy-sw.fy-gc { background: linear-gradient(135deg, #a855f7, #ec4899); }
+  .myr-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 14px; }
+  .myr-table th { text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
+  .myr-table th:first-child { text-align: left; }
+  .myr-table td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--sep); color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
+  .myr-table td:first-child { text-align: left; color: var(--text-primary); }
+  .myr-table tr:last-child td { border-bottom: none; }
+  .myr-partial { font-size: 9px; color: var(--text-dim); margin-left: 5px; font-weight: 500; }
+  .myr-note { font-size: 11px; color: var(--text-muted); margin-top: 12px; line-height: 1.5; }
+
   /* ── FAQ ── */
   .faq-item { border-bottom: 1px solid var(--sep); }
   .faq-item:last-child { border-bottom: none; }
@@ -815,10 +829,15 @@ function renderH1bSection(h1b) {
 }
 
 function renderOccupations(emp, h1b) {
-  // H-1B occupations from SOC titles
+  // Prefer the fuller multi-year combined occupations (socsAll / permTitlesAll);
+  // fall back to the current-FY socs / live PERM topTitles for older payloads.
+  const h1bMulti = !!(h1b && Array.isArray(h1b.socsAll) && h1b.socsAll.length);
+  const socSource = h1bMulti ? h1b.socsAll
+    : ((h1b && Array.isArray(h1b.socs)) ? h1b.socs : []);
+
   let h1bCol;
-  if (h1b && Array.isArray(h1b.socs) && h1b.socs.length) {
-    const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 10);
+  if (socSource.length) {
+    const socs = socSource.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 10);
     const maxN = socs[0].n || 1;
     h1bCol = socs.map((s, i) =>
       '<div class="employer-row">' +
@@ -832,8 +851,11 @@ function renderOccupations(emp, h1b) {
     h1bCol = '<div class="soon-inner" style="padding:24px 8px;"><div class="soon-msg">No H-1B occupation data.</div></div>';
   }
 
-  // Green-card occupations from PERM topTitles
-  const titles = (emp.topTitles || []).slice(0, 10);
+  // Green-card occupations: multi-year combined PERM titles, else live topTitles.
+  const gcMulti = !!(h1b && Array.isArray(h1b.permTitlesAll) && h1b.permTitlesAll.length);
+  const titles = gcMulti
+    ? h1b.permTitlesAll.map(t => ({ title: t.title, count: t.n })).slice(0, 10)
+    : (emp.topTitles || []).slice(0, 10);
   const maxTitle = titles.length ? titles[0].count : 1;
   const gcCol = titles.length ? titles.map((t, i) =>
     '<div class="employer-row">' +
@@ -844,6 +866,8 @@ function renderOccupations(emp, h1b) {
     '</div>'
   ).join('') : '<div class="soon-inner" style="padding:24px 8px;"><div class="soon-msg">No PERM title data.</div></div>';
 
+  const h1bSub = h1bMulti ? '<span class="muted" style="font-weight:400;color:var(--text-dim);"> · FY2020–2026</span>' : '';
+  const gcSub = gcMulti ? '<span class="muted" style="font-weight:400;color:var(--text-dim);"> · FY2020–2026</span>' : '';
   return '' +
   '<section class="emp-section">' +
     '<div class="emp-section-head">' +
@@ -852,8 +876,8 @@ function renderOccupations(emp, h1b) {
       '<span class="tag-live">● Live data</span>' +
     '</div>' +
     '<div class="occ-split">' +
-      '<div><div class="sub-head">H-1B Occupations (SOC)</div><div class="rowlist">' + h1bCol + '</div></div>' +
-      '<div><div class="sub-head">Green Card Job Titles (PERM)</div><div class="rowlist">' + gcCol + '</div></div>' +
+      '<div><div class="sub-head">H-1B Occupations (SOC)' + h1bSub + '</div><div class="rowlist">' + h1bCol + '</div></div>' +
+      '<div><div class="sub-head">Green Card Job Titles (PERM)' + gcSub + '</div><div class="rowlist">' + gcCol + '</div></div>' +
     '</div>' +
   '</section>';
 }
@@ -881,16 +905,128 @@ function soonCard(title, eyebrow, sub, body) {
     '<div class="soon-inner"><div class="soon-sub">' + esc(sub) + '</div></div>' +
   '</section>';
 }
-function renderPlaceholders() {
-  return '' +
-    soonCard('H-1B LCAs & Green Card by Year', 'History', 'Year-by-year LCA and PERM filing counts will appear here once multi-year DOL disclosure files are ingested.',
-      '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B LCAs by Year</div>' + skChart(8) + '</div><div class="panel"><div class="panel-title">Green Card (PERM) by Year</div>' + skChart(8) + '</div></div>') +
-    soonCard('H-1B Petition History', 'USCIS', 'H-1B petition approvals, denials, initial vs. continuing, and approval-rate history (USCIS H-1B Employer Data Hub) will populate this section.',
-      '<div class="panel">' + skRows(5) + '</div>') +
-    soonCard('Annual Salary Trend', 'Salaries', 'Multi-year median offered, prevailing, and green-card salary trends will be charted here once historical wage data is loaded.',
-      '<div class="panel">' + skChart(10) + '</div>') +
-    soonCard('Worksite Locations', 'Geography', 'H-1B and green-card worksite cities, states, and prevailing-wage areas will be tabled here from worksite-level disclosure data.',
-      '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B Work Sites</div>' + skRows(5) + '</div><div class="panel"><div class="panel-title">Green Card Work Sites</div>' + skRows(5) + '</div></div>');
+// ── MULTI-YEAR sections (real data from the LCA/PERM/USCIS backfill) ────────
+// Backed by the H-1B store fields: lcaByYear, permByYear, uscisByYear,
+// salaryTrend, socsAll, permTitlesAll. Each section degrades to a tasteful
+// placeholder if its data is absent (e.g. an older single-FY payload).
+const fyShort = (fy) => "'" + String(fy || '').slice(4);
+
+function liveSection(eyebrow, title, body, meta) {
+  return '<section class="emp-section">' +
+    '<div class="emp-section-head"><div><div class="emp-section-eyebrow">' + esc(eyebrow) + '</div>' +
+    '<div class="emp-section-title">' + esc(title) + '</div></div><div class="spacer"></div>' +
+    (meta ? '<span class="emp-section-meta">' + esc(meta) + '</span>' : '') +
+    '<span class="tag-live">● Live data</span></div>' + body + '</section>';
+}
+
+function fyBars(items, cls) {
+  if (!items || !items.length) return '';
+  const max = items.reduce((m, b) => Math.max(m, b.value || 0), 1);
+  const groups = items.map(b => {
+    const h = Math.max(4, Math.round((b.value || 0) / max * 80));
+    return '<div class="fy-group"><div class="fy-bars"><div class="fy-bar-wrap">' +
+      '<div class="fy-val">' + n(b.value) + '</div>' +
+      '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(b.fy + ': ' + n(b.value)) + '"></div>' +
+      '</div></div><div class="fy-year">' + esc(fyShort(b.fy)) +
+      (b.partial ? '<span class="fy-tag">partial</span>' : '') + '</div></div>';
+  }).join('');
+  return '<div class="fy-chart" style="gap:10px;">' + groups + '</div>';
+}
+
+function myrTable(headers, rows) {
+  return '<table class="myr-table"><thead><tr>' +
+    headers.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+    rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table>';
+}
+
+function pTag(partial) { return partial ? '<span class="myr-partial">partial</span>' : ''; }
+
+function renderByYear(h1b) {
+  const lca = (h1b && Array.isArray(h1b.lcaByYear)) ? h1b.lcaByYear : [];
+  const perm = (h1b && Array.isArray(h1b.permByYear)) ? h1b.permByYear : [];
+  if (!lca.length && !perm.length) {
+    // graceful fallback for older single-FY payloads
+    return soonCard('H-1B LCAs & Green Card by Year', 'History',
+      'Year-by-year LCA and PERM filing counts will appear here once multi-year DOL disclosure files are ingested.',
+      '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B LCAs by Year</div>' + skChart(8) +
+      '</div><div class="panel"><div class="panel-title">Green Card (PERM) by Year</div>' + skChart(8) + '</div></div>');
+  }
+  const lcaBars = fyBars(lca.map(y => ({ fy: y.fy, value: y.total, partial: y.partial })), 'fy-h1b');
+  const lcaRows = lca.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
+  const permBars = fyBars(perm.map(y => ({ fy: y.fy, value: y.cert, partial: y.partial })), 'fy-gc');
+  const permRows = perm.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
+  const allFy = lca.concat(perm).map(y => y.fy).sort();
+  const meta = allFy.length ? (allFy[0] + '–' + allFy[allFy.length - 1]) : '';
+  return liveSection('History', 'H-1B LCAs & Green Card by Year',
+    '<div class="placeholder-grid">' +
+      '<div class="panel"><div class="panel-title">H-1B LCAs by Year <span class="muted">· certified positions</span></div>' +
+        lcaBars + (lcaRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], lcaRows) : '') + '</div>' +
+      '<div class="panel"><div class="panel-title">Green Card (PERM) by Year <span class="muted">· certified</span></div>' +
+        permBars + (permRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], permRows) : '') + '</div>' +
+    '</div>' +
+    '<div class="myr-note">LCA = H-1B Labor Condition Applications (certified positions, DOL OFLC ETA-9035). PERM = green-card labor certifications (DOL OFLC ETA-9089). FY2026 is partial (year-to-date).</div>',
+    meta);
+}
+
+function renderPetitionHistory(h1b) {
+  const u = (h1b && Array.isArray(h1b.uscisByYear)) ? h1b.uscisByYear : [];
+  if (!u.length) return soonCard('H-1B Petition History', 'USCIS',
+    'H-1B petition approvals, denials, initial vs. continuing, and approval-rate history (USCIS H-1B Employer Data Hub) will populate this section.',
+    '<div class="panel">' + skRows(5) + '</div>');
+  const bars = fyBars(u.map(y => ({ fy: y.fy, value: y.approvals, partial: false })), 'fy-h1b');
+  const rows = u.map(y => [
+    esc(fyShort(y.fy)), n(y.initial_approval), n(y.initial_denial),
+    n(y.continuing_approval), n(y.continuing_denial),
+    y.approval_rate == null ? '—' :
+      '<span class="' + (y.approval_rate >= 90 ? 'myr-pos' : y.approval_rate >= 70 ? '' : 'myr-neg') + '">' + y.approval_rate + '%</span>',
+  ]);
+  const meta = u[0].fy + '–' + u[u.length - 1].fy;
+  return liveSection('USCIS', 'H-1B Petition History',
+    '<div class="panel"><div class="panel-title">Petitions Approved by Fiscal Year <span class="muted">· USCIS H-1B Employer Data Hub</span></div>' +
+      bars + myrTable(['FY', 'Init. Appr', 'Init. Den', 'Cont. Appr', 'Cont. Den', 'Approval %'], rows) +
+      '<div class="myr-note">Initial = new H-1B petitions; Continuing = extensions/amendments. Approval rate = approvals ÷ (approvals + denials). Source: USCIS H-1B Employer Data Hub (bulk files available FY2020–FY2023).</div>' +
+    '</div>', meta);
+}
+
+function renderSalaryTrend(h1b) {
+  const t = (h1b && Array.isArray(h1b.salaryTrend)) ? h1b.salaryTrend : [];
+  const has = t.some(y => y.h1b_offered != null || y.prevailing != null || y.gc != null);
+  if (!t.length || !has) return soonCard('Annual Salary Trend', 'Salaries',
+    'Multi-year median offered, prevailing, and green-card salary trends will be charted here once historical wage data is loaded.',
+    '<div class="panel">' + skChart(10) + '</div>');
+  const max = t.reduce((m, y) => Math.max(m, y.h1b_offered || 0, y.prevailing || 0, y.gc || 0), 1);
+  const bar = (v, cls, lbl) => {
+    if (v == null) return '<div class="fy-bar-wrap"></div>';
+    const h = Math.max(4, Math.round(v / max * 80));
+    return '<div class="fy-bar-wrap"><div class="fy-val">' + fmtK(v) + '</div>' +
+      '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(lbl + ' ' + fmtUSD(v)) + '"></div></div>';
+  };
+  const groups = t.map(y => '<div class="fy-group"><div class="fy-bars" style="gap:5px;">' +
+    bar(y.h1b_offered, 'fy-h1b', 'H-1B offered') + bar(y.prevailing, 'fy-pw', 'Prevailing') + bar(y.gc, 'fy-gc', 'Green card') +
+    '</div><div class="fy-year">' + esc(fyShort(y.fy)) + (y.partial ? '<span class="fy-tag">partial</span>' : '') + '</div></div>').join('');
+  const legend =
+    '<span class="fy-li"><span class="fy-sw fy-h1b"></span> H-1B offered (median)</span>' +
+    '<span class="fy-li"><span class="fy-sw fy-pw"></span> Prevailing wage (median)</span>' +
+    '<span class="fy-li"><span class="fy-sw fy-gc"></span> Green card / PERM (median)</span>';
+  const meta = t[0].fy + '–' + t[t.length - 1].fy;
+  return liveSection('Salaries', 'Annual Salary Trend',
+    '<div class="panel"><div class="panel-title">Median Wages by Fiscal Year</div>' +
+      '<div class="fy-chart" style="gap:16px;">' + groups + '</div>' +
+      '<div class="fy-legend">' + legend + '</div>' +
+      '<div class="myr-note">Annualized medians of certified filings. H-1B offered &amp; prevailing wages from LCA disclosure; green-card wage from PERM offered wage. FY2026 partial.</div>' +
+    '</div>', meta);
+}
+
+function renderWorksitesSoon() {
+  return soonCard('Worksite Locations', 'Geography',
+    'Worksite cities, states, and prevailing-wage areas are not yet ingested in this phase.',
+    '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B Work Sites</div>' + skRows(5) +
+    '</div><div class="panel"><div class="panel-title">Green Card Work Sites</div>' + skRows(5) + '</div></div>');
+}
+
+function renderMultiYear(emp, h1b) {
+  return renderByYear(h1b) + renderPetitionHistory(h1b) + renderSalaryTrend(h1b) + renderWorksitesSoon();
 }
 
 function renderFaqs(emp, ps, h1b, rankInfo) {
@@ -926,8 +1062,8 @@ function renderFaqs(emp, ps, h1b, rankInfo) {
       (abovePct != null ? ' About <b>' + abovePct + '%</b> of filings are at or above the DOL prevailing wage for the role.' : '')]);
   }
 
-  faqs.push(['Is this the complete immigration history for ' + name + '?',
-    'Not yet. The PERM and FY2025 H-1B salary data shown here is live. Multi-year LCA/PERM history, USCIS H-1B petition approval/denial counts, multi-year salary trends, and worksite locations are marked “coming soon” and will be added as historical datasets are ingested.']);
+  faqs.push(['How far back does the data for ' + name + ' go?',
+    'This profile now includes multi-year history: H-1B LCA and green-card (PERM) filings by fiscal year (FY2020–FY2026), annual salary trends, and USCIS H-1B petition approval/denial counts (FY2020–FY2023). FY2026 is year-to-date (partial). The real-time PERM case-status dashboard covers recent filings (Nov 2024 onward). Worksite-level locations are not yet ingested.']);
 
   const items = faqs.map((f, i) =>
     '<div class="faq-item' + (i === 0 ? ' open' : '') + '">' +
@@ -1011,7 +1147,7 @@ function renderAll(emp, h1b, rankInfo) {
     renderPermSection(emp, ps, h1b) +
     renderH1bSection(h1b) +
     renderOccupations(emp, h1b) +
-    renderPlaceholders() +
+    renderMultiYear(emp, h1b) +
     renderFaqs(emp, ps, h1b, rankInfo);
   wireDonut(ps);
   wireFaq();
