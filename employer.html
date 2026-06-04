@@ -155,6 +155,24 @@
   .trend-x { font-size: 9.5px; color: var(--text-dim); white-space: nowrap; transform: rotate(-40deg); transform-origin: center; height: 14px; }
   .trend-legend { font-size: 11px; color: var(--text-muted); margin-top: 14px; }
 
+  /* Filings by Year — grouped annual bar chart (replaces sparse monthly trend) */
+  .fy-chart { display: flex; align-items: flex-end; justify-content: space-around; gap: 28px; height: 188px; padding: 20px 6px 0; }
+  .fy-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; max-width: 280px; }
+  .fy-bars { display: flex; align-items: flex-end; justify-content: center; gap: 16px; height: 100%; width: 100%; }
+  .fy-bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1; max-width: 68px; }
+  .fy-val { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 7px; white-space: nowrap; letter-spacing: -0.2px; }
+  .fy-bar { width: 100%; border-radius: 7px 7px 2px 2px; min-height: 4px; transition: opacity 0.15s, transform 0.15s; cursor: default; }
+  .fy-bar:hover { opacity: 0.86; }
+  .fy-bar.fy-perm { background: linear-gradient(180deg, #a855f7, #ec4899); box-shadow: 0 2px 10px rgba(168,85,247,0.22); }
+  .fy-bar.fy-h1b { background: linear-gradient(180deg, #3b82f6, #8b5cf6); box-shadow: 0 2px 10px rgba(59,130,246,0.22); }
+  .fy-year { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+  .fy-tag { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-dim); border: 1px solid var(--card-border); border-radius: 5px; padding: 1px 5px; }
+  .fy-legend { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 16px; }
+  .fy-li { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--text-secondary); }
+  .fy-sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; flex-shrink: 0; }
+  .fy-sw.fy-perm { background: linear-gradient(135deg, #a855f7, #ec4899); }
+  .fy-sw.fy-h1b { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+
   /* ── ROWS (Top Titles + occupations) ── */
   .rowlist { display: flex; flex-direction: column; }
   .employer-row { display: grid; grid-template-columns: 22px 1fr 54px 78px; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--sep); }
@@ -341,7 +359,7 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 //
 // REAL sections (populated from current staging data):
 //   • Overview header (key stats + approx PERM-volume rank)
-//   • Green Card / PERM (status donut, cert rate, monthly trend, top titles)
+//   • Green Card / PERM (status donut, cert rate, filings-by-year, top titles)
 //   • H-1B Salaries (FY2025 LCA medians, P10–P90 range bars, prevailing wage)
 //   • Occupations & Job Titles (H-1B SOC vs Green Card titles)
 //   • FAQs (auto-generated)
@@ -548,7 +566,7 @@ function keystat(label, value, sub, cls) {
   '</div>';
 }
 
-function renderPermSection(emp, ps) {
+function renderPermSection(emp, ps, h1b) {
   const firstStr = fmtMonthYear(emp.firstFiling);
   const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
   const period = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
@@ -582,19 +600,8 @@ function renderPermSection(emp, ps) {
     '<span class="legend-value">' + n(item.value) + ' (' + item.pct + '%)</span></div>'
   ).join('');
 
-  // monthly trend
-  const monthly = (emp.monthlyFilings || []).slice();
-  const maxM = monthly.reduce((m, x) => Math.max(m, x.count || 0), 1);
-  const showLbl = monthly.length <= 18;
-  const trendBars = monthly.map((m, i) => {
-    const h = Math.max(2, Math.round((m.count || 0) / maxM * 100));
-    const p = m.month.split('-');
-    const lbl = MONTHS[parseInt(p[1], 10) - 1] + (p[1] === '01' || i === 0 ? " '" + p[0].slice(2) : '');
-    return '<div class="trend-col" title="' + esc(MONTHS[parseInt(p[1],10)-1] + ' ' + p[0]) + ': ' + n(m.count) + ' filings">' +
-      '<div class="trend-bar" style="height:' + h + '%;"></div>' +
-      (showLbl ? '<div class="trend-x">' + esc(lbl) + '</div>' : '') +
-    '</div>';
-  }).join('');
+  // filings-by-year (replaces the old sparse monthly trend)
+  const filingsByYear = renderFilingsByYear(emp, h1b);
 
   // top titles
   const titles = (emp.topTitles || []).slice(0, 10);
@@ -650,18 +657,99 @@ function renderPermSection(emp, ps) {
         '</div>' +
       '</div>' : '<div class="panel"><div class="soon-inner"><div class="soon-msg">No status breakdown available.</div></div></div>') +
     '</div>' +
-    (monthly.length ?
-    '<div class="panel" style="margin-top:16px;">' +
-      '<div class="panel-title">Monthly Filing Trend <span class="muted">· ' + n(monthly.length) + ' months</span></div>' +
-      '<div class="trend">' + trendBars + '</div>' +
-      '<div class="trend-legend">Monthly PERM filing volume over the available window.</div>' +
-    '</div>' : '') +
+    filingsByYear +
     (titles.length ?
     '<div class="panel" style="margin-top:16px;">' +
       '<div class="panel-title">Top ' + Math.min(titles.length, 10) + ' PERM Job Titles</div>' +
       '<div class="rowlist">' + titlesHtml + '</div>' +
     '</div>' : '') +
   '</section>';
+}
+
+// Filings by Year — a clean grouped bar chart of annual filing volume.
+// Replaces the old monthly trend, which was sparse/spiky for a single employer.
+// PERM is bucketed by calendar year from monthlyFilings; H-1B is the certified
+// FY2025 LCA total. Falls back to a tasteful "coming soon" panel when there
+// aren't at least two data points to compare.
+function renderFilingsByYear(emp, h1b) {
+  // Bucket PERM filings into calendar years.
+  const permByYear = {};
+  (emp.monthlyFilings || []).forEach(m => {
+    if (!m || !m.month) return;
+    const y = String(m.month).slice(0, 4);
+    permByYear[y] = (permByYear[y] || 0) + (m.count || 0);
+  });
+  const permYears = Object.keys(permByYear).filter(y => permByYear[y] > 0).sort();
+  // The first calendar year of DOL disclosure data is partial (coverage begins
+  // mid-window), so flag it rather than implying an artificially low year.
+  const firstYear = emp.firstFiling ? String(emp.firstFiling).slice(0, 4) : (permYears[0] || null);
+
+  const h1bTotal = (h1b && typeof h1b.total === 'number' && h1b.total > 0) ? h1b.total : null;
+  const h1bFy = (h1b && h1b.fy) ? String(h1b.fy) : 'FY2025';
+  const h1bYear = (h1bFy.match(/\d{4}/) || [permYears[permYears.length - 1] || '2025'])[0];
+
+  // Assemble bars: PERM per year + H-1B FY total.
+  const bars = [];
+  permYears.forEach(y => bars.push({
+    year: y, program: 'perm', value: permByYear[y],
+    partial: y === firstYear && permYears.length > 1,
+    label: 'Green Card · PERM ' + y + (y === firstYear && permYears.length > 1 ? ' (partial)' : '')
+  }));
+  if (h1bTotal != null) bars.push({
+    year: h1bYear, program: 'h1b', value: h1bTotal, partial: false,
+    label: 'H-1B · LCA ' + h1bFy
+  });
+
+  // Fewer than two comparable data points → tasteful placeholder, not a bad chart.
+  if (bars.length < 2) {
+    return '<div class="panel" style="margin-top:16px;">' +
+        '<div class="panel-title">Filings by Year</div>' +
+        '<div class="soon-inner"><div class="soon-icon">📈</div>' +
+        '<div class="soon-msg">Multi-year filing trends coming soon — more historical data is being ingested.</div></div>' +
+      '</div>';
+  }
+
+  // Group bars under their calendar year for a grouped-bar layout.
+  const groupYears = [];
+  bars.forEach(b => { if (groupYears.indexOf(b.year) === -1) groupYears.push(b.year); });
+  groupYears.sort();
+  const maxVal = bars.reduce((m, b) => Math.max(m, b.value), 1);
+
+  const groupsHtml = groupYears.map(gy => {
+    const gbars = bars.filter(b => b.year === gy);
+    const barsHtml = gbars.map(b => {
+      const h = Math.max(4, Math.round(b.value / maxVal * 80));
+      const cls = b.program === 'h1b' ? 'fy-h1b' : 'fy-perm';
+      const title = b.label + ': ' + n(b.value) + ' filings';
+      return '<div class="fy-bar-wrap">' +
+          '<div class="fy-val">' + n(b.value) + '</div>' +
+          '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(title) + '"></div>' +
+        '</div>';
+    }).join('');
+    const partial = gbars.some(b => b.partial);
+    return '<div class="fy-group">' +
+        '<div class="fy-bars">' + barsHtml + '</div>' +
+        '<div class="fy-year">' + esc(gy) + (partial ? '<span class="fy-tag">partial</span>' : '') + '</div>' +
+      '</div>';
+  }).join('');
+
+  const showH1b = h1bTotal != null;
+  const showPerm = permYears.length > 0;
+  const legendHtml =
+    (showPerm ? '<span class="fy-li"><span class="fy-sw fy-perm"></span> Green Card (PERM)</span>' : '') +
+    (showH1b ? '<span class="fy-li"><span class="fy-sw fy-h1b"></span> H-1B (LCA · ' + esc(h1bFy) + ')</span>' : '');
+
+  const noteParts = [];
+  if (showPerm) noteParts.push('PERM labor certifications by calendar year' +
+    (permYears.length > 1 && firstYear ? ' (' + esc(firstYear) + ' reflects the partial window when DOL disclosure data begins)' : ''));
+  if (showH1b) noteParts.push('H-1B shows certified ' + esc(h1bFy) + ' LCA positions');
+
+  return '<div class="panel" style="margin-top:16px;">' +
+      '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume</span></div>' +
+      '<div class="fy-chart">' + groupsHtml + '</div>' +
+      '<div class="fy-legend">' + legendHtml + '</div>' +
+      '<div class="trend-legend">' + noteParts.join('. ') + '.</div>' +
+    '</div>';
 }
 
 function renderH1bSection(h1b) {
@@ -920,7 +1008,7 @@ function renderAll(emp, h1b, rankInfo) {
   document.getElementById('emp-body').innerHTML =
     '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
     renderHero(emp, ps, h1b, rankInfo) +
-    renderPermSection(emp, ps) +
+    renderPermSection(emp, ps, h1b) +
     renderH1bSection(h1b) +
     renderOccupations(emp, h1b) +
     renderPlaceholders() +
