@@ -6,7 +6,7 @@
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 <title>Employer PERM &amp; H-1B Profile | ImmiLane</title>
-<meta name="description" content="PERM labor certification and H-1B salary profile for this employer: total filings, status distribution, certification rate, top job titles, and certified H-1B LCA offered wages (FY2025).">
+<meta name="description" content="PERM labor certification and H-1B salary profile for this employer: total filings, status distribution, certification rate, top job titles, occupations, and certified H-1B LCA offered wages (FY2025).">
 <meta name="robots" content="index,follow">
 <link rel="canonical" id="emp-canonical" href="https://immilane.com/employer.html">
 <meta property="og:type" content="website">
@@ -35,6 +35,8 @@
     --modal-bg: #0e0e1a; --modal-backdrop: rgba(0,0,0,0.65); --modal-border: rgba(255,255,255,0.08);
     --bg-card: rgba(15,15,24,0.92);
     --gradient-start: rgba(59,130,246,0.08); --gradient-end: rgba(139,92,246,0.06);
+    --accent: #3b82f6; --accent-2: #8b5cf6;
+    --skeleton: rgba(255,255,255,0.05); --skeleton-shine: rgba(255,255,255,0.09);
   }
 
   html.light {
@@ -47,6 +49,7 @@
     --modal-bg: #fff; --modal-backdrop: rgba(0,0,0,0.3); --modal-border: rgba(0,0,0,0.1);
     --bg-card: rgba(245,247,250,0.95);
     --gradient-start: transparent; --gradient-end: transparent;
+    --skeleton: rgba(0,0,0,0.05); --skeleton-shine: rgba(0,0,0,0.09);
   }
 
   html { background: var(--bg-html); overflow-x: hidden; }
@@ -74,47 +77,145 @@
   footer a { color: var(--text-muted); text-decoration: none; }
   footer a:hover { color: var(--text-secondary); }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
 
   /* ── PAGE LAYOUT ── */
-  .emp-page { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 28px 24px 64px; }
-  .emp-breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+  .emp-page { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 26px 24px 72px; }
+  .emp-breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
   .emp-breadcrumb a { color: var(--text-secondary); text-decoration: none; }
   .emp-breadcrumb a:hover { color: var(--text-primary); }
-  .emp-page-title { font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 4px; }
-  .emp-page-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
 
-  .stat-details { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--sep); display: flex; flex-direction: column; gap: 6px; }
-  .stat-detail-row { display: flex; justify-content: space-between; font-size: 12px; }
+  /* ── HERO / OVERVIEW HEADER ── */
+  .emp-hero { background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(139,92,246,0.06)); border: 1px solid var(--card-border); border-radius: 18px; padding: 26px 26px 22px; margin-bottom: 22px; position: relative; overflow: hidden; }
+  .emp-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .emp-hero-top { display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+  .emp-hero-mark { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 6px 20px rgba(59,130,246,0.3); }
+  .emp-hero-head { flex: 1; min-width: 220px; }
+  .emp-hero-title { font-size: 30px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.18; margin-bottom: 8px; }
+  .emp-hero-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .emp-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: var(--tab-active); color: var(--text-secondary); border: 1px solid var(--card-border); }
+  .emp-badge.rank { background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.18)); color: var(--text-primary); border-color: rgba(99,102,241,0.35); }
+  .emp-badge .b-num { font-weight: 800; color: var(--text-primary); }
+  .emp-hero-blurb { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-top: 16px; max-width: 760px; }
+
+  .emp-keystats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
+  .emp-keystat { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 14px; }
+  .emp-keystat .ks-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 7px; }
+  .emp-keystat .ks-value { font-size: 23px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.05; }
+  .emp-keystat .ks-sub { font-size: 11px; color: var(--text-secondary); margin-top: 5px; }
+  .ks-value.good { color: #22c55e; } .ks-value.med { color: #f59e0b; } .ks-value.bad { color: #ef4444; } .ks-value.na { color: var(--text-muted); }
+
+  /* ── SECTIONS ── */
+  .emp-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 22px; margin-bottom: 18px; }
+  .emp-section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .emp-section-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+  .emp-section-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .emp-section-meta { font-size: 11.5px; color: var(--text-muted); font-weight: 400; }
+  .emp-section-head .spacer { flex: 1; }
+  .tag-soon { font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: rgba(245,158,11,0.14); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+  .tag-live { font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: rgba(34,197,94,0.13); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  .sub-head { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 0 12px; }
+
+  /* ── STAT CARDS ── */
+  .emp-grid-2 { display: grid; grid-template-columns: 280px 1fr; gap: 16px; align-items: start; }
+  .emp-cards-col { display: flex; flex-direction: column; gap: 12px; }
+  .emp-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px 14px; position: relative; overflow: hidden; }
+  .emp-stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent); opacity: 0.6; }
+  .emp-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+  .emp-stat-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text-primary); }
+  .emp-stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.55; word-break: break-word; }
+  .emp-stat-value.cr-good { color: #22c55e; } .emp-stat-value.cr-med { color: #f59e0b; } .emp-stat-value.cr-bad { color: #ef4444; } .emp-stat-value.cr-na { color: var(--text-muted); }
+  .emp-stat-disclaimer { font-size: 10px; color: var(--text-dim); margin-top: 10px; font-style: italic; line-height: 1.4; }
+  .stat-details { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--sep); display: flex; flex-direction: column; gap: 4px; }
+  .stat-detail-row { display: flex; justify-content: space-between; font-size: 11px; }
   .stat-detail-label { color: var(--text-muted); } .stat-detail-value { color: var(--text-secondary); font-weight: 600; }
+  .panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; }
+  .panel-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; letter-spacing: -0.2px; }
+  .panel-title .muted { color: var(--text-dim); font-weight: 400; font-size: 11px; }
 
   /* ── DONUT ── */
-  .donut-container { display: flex; align-items: center; gap: 24px; }
-  .donut-wrap { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
-  .donut-svg { width: 180px; height: 180px; transform: rotate(-90deg); }
+  .donut-container { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; justify-content: center; }
+  .donut-wrap { position: relative; width: 168px; height: 168px; flex-shrink: 0; }
+  .donut-svg { width: 168px; height: 168px; transform: rotate(-90deg); }
   .donut-seg { cursor: pointer; transition: opacity 0.2s; }
   .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
   .donut-number { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); }
-  .donut-label  { font-size: 10px; color: var(--text-muted); font-weight: 500; }
-  .donut-pct    { font-size: 10px; font-weight: 600; margin-top: 1px; }
-  .legend { display: flex; flex-direction: column; gap: 8px; }
+  .donut-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+  .donut-pct { font-size: 10px; font-weight: 600; margin-top: 1px; }
+  .legend { display: flex; flex-direction: column; gap: 8px; min-width: 180px; }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-  .legend-dot   { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
   .legend-value { margin-left: auto; font-weight: 600; color: var(--text-secondary); font-size: 12px; }
 
-  /* ── ROWS (Top Titles + H-1B) ── */
-  .employer-row { display: grid; grid-template-columns: 24px 1fr 60px 80px; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--sep); }
-  .employer-rank  { font-size: 12px; font-weight: 700; color: var(--text-dim); text-align: center; }
-  .employer-name  { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* ── MONTHLY TREND BARS ── */
+  .trend { display: flex; align-items: flex-end; gap: 4px; height: 130px; padding-top: 8px; }
+  .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; min-width: 0; }
+  .trend-bar { width: 100%; max-width: 26px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #3b82f6, #8b5cf6); transition: opacity 0.15s; cursor: default; min-height: 2px; }
+  .trend-col:hover .trend-bar { opacity: 0.82; }
+  .trend-x { font-size: 9.5px; color: var(--text-dim); white-space: nowrap; transform: rotate(-40deg); transform-origin: center; height: 14px; }
+  .trend-legend { font-size: 11px; color: var(--text-muted); margin-top: 14px; }
+
+  /* ── ROWS (Top Titles + occupations) ── */
+  .rowlist { display: flex; flex-direction: column; }
+  .employer-row { display: grid; grid-template-columns: 22px 1fr 54px 78px; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--sep); }
+  .employer-row:last-child { border-bottom: none; }
+  .employer-rank { font-size: 12px; font-weight: 700; color: var(--text-dim); text-align: center; }
+  .employer-name { font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .employer-count { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-align: right; }
-  .employer-bar   { height: 5px; border-radius: 3px; background: var(--card-border); overflow: hidden; }
+  .employer-bar { height: 5px; border-radius: 3px; background: var(--card-border); overflow: hidden; }
   .employer-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
-  .h1b-row { border-bottom: none; padding-bottom: 1px; }
-  .h1b-sub { grid-column: 2 / 5; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; color: var(--text-muted); padding: 0 0 6px 0; border-bottom: 1px solid var(--sep); margin-bottom: 1px; }
-  .h1b-sub .h1b-pw-above { color: #22c55e; font-weight: 600; }
-  .h1b-sub .h1b-pw-below { color: #f59e0b; font-weight: 600; }
+  .gc-bar-fill { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
   .h1b-bar-fill { background: linear-gradient(90deg, #14b8a6, #6366f1); }
-  .h1b-loading, .h1b-empty { font-size: 12px; color: var(--text-muted); padding: 10px 0; }
-  .h1b-empty b { color: var(--text-secondary); font-weight: 600; }
+
+  /* ── H-1B SALARY TABLE w/ RANGE BARS ── */
+  .saltable { width: 100%; }
+  .salrow { display: grid; grid-template-columns: 200px 70px 1fr 96px; align-items: center; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--sep); }
+  .salrow.head { padding: 0 0 10px; border-bottom: 1px solid var(--card-border); }
+  .salrow.head span { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; }
+  .sal-title { min-width: 0; }
+  .sal-title .t { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sal-title .soc { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .sal-n { font-size: 12px; color: var(--text-secondary); text-align: right; font-weight: 600; }
+  .sal-pct { text-align: right; font-size: 12px; font-weight: 700; }
+  .sal-pct.above { color: #22c55e; } .sal-pct.below { color: #f59e0b; }
+  .sal-pct .pl { display: block; font-size: 9.5px; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; }
+  .rangebar { position: relative; height: 26px; }
+  .rb-track { position: absolute; top: 50%; left: 0; right: 0; height: 5px; transform: translateY(-50%); background: var(--card-border); border-radius: 3px; }
+  .rb-fill { position: absolute; top: 50%; height: 5px; transform: translateY(-50%); border-radius: 3px; background: linear-gradient(90deg, #14b8a6, #6366f1); }
+  .rb-median { position: absolute; top: 50%; width: 11px; height: 11px; transform: translate(-50%,-50%); border-radius: 50%; background: #f0f0f8; border: 2px solid #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.25); }
+  .rb-pw { position: absolute; top: 50%; width: 2px; height: 16px; transform: translate(-50%,-50%); background: #f59e0b; border-radius: 1px; }
+  .rb-pw::after { content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: #f59e0b; border-radius: 50%; }
+  .rangebar .rb-val { position: absolute; top: -2px; font-size: 9px; color: var(--text-dim); white-space: nowrap; }
+  .sal-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 11px; color: var(--text-muted); }
+  .sal-legend .li { display: inline-flex; align-items: center; gap: 6px; }
+  .sal-legend .sw { width: 18px; height: 5px; border-radius: 3px; display: inline-block; }
+  .sal-legend .dot { width: 11px; height: 11px; border-radius: 50%; background: #f0f0f8; border: 2px solid #6366f1; display: inline-block; }
+  .sal-legend .pw { width: 2px; height: 14px; background: #f59e0b; display: inline-block; position: relative; }
+
+  /* ── OCCUPATIONS SPLIT ── */
+  .occ-split { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+  /* ── COMING-SOON PLACEHOLDERS ── */
+  .soon { position: relative; }
+  .soon-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 18px 16px 22px; }
+  .soon-icon { font-size: 26px; margin-bottom: 8px; opacity: 0.85; }
+  .soon-msg { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+  .soon-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; max-width: 460px; line-height: 1.55; }
+  .skeleton-rows { width: 100%; display: flex; flex-direction: column; gap: 9px; margin-top: 4px; }
+  .sk { border-radius: 6px; background: linear-gradient(90deg, var(--skeleton) 25%, var(--skeleton-shine) 37%, var(--skeleton) 63%); background-size: 800px 100%; animation: shimmer 1.6s linear infinite; }
+  .sk-row { height: 13px; }
+  .sk-chart { display: flex; align-items: flex-end; gap: 8px; height: 90px; width: 100%; }
+  .sk-chart .sk { flex: 1; border-radius: 5px 5px 2px 2px; }
+  .placeholder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  /* ── FAQ ── */
+  .faq-item { border-bottom: 1px solid var(--sep); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { width: 100%; text-align: left; background: none; border: none; color: var(--text-primary); font-family: inherit; font-size: 14px; font-weight: 600; padding: 15px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .faq-q .chev { color: var(--text-muted); transition: transform 0.2s; flex-shrink: 0; font-size: 13px; }
+  .faq-item.open .faq-q .chev { transform: rotate(180deg); }
+  .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.65; max-height: 0; overflow: hidden; transition: max-height 0.25s ease, padding 0.25s ease; }
+  .faq-item.open .faq-a { max-height: 320px; padding-bottom: 15px; }
 
   /* ── NAV SEARCH ── */
   .nav-right { display: flex; align-items: center; gap: 24px; }
@@ -135,64 +236,44 @@
   .nav-search-item-count { font-size: 12px; color: var(--text-secondary); font-weight: 700; flex-shrink: 0; }
   .nav-search-empty { padding: 18px 14px; color: var(--text-muted); font-size: 13px; text-align: center; }
 
-  /* ── STAT CARDS / SECTIONS (identical tokens to the former modal) ── */
-  .emp-modal-grid { display: grid; grid-template-columns: 280px 1fr; gap: 14px; margin-bottom: 14px; }
-  .emp-modal-cards { display: flex; flex-direction: column; gap: 12px; }
-  .emp-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px 14px; position: relative; overflow: hidden; }
-  .emp-stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent); opacity: 0.6; }
-  .emp-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 500; }
-  .emp-stat-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text-primary); }
-  .emp-stat-value.period { font-size: 16px; letter-spacing: -0.3px; }
-  .emp-stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.55; word-break: break-word; }
-  .emp-stat-value.cr-good { color: #22c55e; }
-  .emp-stat-value.cr-med  { color: #f59e0b; }
-  .emp-stat-value.cr-bad  { color: #ef4444; }
-  .emp-stat-value.cr-na   { color: var(--text-muted); }
-  .emp-stat-disclaimer { font-size: 10px; color: var(--text-dim); margin-top: 10px; font-style: italic; line-height: 1.4; }
-  .emp-stat-card .stat-details { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--sep); display: flex; flex-direction: column; gap: 4px; }
-  .emp-stat-card .stat-detail-row { display: flex; justify-content: space-between; font-size: 11px; }
-  .emp-stat-card .stat-detail-label { color: var(--text-muted); }
-  .emp-stat-card .stat-detail-value { color: var(--text-secondary); font-weight: 600; }
-  .emp-modal-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
-  .emp-modal-section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; letter-spacing: -0.2px; }
-  /* full-page donut layout (mirrors the former .emp-modal overrides) */
-  .emp-page .donut-container { flex-direction: column; align-items: center; gap: 16px; }
-  .emp-page .legend { flex-wrap: wrap; justify-content: center; gap: 8px 20px; }
-  .emp-page .legend-item { white-space: nowrap; }
-  .emp-page .legend-value { margin-left: 4px; }
-
-  .emp-loading { padding: 60px 20px; text-align: center; color: var(--text-secondary); font-size: 13px; }
-  .emp-loading-spinner { width: 30px; height: 30px; margin: 0 auto 14px; border: 3px solid var(--card-border); border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
-  .emp-error { padding: 40px 20px; text-align: center; color: #fca5a5; font-size: 14px; }
-  .emp-error a { color: #93c5fd; }
-
   /* ── THEME TOGGLE ── */
   .theme-toggle { width: 40px; height: 22px; border-radius: 11px; border: none; cursor: pointer; background: rgba(255,255,255,0.1); position: relative; transition: background 0.3s; display: flex; align-items: center; padding: 0 3px; flex-shrink: 0; }
   .theme-toggle::after { content: ''; width: 16px; height: 16px; border-radius: 50%; background: #f0f0f8; transition: transform 0.3s, background 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
   html.light .theme-toggle { background: rgba(0,0,0,0.1); }
   html.light .theme-toggle::after { transform: translateX(18px); background: #1a1a2e; }
   .theme-toggle-icon { position: absolute; font-size: 11px; top: 50%; transform: translateY(-50%); pointer-events: none; line-height: 1; }
-  .theme-toggle-icon.sun  { right: 5px; }
+  .theme-toggle-icon.sun { right: 5px; }
   .theme-toggle-icon.moon { left: 5px; }
-  html:not(.light) .theme-toggle-icon.sun  { opacity: 0.4; }
+  html:not(.light) .theme-toggle-icon.sun { opacity: 0.4; }
   html:not(.light) .theme-toggle-icon.moon { opacity: 0; }
-  html.light .theme-toggle-icon.sun  { opacity: 0; }
+  html.light .theme-toggle-icon.sun { opacity: 0; }
   html.light .theme-toggle-icon.moon { opacity: 0.4; }
 
+  .emp-loading { padding: 80px 20px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+  .emp-loading-spinner { width: 30px; height: 30px; margin: 0 auto 14px; border: 3px solid var(--card-border); border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .emp-error { padding: 60px 20px; text-align: center; color: #fca5a5; font-size: 14px; }
+  .emp-error a { color: #93c5fd; }
+
+  @media (max-width: 860px) {
+    .emp-keystats { grid-template-columns: repeat(2, 1fr); }
+    .occ-split, .placeholder-grid { grid-template-columns: 1fr; }
+    .emp-grid-2 { grid-template-columns: 1fr; }
+  }
   @media (max-width: 768px) {
     .nav-right { gap: 6px; order: 2; margin-left: auto; }
     .nav-search-input { width: 120px !important; }
     .nav-search-dropdown { width: calc(100vw - 28px); right: 14px; max-height: 60vh; }
-    .emp-modal-grid { grid-template-columns: 1fr; }
-    .emp-stat-value { font-size: 24px; }
-    .emp-page { padding: 20px 16px 48px; }
-    .emp-page-title { font-size: 22px; }
+    .emp-page { padding: 20px 14px 56px; }
+    .emp-hero-title { font-size: 24px; }
+    .salrow { grid-template-columns: 1fr 60px; grid-template-areas: "title pct" "range range"; row-gap: 8px; }
+    .salrow .sal-title { grid-area: title; } .salrow .sal-pct { grid-area: pct; } .salrow .rangebar { grid-area: range; } .salrow .sal-n { display: none; }
+    .salrow.head { display: none; }
   }
   @media (max-width: 480px) {
     nav { padding: 10px 10px; }
     .nav-search-input { width: 100px !important; padding: 8px 10px 8px 30px !important; font-size: 12px; }
-    .donut-wrap, .donut-svg { width: 140px; height: 140px; }
-    .legend-item { font-size: 12px; }
+    .emp-keystats { grid-template-columns: 1fr 1fr; }
+    .donut-wrap, .donut-svg { width: 150px; height: 150px; }
   }
 </style>
 </head>
@@ -252,11 +333,22 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 
 <script>
 // ═══════════════════════════════════════════════════════
-// EMPLOYER PROFILE PAGE (dedicated full page — PERM + H-1B)
+// EMPLOYER PROFILE PAGE (MyVisaJobs-style sectioned profile)
 // ═══════════════════════════════════════════════════════
 //
-// Reads the employer from the URL (?e=<name> or ?e=<slug>) and renders the full
-// PERM profile + H-1B salary section as a standalone, deep-linkable page.
+// Reads the employer from the URL (?e=<name> or ?e=<slug>) and renders a full,
+// sectioned PERM + H-1B profile as a standalone, deep-linkable page.
+//
+// REAL sections (populated from current staging data):
+//   • Overview header (key stats + approx PERM-volume rank)
+//   • Green Card / PERM (status donut, cert rate, monthly trend, top titles)
+//   • H-1B Salaries (FY2025 LCA medians, P10–P90 range bars, prevailing wage)
+//   • Occupations & Job Titles (H-1B SOC vs Green Card titles)
+//   • FAQs (auto-generated)
+// PLACEHOLDER sections (clean empty-states, pending multi-year USCIS/DOL ingest):
+//   • H-1B LCAs by year, Green Card (PERM) by year, H-1B petition history,
+//     multi-year salary trend, worksite locations.
+//
 // Backend: Cloudflare Worker (immilane-api). Staging host → staging worker.
 const EMPLOYER_API_BASE = (typeof window !== 'undefined' && window.IMMILANE_API_BASE)
   ? String(window.IMMILANE_API_BASE).replace(/\/+$/, '')
@@ -284,6 +376,12 @@ function employerSlug(name) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 200);
+}
+function initials(name) {
+  const words = String(name || '').replace(/[^A-Za-z0-9 ]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '—';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
 }
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -335,68 +433,170 @@ function loadH1b(slug) {
     .catch(() => undefined); // undefined = temporarily unavailable
 }
 
-// ── PERM profile renderer (ported verbatim from the former modal) ───────────
-function renderEmployerProfile(emp) {
+// Approximate PERM-volume rank, computed from the deployed static employer
+// index (same origin). Rank = 1 + (# of employers whose total exceeds this
+// employer's live PERM total), so it stays coherent with the live total shown.
+// Clearly labelled "approximate" in the UI. Cached after first fetch.
+let _indexPromise = null;
+function loadRank(liveTotal) {
+  if (liveTotal == null || isNaN(liveTotal)) return Promise.resolve(null);
+  if (!_indexPromise) {
+    _indexPromise = fetch('data/employer_index.json')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .catch(() => null);
+  }
+  return _indexPromise.then(idx => {
+    if (!idx || !Array.isArray(idx.employers)) return null;
+    let above = 0;
+    for (const e of idx.employers) { if (e && e.t > liveTotal) above++; }
+    return { rank: above + 1, totalEmployers: idx.totalEmployers || idx.employers.length };
+  });
+}
+
+// ── Derived PERM stats ──────────────────────────────────────────────────────
+function permStats(emp) {
   const statuses = emp.statuses || {};
   const total = emp.total || Object.values(statuses).reduce((s, v) => s + v, 0);
-
-  const fmtDate = (d) => { if (!d) return ''; const p = d.split('-'); return MONTHS[parseInt(p[1], 10) - 1] + ' ' + p[0]; };
-  const firstStr = fmtDate(emp.firstFiling);
-  const lastStr  = fmtDate(globalLastFiling || emp.lastFiling);
-  const filingPeriod = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
-
-  let pendingCount = 0;
-  Object.entries(statuses).forEach(([k, v]) => { if (PENDING_STATUSES.has(k)) pendingCount += v; });
-
   const certCount = statuses['CERTIFIED'] || 0;
   const deniedCount = statuses['DENIED'] || 0;
   const withdrawnCount = statuses['WITHDRAWN'] || 0;
   const adjudicated = certCount + deniedCount;
   const resolved = adjudicated + withdrawnCount;
-
-  let certRateDisplay, certClass;
+  let pendingCount = 0;
+  Object.entries(statuses).forEach(([k, v]) => { if (PENDING_STATUSES.has(k)) pendingCount += v; });
+  let certRate = null, certClass = 'cr-na';
   if (adjudicated > 0) {
-    const cr = certCount / adjudicated * 100;
-    certRateDisplay = cr.toFixed(1) + '%';
-    certClass = cr > 80 ? 'cr-good' : cr >= 60 ? 'cr-med' : 'cr-bad';
-  } else {
-    certRateDisplay = '—';
-    certClass = 'cr-na';
+    certRate = certCount / adjudicated * 100;
+    certClass = certRate > 80 ? 'cr-good' : certRate >= 60 ? 'cr-med' : 'cr-bad';
+  }
+  return { statuses, total, certCount, deniedCount, withdrawnCount, adjudicated, resolved, pendingCount, certRate, certClass };
+}
+
+function h1bAbovePct(h1b) {
+  if (!h1b || !Array.isArray(h1b.socs)) return null;
+  let aboveN = 0, cmpN = 0;
+  h1b.socs.forEach(s => {
+    if (s.wage_median != null && s.pw_median != null && s.pw_median > 0) {
+      cmpN += (s.n || 0);
+      if (s.wage_median >= s.pw_median) aboveN += (s.n || 0);
+    }
+  });
+  return cmpN > 0 ? Math.round(aboveN / cmpN * 100) : null;
+}
+
+function fmtMonthYear(d) {
+  if (!d) return '';
+  const p = d.split('-');
+  return MONTHS[parseInt(p[1], 10) - 1] + ' ' + p[0];
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SECTION RENDERERS
+// ════════════════════════════════════════════════════════════════════════
+
+function renderHero(emp, ps, h1b, rankInfo) {
+  const firstStr = fmtMonthYear(emp.firstFiling);
+  const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
+  const period = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
+
+  let rankBadge = '';
+  if (rankInfo) {
+    rankBadge = '<span class="emp-badge rank" title="Approximate rank by total PERM (green card) filing volume in the ImmiLane dataset.">🏅 Approx. PERM-volume rank <span class="b-num">#' + n(rankInfo.rank) + '</span> of ' + n(rankInfo.totalEmployers) + '</span>';
   }
 
+  // Key stats
+  const h1bTotal = (h1b && h1b.total != null) ? h1b.total : null;
+  const h1bMedian = (h1b && h1b.wage_median_all != null) ? h1b.wage_median_all : null;
+  const abovePct = h1bAbovePct(h1b);
+
+  const blurb = esc(emp.name) + ' has <b>' + n(ps.total) + '</b> PERM (green card) labor certification filings on record' +
+    (period !== '—' ? ' (' + esc(period) + ')' : '') +
+    (h1bTotal != null ? ' and <b>' + n(h1bTotal) + '</b> certified H-1B LCA positions in FY2025' : '') +
+    '. ' + (ps.certRate != null ? 'Its PERM certification rate is <b>' + ps.certRate.toFixed(1) + '%</b>' : 'No PERM cases have been adjudicated yet') +
+    (h1bMedian != null ? ', with a median offered H-1B salary of <b>' + fmtUSD(h1bMedian) + '</b>' : '') + '.';
+
+  return '' +
+  '<div class="emp-hero">' +
+    '<div class="emp-hero-top">' +
+      '<div class="emp-hero-mark">' + esc(initials(emp.name)) + '</div>' +
+      '<div class="emp-hero-head">' +
+        '<h1 class="emp-hero-title">' + esc(emp.name) + '</h1>' +
+        '<div class="emp-hero-badges">' +
+          rankBadge +
+          '<span class="emp-badge">📋 PERM + H-1B profile</span>' +
+          '<span class="emp-badge">🗓️ FY2025 LCA data</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<p class="emp-hero-blurb">' + blurb + '</p>' +
+    '<div class="emp-keystats">' +
+      keystat('H-1B LCAs (FY2025)', h1bTotal != null ? n(h1bTotal) : '—', 'Certified LCA positions', '') +
+      keystat('Green Card (PERM)', n(ps.total), 'Labor cert. filings', '') +
+      keystat('PERM Cert. Rate', ps.certRate != null ? ps.certRate.toFixed(1) + '%' : '—',
+              ps.adjudicated > 0 ? n(ps.certCount) + ' of ' + n(ps.adjudicated) + ' adjudicated' : 'None adjudicated yet',
+              ps.certClass.replace('cr-', '')) +
+      keystat('Median H-1B Salary', h1bMedian != null ? fmtUSD(h1bMedian) : '—',
+              abovePct != null ? abovePct + '% at/above prevailing' : 'FY2025 offered wage', '') +
+    '</div>' +
+  '</div>';
+}
+function keystat(label, value, sub, cls) {
+  return '<div class="emp-keystat">' +
+    '<div class="ks-label">' + esc(label) + '</div>' +
+    '<div class="ks-value ' + (cls || '') + '">' + value + '</div>' +
+    '<div class="ks-sub">' + esc(sub) + '</div>' +
+  '</div>';
+}
+
+function renderPermSection(emp, ps) {
+  const firstStr = fmtMonthYear(emp.firstFiling);
+  const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
+  const period = firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—');
+
+  // cert-rate breakdown rows
   const crRows = [];
-  if (certCount) crRows.push({ label: 'Certified', val: certCount, color: '#22c55e' });
-  if (deniedCount) crRows.push({ label: 'Denied', val: deniedCount, color: '#ef4444' });
-  if (withdrawnCount) crRows.push({ label: 'Withdrawn', val: withdrawnCount, color: '#6b7280' });
-  const crBreakdownHtml = crRows.map(r =>
-    '<div class="stat-detail-row">' +
-      '<span class="stat-detail-label" style="color:' + r.color + '">' + r.label + '</span>' +
-      '<span class="stat-detail-value">' + n(r.val) + '</span>' +
-    '</div>'
+  if (ps.certCount)     crRows.push({ label: 'Certified', val: ps.certCount, color: '#22c55e' });
+  if (ps.deniedCount)   crRows.push({ label: 'Denied', val: ps.deniedCount, color: '#ef4444' });
+  if (ps.withdrawnCount)crRows.push({ label: 'Withdrawn', val: ps.withdrawnCount, color: '#6b7280' });
+  const crBreakdown = crRows.map(r =>
+    '<div class="stat-detail-row"><span class="stat-detail-label" style="color:' + r.color + '">' + r.label + '</span><span class="stat-detail-value">' + n(r.val) + '</span></div>'
   ).join('');
 
-  const donutItems = Object.entries(statuses)
+  // donut
+  const donutItems = Object.entries(ps.statuses)
     .map(([k, v]) => ({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR }))
     .sort((a, b) => b.value - a.value);
   const donutTotal = donutItems.reduce((s, i) => s + i.value, 0);
   donutItems.forEach(i => { i.pct = donutTotal ? +(i.value / donutTotal * 100).toFixed(1) : 0; });
-
   const r = 70, circ = 2 * Math.PI * r;
   let off = 0, segs = '';
   donutItems.forEach((item, i) => {
     const len = item.pct / 100 * circ;
-    segs += '<circle class="donut-seg" data-i="' + i + '" cx="90" cy="90" r="' + r +
-            '" fill="none" stroke="' + item.color + '" stroke-width="30" stroke-dasharray="' +
+    segs += '<circle class="donut-seg" data-i="' + i + '" cx="84" cy="84" r="' + r +
+            '" fill="none" stroke="' + item.color + '" stroke-width="28" stroke-dasharray="' +
             len + ' ' + (circ - len) + '" stroke-dashoffset="' + (-off) + '" />';
     off += len;
   });
-
   const legend = donutItems.map(item =>
-    '<div class="legend-item"><div class="legend-dot" style="background:' + item.color +
-    ';"></div>' + esc(item.label) +
+    '<div class="legend-item"><div class="legend-dot" style="background:' + item.color + ';"></div>' + esc(item.label) +
     '<span class="legend-value">' + n(item.value) + ' (' + item.pct + '%)</span></div>'
   ).join('');
 
+  // monthly trend
+  const monthly = (emp.monthlyFilings || []).slice();
+  const maxM = monthly.reduce((m, x) => Math.max(m, x.count || 0), 1);
+  const showLbl = monthly.length <= 18;
+  const trendBars = monthly.map((m, i) => {
+    const h = Math.max(2, Math.round((m.count || 0) / maxM * 100));
+    const p = m.month.split('-');
+    const lbl = MONTHS[parseInt(p[1], 10) - 1] + (p[1] === '01' || i === 0 ? " '" + p[0].slice(2) : '');
+    return '<div class="trend-col" title="' + esc(MONTHS[parseInt(p[1],10)-1] + ' ' + p[0]) + ': ' + n(m.count) + ' filings">' +
+      '<div class="trend-bar" style="height:' + h + '%;"></div>' +
+      (showLbl ? '<div class="trend-x">' + esc(lbl) + '</div>' : '') +
+    '</div>';
+  }).join('');
+
+  // top titles
   const titles = (emp.topTitles || []).slice(0, 10);
   const maxTitle = titles.length ? titles[0].count : 1;
   const titlesHtml = titles.map((t, i) =>
@@ -404,41 +604,42 @@ function renderEmployerProfile(emp) {
       '<span class="employer-rank">' + (i + 1) + '</span>' +
       '<span class="employer-name">' + esc(t.title) + '</span>' +
       '<span class="employer-count">' + n(t.count) + '</span>' +
-      '<div class="employer-bar"><div class="employer-bar-fill" style="width:' +
-        Math.round(t.count / maxTitle * 100) + '%;"></div></div>' +
+      '<div class="employer-bar"><div class="employer-bar-fill gc-bar-fill" style="width:' + Math.round(t.count / maxTitle * 100) + '%;"></div></div>' +
     '</div>'
   ).join('');
 
-  const body = document.getElementById('emp-body');
-  body.innerHTML =
-    '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
-    '<h1 class="emp-page-title">' + esc(emp.name) + '</h1>' +
-    '<div class="emp-page-subtitle">PERM labor certification &amp; H-1B salary profile · ' + esc(filingPeriod) + '</div>' +
-    '<div class="emp-modal-grid">' +
-      '<div class="emp-modal-cards">' +
+  return '' +
+  '<section class="emp-section">' +
+    '<div class="emp-section-head">' +
+      '<div><div class="emp-section-eyebrow">Green Card</div><div class="emp-section-title">PERM Labor Certifications</div></div>' +
+      '<div class="spacer"></div>' +
+      '<span class="emp-section-meta">' + esc(period) + '</span>' +
+      '<span class="tag-live">● Live data</span>' +
+    '</div>' +
+    '<div class="emp-grid-2">' +
+      '<div class="emp-cards-col">' +
         '<div class="emp-stat-card">' +
-          '<div class="emp-stat-label">Total Filings</div>' +
-          '<div class="emp-stat-value">' + n(total) + '</div>' +
-          '<div class="emp-stat-sub">' + esc(filingPeriod) + '</div>' +
+          '<div class="emp-stat-label">Total PERM Filings</div>' +
+          '<div class="emp-stat-value">' + n(ps.total) + '</div>' +
           '<div class="stat-details">' +
-            '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(pendingCount) + '</span></div>' +
-            '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(resolved) + '</span></div>' +
+            '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(ps.pendingCount) + '</span></div>' +
+            '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(ps.resolved) + '</span></div>' +
           '</div>' +
         '</div>' +
         '<div class="emp-stat-card">' +
           '<div class="emp-stat-label">Certification Rate</div>' +
-          '<div class="emp-stat-value ' + certClass + '">' + certRateDisplay + '</div>' +
-          '<div class="emp-stat-sub">' + (adjudicated > 0 ? n(certCount) + ' certified of ' + n(adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
-          (crRows.length ? '<div class="stat-details">' + crBreakdownHtml + '</div>' : '') +
+          '<div class="emp-stat-value ' + ps.certClass + '">' + (ps.certRate != null ? ps.certRate.toFixed(1) + '%' : '—') + '</div>' +
+          '<div class="emp-stat-sub">' + (ps.adjudicated > 0 ? n(ps.certCount) + ' certified of ' + n(ps.adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
+          (crRows.length ? '<div class="stat-details">' + crBreakdown + '</div>' : '') +
           '<div class="emp-stat-disclaimer">Based on filings since ' + esc(firstStr || '—') + '</div>' +
         '</div>' +
       '</div>' +
       (donutTotal > 0 ?
-      '<div class="emp-modal-section" style="margin-bottom:0;">' +
-        '<div class="emp-modal-section-title">Status Distribution <span style="color:#475569;font-weight:400;font-size:11px;">· ' + esc(filingPeriod) + '</span></div>' +
+      '<div class="panel">' +
+        '<div class="panel-title">Status Distribution <span class="muted">· ' + esc(period) + '</span></div>' +
         '<div class="donut-container">' +
           '<div class="donut-wrap">' +
-            '<svg class="donut-svg" viewBox="0 0 180 180" id="emp-donut-svg">' + segs + '</svg>' +
+            '<svg class="donut-svg" viewBox="0 0 168 168" id="emp-donut-svg">' + segs + '</svg>' +
             '<div class="donut-center">' +
               '<div class="donut-number" id="emp-donut-num">' + n(donutTotal) + '</div>' +
               '<div class="donut-label" id="emp-donut-lbl">Total Cases</div>' +
@@ -447,110 +648,244 @@ function renderEmployerProfile(emp) {
           '</div>' +
           '<div class="legend">' + legend + '</div>' +
         '</div>' +
-      '</div>' : '') +
+      '</div>' : '<div class="panel"><div class="soon-inner"><div class="soon-msg">No status breakdown available.</div></div></div>') +
     '</div>' +
-    (titles.length ?
-    '<div class="emp-modal-section">' +
-      '<div class="emp-modal-section-title">Top ' + Math.min(titles.length, 10) + ' Job Titles</div>' +
-      titlesHtml +
+    (monthly.length ?
+    '<div class="panel" style="margin-top:16px;">' +
+      '<div class="panel-title">Monthly Filing Trend <span class="muted">· ' + n(monthly.length) + ' months</span></div>' +
+      '<div class="trend">' + trendBars + '</div>' +
+      '<div class="trend-legend">Monthly PERM filing volume over the available window.</div>' +
     '</div>' : '') +
-    '<div class="emp-modal-section" id="emp-h1b-section">' +
-      '<div class="emp-modal-section-title">H-1B Salaries ' +
-        '<span style="color:#475569;font-weight:400;font-size:11px;">· FY2025 LCA (offered wages)</span></div>' +
-      '<div id="emp-h1b-body"><div class="h1b-loading">Loading H-1B salary data…</div></div>' +
-    '</div>';
-
-  // Donut hover interactions
-  const svg = document.getElementById('emp-donut-svg');
-  if (svg) {
-    const numEl = document.getElementById('emp-donut-num');
-    const lblEl = document.getElementById('emp-donut-lbl');
-    const pctEl = document.getElementById('emp-donut-pct');
-    const origNum = n(donutTotal);
-    svg.querySelectorAll('.donut-seg').forEach(seg => {
-      seg.addEventListener('mouseenter', () => {
-        const item = donutItems[parseInt(seg.dataset.i, 10)];
-        svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = s === seg ? '1' : '0.2'; });
-        numEl.textContent = n(item.value);
-        numEl.style.color = item.color;
-        lblEl.textContent = item.label;
-        pctEl.textContent = item.pct + '%';
-        pctEl.style.color = item.color;
-        pctEl.style.display = '';
-      });
-      seg.addEventListener('mouseleave', () => {
-        svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = '1'; });
-        numEl.textContent = origNum;
-        numEl.style.color = 'var(--text-primary)';
-        lblEl.textContent = 'Total Cases';
-        pctEl.style.display = 'none';
-      });
-    });
-  }
+    (titles.length ?
+    '<div class="panel" style="margin-top:16px;">' +
+      '<div class="panel-title">Top ' + Math.min(titles.length, 10) + ' PERM Job Titles</div>' +
+      '<div class="rowlist">' + titlesHtml + '</div>' +
+    '</div>' : '') +
+  '</section>';
 }
 
-// ── H-1B salary section renderer (ported verbatim from the former modal) ────
-function renderH1bBody(h1b) {
-  const body = document.getElementById('emp-h1b-body');
-  if (!body) return;
-
+function renderH1bSection(h1b) {
+  let inner;
   if (h1b === undefined) {
-    body.innerHTML = '<div class="h1b-empty">H-1B salary data is temporarily unavailable.</div>';
-    return;
-  }
-  if (!h1b || !Array.isArray(h1b.socs) || h1b.socs.length === 0) {
-    body.innerHTML = '<div class="h1b-empty">No certified <b>H-1B LCA</b> salary data on file for this employer (FY2025).</div>';
-    return;
-  }
+    inner = '<div class="soon-inner"><div class="soon-icon">⚠️</div><div class="soon-msg">H-1B salary data is temporarily unavailable.</div></div>';
+  } else if (!h1b || !Array.isArray(h1b.socs) || h1b.socs.length === 0) {
+    inner = '<div class="soon-inner"><div class="soon-icon">📭</div><div class="soon-msg">No certified H-1B LCA salary data on file (FY2025).</div></div>';
+  } else {
+    const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 12);
+    const abovePct = h1bAbovePct(h1b);
+    // domain for range bars across shown rows (use p10/pw min and p90 max)
+    let dmin = Infinity, dmax = -Infinity;
+    socs.forEach(s => {
+      [s.wage_p10, s.pw_median].forEach(v => { if (v != null && v < dmin) dmin = v; });
+      [s.wage_p90, s.wage_median].forEach(v => { if (v != null && v > dmax) dmax = v; });
+    });
+    if (!isFinite(dmin) || !isFinite(dmax) || dmax <= dmin) { dmin = 0; dmax = 1; }
+    const pos = v => Math.max(0, Math.min(100, (v - dmin) / (dmax - dmin) * 100));
 
-  const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 10);
-  const maxMedian = socs.reduce((m, s) => Math.max(m, s.wage_median || 0), 1);
+    const rows = socs.map((s, i) => {
+      const pct = (s.pw_median && s.wage_median != null) ? Math.round((s.wage_median - s.pw_median) / s.pw_median * 100) : null;
+      const pctCls = pct == null ? '' : (pct >= 0 ? 'above' : 'below');
+      const pctTxt = pct == null ? '—' : (pct >= 0 ? '+' + pct + '%' : pct + '%');
+      const fillL = (s.wage_p10 != null) ? pos(s.wage_p10) : null;
+      const fillR = (s.wage_p90 != null) ? pos(s.wage_p90) : null;
+      const fillHtml = (fillL != null && fillR != null)
+        ? '<div class="rb-fill" style="left:' + fillL + '%;width:' + Math.max(0, fillR - fillL) + '%;"></div>' : '';
+      const medHtml = (s.wage_median != null) ? '<div class="rb-median" style="left:' + pos(s.wage_median) + '%;" title="Median offered ' + fmtUSD(s.wage_median) + '"></div>' : '';
+      const pwHtml  = (s.pw_median != null) ? '<div class="rb-pw" style="left:' + pos(s.pw_median) + '%;" title="Prevailing ' + fmtUSD(s.pw_median) + '"></div>' : '';
+      const p10lbl = (s.wage_p10 != null) ? '<span class="rb-val" style="left:' + fillL + '%;transform:translateX(-50%);">' + fmtK(s.wage_p10) + '</span>' : '';
+      const p90lbl = (s.wage_p90 != null) ? '<span class="rb-val" style="left:' + fillR + '%;transform:translateX(-50%);">' + fmtK(s.wage_p90) + '</span>' : '';
+      return '<div class="salrow">' +
+          '<div class="sal-title"><div class="t">' + esc(s.title || s.soc || '—') + '</div><div class="soc">SOC ' + esc(s.soc || '—') + ' · ' + fmtUSD(s.wage_median) + ' median</div></div>' +
+          '<div class="sal-n">' + n(s.n) + '</div>' +
+          '<div class="rangebar"><div class="rb-track"></div>' + fillHtml + medHtml + pwHtml + p10lbl + p90lbl + '</div>' +
+          '<div class="sal-pct ' + pctCls + '">' + pctTxt + '<span class="pl">vs prevailing</span></div>' +
+        '</div>';
+    }).join('');
 
-  let aboveN = 0, cmpN = 0;
-  socs.forEach(s => {
-    if (s.wage_median != null && s.pw_median != null && s.pw_median > 0) {
-      cmpN += (s.n || 0);
-      if (s.wage_median >= s.pw_median) aboveN += (s.n || 0);
-    }
-  });
-  const abovePct = cmpN > 0 ? Math.round(aboveN / cmpN * 100) : null;
-
-  const cardsHtml =
-    '<div class="emp-modal-cards" style="margin-bottom:14px;">' +
-      '<div class="emp-stat-card">' +
-        '<div class="emp-stat-label">Median Offered Salary</div>' +
-        '<div class="emp-stat-value">' + fmtUSD(h1b.wage_median_all) + '</div>' +
-        '<div class="emp-stat-sub">Across ' + n(h1b.total || 0) + ' certified LCAs · ' + esc(h1b.fy || 'FY2025') + '</div>' +
+    inner =
+      '<div class="emp-grid-2" style="grid-template-columns:repeat(2,1fr);margin-bottom:16px;">' +
+        '<div class="emp-stat-card"><div class="emp-stat-label">Median Offered Salary</div><div class="emp-stat-value">' + fmtUSD(h1b.wage_median_all) + '</div><div class="emp-stat-sub">Across ' + n(h1b.total || 0) + ' certified LCAs · ' + esc(h1b.fy || 'FY2025') + '</div></div>' +
+        '<div class="emp-stat-card"><div class="emp-stat-label">% At/Above Prevailing</div><div class="emp-stat-value ' + (abovePct == null ? 'cr-na' : abovePct >= 80 ? 'cr-good' : abovePct >= 50 ? 'cr-med' : 'cr-bad') + '">' + (abovePct == null ? '—' : abovePct + '%') + '</div><div class="emp-stat-sub">' + (abovePct == null ? 'Prevailing wage not comparable' : 'of filings meet/exceed DOL prevailing wage') + '</div></div>' +
       '</div>' +
-      '<div class="emp-stat-card">' +
-        '<div class="emp-stat-label">% Above Prevailing</div>' +
-        '<div class="emp-stat-value ' + (abovePct == null ? 'cr-na' : abovePct >= 80 ? 'cr-good' : abovePct >= 50 ? 'cr-med' : 'cr-bad') + '">' +
-          (abovePct == null ? '—' : abovePct + '%') + '</div>' +
-        '<div class="emp-stat-sub">' + (abovePct == null ? 'Prevailing wage not comparable' : 'of filings at/above DOL prevailing wage') + '</div>' +
-      '</div>' +
-    '</div>';
+      '<div class="salrow head"><span>Occupation</span><span style="text-align:right;">Filings</span><span>Offered wage range (P10 – P90)</span><span style="text-align:right;">vs PW</span></div>' +
+      '<div class="saltable">' + rows + '</div>' +
+      '<div class="sal-legend">' +
+        '<span class="li"><span class="sw" style="background:linear-gradient(90deg,#14b8a6,#6366f1);"></span> P10–P90 offered range</span>' +
+        '<span class="li"><span class="dot"></span> Median offered</span>' +
+        '<span class="li"><span class="pw"></span> DOL prevailing wage</span>' +
+      '</div>';
+  }
+  return '' +
+  '<section class="emp-section">' +
+    '<div class="emp-section-head">' +
+      '<div><div class="emp-section-eyebrow">H-1B</div><div class="emp-section-title">H-1B Offered Salaries</div></div>' +
+      '<div class="spacer"></div>' +
+      '<span class="emp-section-meta">FY2025 LCA (ETA-9035)</span>' +
+      '<span class="tag-live">● Live data</span>' +
+    '</div>' + inner +
+  '</section>';
+}
 
-  const rowsHtml = socs.map((s, i) => {
-    const pct = s.pw_median ? Math.round((s.wage_median - s.pw_median) / s.pw_median * 100) : null;
-    let pwTag = '';
-    if (s.pw_median != null && pct != null) {
-      pwTag = '<span class="' + (pct >= 0 ? 'h1b-pw-above' : 'h1b-pw-below') + '">' +
-                (pct >= 0 ? '+' + pct + '% above' : pct + '% below') + ' prevailing</span>';
-    }
-    const range = (s.wage_p10 != null && s.wage_p90 != null)
-      ? '<span>P10–P90 ' + fmtK(s.wage_p10) + ' – ' + fmtK(s.wage_p90) + '</span>' : '';
-    const pw = (s.pw_median != null) ? '<span>Prevailing ' + fmtUSD(s.pw_median) + '</span>' : '';
-    return '<div class="employer-row h1b-row">' +
+function renderOccupations(emp, h1b) {
+  // H-1B occupations from SOC titles
+  let h1bCol;
+  if (h1b && Array.isArray(h1b.socs) && h1b.socs.length) {
+    const socs = h1b.socs.slice().sort((a, b) => (b.n || 0) - (a.n || 0)).slice(0, 10);
+    const maxN = socs[0].n || 1;
+    h1bCol = socs.map((s, i) =>
+      '<div class="employer-row">' +
         '<span class="employer-rank">' + (i + 1) + '</span>' +
-        '<span class="employer-name">' + esc(s.title || s.soc || '—') + '</span>' +
-        '<span class="employer-count">' + fmtUSD(s.wage_median) + '</span>' +
-        '<div class="employer-bar"><div class="employer-bar-fill h1b-bar-fill" style="width:' +
-          Math.round((s.wage_median || 0) / maxMedian * 100) + '%;"></div></div>' +
-      '</div>' +
-      '<div class="h1b-sub">' + range + pw + pwTag + '</div>';
-  }).join('');
+        '<span class="employer-name">' + esc(s.title || s.soc) + '</span>' +
+        '<span class="employer-count">' + n(s.n) + '</span>' +
+        '<div class="employer-bar"><div class="employer-bar-fill h1b-bar-fill" style="width:' + Math.round((s.n || 0) / maxN * 100) + '%;"></div></div>' +
+      '</div>'
+    ).join('');
+  } else {
+    h1bCol = '<div class="soon-inner" style="padding:24px 8px;"><div class="soon-msg">No H-1B occupation data.</div></div>';
+  }
 
-  body.innerHTML = cardsHtml + rowsHtml;
+  // Green-card occupations from PERM topTitles
+  const titles = (emp.topTitles || []).slice(0, 10);
+  const maxTitle = titles.length ? titles[0].count : 1;
+  const gcCol = titles.length ? titles.map((t, i) =>
+    '<div class="employer-row">' +
+      '<span class="employer-rank">' + (i + 1) + '</span>' +
+      '<span class="employer-name">' + esc(t.title) + '</span>' +
+      '<span class="employer-count">' + n(t.count) + '</span>' +
+      '<div class="employer-bar"><div class="employer-bar-fill gc-bar-fill" style="width:' + Math.round(t.count / maxTitle * 100) + '%;"></div></div>' +
+    '</div>'
+  ).join('') : '<div class="soon-inner" style="padding:24px 8px;"><div class="soon-msg">No PERM title data.</div></div>';
+
+  return '' +
+  '<section class="emp-section">' +
+    '<div class="emp-section-head">' +
+      '<div><div class="emp-section-eyebrow">Roles</div><div class="emp-section-title">Occupations &amp; Job Titles</div></div>' +
+      '<div class="spacer"></div>' +
+      '<span class="tag-live">● Live data</span>' +
+    '</div>' +
+    '<div class="occ-split">' +
+      '<div><div class="sub-head">H-1B Occupations (SOC)</div><div class="rowlist">' + h1bCol + '</div></div>' +
+      '<div><div class="sub-head">Green Card Job Titles (PERM)</div><div class="rowlist">' + gcCol + '</div></div>' +
+    '</div>' +
+  '</section>';
+}
+
+// Clean "coming soon — multi-year data" placeholders that show intended structure.
+function skRows(count) {
+  let h = '<div class="skeleton-rows">';
+  for (let i = 0; i < count; i++) h += '<div class="sk sk-row" style="width:' + (95 - i * 7) + '%;"></div>';
+  return h + '</div>';
+}
+function skChart(bars) {
+  let h = '<div class="sk-chart">';
+  const heights = [40, 65, 50, 80, 60, 90, 72, 55, 85, 48, 70, 60];
+  for (let i = 0; i < bars; i++) h += '<div class="sk" style="height:' + heights[i % heights.length] + '%;"></div>';
+  return h + '</div>';
+}
+function soonCard(title, eyebrow, sub, body) {
+  return '<section class="emp-section soon">' +
+    '<div class="emp-section-head">' +
+      '<div><div class="emp-section-eyebrow">' + esc(eyebrow) + '</div><div class="emp-section-title">' + esc(title) + '</div></div>' +
+      '<div class="spacer"></div>' +
+      '<span class="tag-soon">Coming soon · multi-year</span>' +
+    '</div>' +
+    body +
+    '<div class="soon-inner"><div class="soon-sub">' + esc(sub) + '</div></div>' +
+  '</section>';
+}
+function renderPlaceholders() {
+  return '' +
+    soonCard('H-1B LCAs & Green Card by Year', 'History', 'Year-by-year LCA and PERM filing counts will appear here once multi-year DOL disclosure files are ingested.',
+      '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B LCAs by Year</div>' + skChart(8) + '</div><div class="panel"><div class="panel-title">Green Card (PERM) by Year</div>' + skChart(8) + '</div></div>') +
+    soonCard('H-1B Petition History', 'USCIS', 'H-1B petition approvals, denials, initial vs. continuing, and approval-rate history (USCIS H-1B Employer Data Hub) will populate this section.',
+      '<div class="panel">' + skRows(5) + '</div>') +
+    soonCard('Annual Salary Trend', 'Salaries', 'Multi-year median offered, prevailing, and green-card salary trends will be charted here once historical wage data is loaded.',
+      '<div class="panel">' + skChart(10) + '</div>') +
+    soonCard('Worksite Locations', 'Geography', 'H-1B and green-card worksite cities, states, and prevailing-wage areas will be tabled here from worksite-level disclosure data.',
+      '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B Work Sites</div>' + skRows(5) + '</div><div class="panel"><div class="panel-title">Green Card Work Sites</div>' + skRows(5) + '</div></div>');
+}
+
+function renderFaqs(emp, ps, h1b, rankInfo) {
+  const name = emp.name;
+  const firstStr = fmtMonthYear(emp.firstFiling);
+  const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
+  const period = firstStr && lastStr ? (firstStr + ' to ' + lastStr) : (firstStr || lastStr || 'the available period');
+  const topTitles = (emp.topTitles || []).slice(0, 3).map(t => t.title);
+  const abovePct = h1bAbovePct(h1b);
+  const faqs = [];
+
+  faqs.push(['How many PERM (green card) labor certifications has ' + name + ' filed?',
+    name + ' has <b>' + n(ps.total) + '</b> PERM labor certification filings on record in the ImmiLane dataset, spanning ' + esc(period) + '.' +
+    (rankInfo ? ' That ranks it approximately <b>#' + n(rankInfo.rank) + '</b> of ' + n(rankInfo.totalEmployers) + ' employers by PERM filing volume.' : '')]);
+
+  faqs.push(["What is " + name + "'s PERM certification rate?",
+    ps.adjudicated > 0
+      ? 'Its PERM certification rate is <b>' + ps.certRate.toFixed(1) + '%</b> — ' + n(ps.certCount) + ' certified out of ' + n(ps.adjudicated) + ' adjudicated cases (certified + denied). ' + n(ps.pendingCount) + ' cases are still pending.'
+      : 'No PERM cases have been adjudicated yet, so a certification rate cannot be computed. ' + n(ps.pendingCount) + ' cases are pending.']);
+
+  if (topTitles.length) {
+    faqs.push(['What are the most common PERM job titles at ' + name + '?',
+      'The most frequently sponsored PERM job titles are <b>' + topTitles.map(esc).join('</b>, <b>') + '</b>. See the full top-10 list above.']);
+  }
+
+  if (h1b && h1b.total != null) {
+    faqs.push(['How many H-1B LCAs did ' + name + ' file in FY2025?',
+      name + ' had <b>' + n(h1b.total) + '</b> certified H-1B Labor Condition Application (LCA) positions in FY2025, based on DOL OFLC disclosure data (ETA-9035).']);
+  }
+  if (h1b && h1b.wage_median_all != null) {
+    faqs.push(['What is the median H-1B salary at ' + name + '?',
+      'The median offered H-1B salary is <b>' + fmtUSD(h1b.wage_median_all) + '</b> (FY2025).' +
+      (abovePct != null ? ' About <b>' + abovePct + '%</b> of filings are at or above the DOL prevailing wage for the role.' : '')]);
+  }
+
+  faqs.push(['Is this the complete immigration history for ' + name + '?',
+    'Not yet. The PERM and FY2025 H-1B salary data shown here is live. Multi-year LCA/PERM history, USCIS H-1B petition approval/denial counts, multi-year salary trends, and worksite locations are marked “coming soon” and will be added as historical datasets are ingested.']);
+
+  const items = faqs.map((f, i) =>
+    '<div class="faq-item' + (i === 0 ? ' open' : '') + '">' +
+      '<button class="faq-q" type="button">' + esc(f[0]) + '<span class="chev">▾</span></button>' +
+      '<div class="faq-a">' + f[1] + '</div>' +
+    '</div>'
+  ).join('');
+
+  return '<section class="emp-section">' +
+    '<div class="emp-section-head"><div><div class="emp-section-eyebrow">Q&amp;A</div><div class="emp-section-title">Frequently Asked Questions</div></div></div>' +
+    '<div id="emp-faq">' + items + '</div>' +
+  '</section>';
+}
+
+// ── Donut hover interactions (attached after render) ─────────────────────────
+function wireDonut(ps) {
+  const svg = document.getElementById('emp-donut-svg');
+  if (!svg) return;
+  const donutItems = Object.entries(ps.statuses)
+    .map(([k, v]) => ({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR }))
+    .sort((a, b) => b.value - a.value);
+  const donutTotal = donutItems.reduce((s, i) => s + i.value, 0);
+  donutItems.forEach(i => { i.pct = donutTotal ? +(i.value / donutTotal * 100).toFixed(1) : 0; });
+  const numEl = document.getElementById('emp-donut-num');
+  const lblEl = document.getElementById('emp-donut-lbl');
+  const pctEl = document.getElementById('emp-donut-pct');
+  const origNum = n(donutTotal);
+  svg.querySelectorAll('.donut-seg').forEach(seg => {
+    seg.addEventListener('mouseenter', () => {
+      const item = donutItems[parseInt(seg.dataset.i, 10)];
+      svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = s === seg ? '1' : '0.2'; });
+      numEl.textContent = n(item.value); numEl.style.color = item.color;
+      lblEl.textContent = item.label;
+      pctEl.textContent = item.pct + '%'; pctEl.style.color = item.color; pctEl.style.display = '';
+    });
+    seg.addEventListener('mouseleave', () => {
+      svg.querySelectorAll('.donut-seg').forEach(s => { s.style.opacity = '1'; });
+      numEl.textContent = origNum; numEl.style.color = 'var(--text-primary)';
+      lblEl.textContent = 'Total Cases'; pctEl.style.display = 'none';
+    });
+  });
+}
+function wireFaq() {
+  document.querySelectorAll('#emp-faq .faq-q').forEach(btn => {
+    btn.addEventListener('click', () => btn.closest('.faq-item').classList.toggle('open'));
+  });
 }
 
 // ── SEO / metadata ──────────────────────────────────────────────────────────
@@ -558,65 +893,69 @@ function applySeo(name) {
   const t = name + ' — PERM & H-1B Profile | ImmiLane';
   document.title = t;
   const desc = 'PERM labor certification stats and H-1B salary data for ' + name +
-    ': total filings, status distribution, certification rate, top job titles and certified H-1B LCA offered wages (FY2025).';
+    ': total filings, status distribution, certification rate, top job titles, occupations and certified H-1B LCA offered wages (FY2025).';
   const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el) el.setAttribute('content', val); };
   setMeta('meta[name="description"]', desc);
   const ogT = document.getElementById('emp-og-title'); if (ogT) ogT.setAttribute('content', t);
   const ogD = document.getElementById('emp-og-desc'); if (ogD) ogD.setAttribute('content', desc);
   const can = document.getElementById('emp-canonical');
-  if (can) {
-    // Canonical points at the public (prod) deep link so search engines index one URL per employer.
-    can.setAttribute('href', 'https://immilane.com/employer.html?e=' + encodeURIComponent(employerSlug(name)));
-  }
+  if (can) can.setAttribute('href', 'https://immilane.com/employer.html?e=' + encodeURIComponent(employerSlug(name)));
 }
 
 // ── Page bootstrap ────────────────────────────────────────────────────────
 function getEmployerParam() {
   const params = new URLSearchParams(window.location.search);
-  // Accept ?e= (name or slug). Fall back to ?employer= / ?slug= for resilience.
   return (params.get('e') || params.get('employer') || params.get('slug') || '').trim();
 }
-
-function showError(msg, notFound) {
-  const body = document.getElementById('emp-body');
-  body.innerHTML =
+function showError(msg) {
+  document.getElementById('emp-body').innerHTML =
     '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
     '<div class="emp-error">' + esc(msg) +
       '<div style="margin-top:14px;"><a href="./">Return to the dashboard</a> to search for an employer.</div>' +
     '</div>';
 }
 
+function renderAll(emp, h1b, rankInfo) {
+  const ps = permStats(emp);
+  document.getElementById('emp-body').innerHTML =
+    '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
+    renderHero(emp, ps, h1b, rankInfo) +
+    renderPermSection(emp, ps) +
+    renderH1bSection(h1b) +
+    renderOccupations(emp, h1b) +
+    renderPlaceholders() +
+    renderFaqs(emp, ps, h1b, rankInfo);
+  wireDonut(ps);
+  wireFaq();
+}
+
 (function initEmployerPage() {
   const raw = getEmployerParam();
-  if (!raw) {
-    showError('No employer specified.');
-    return;
-  }
+  if (!raw) { showError('No employer specified.'); return; }
   const slug = employerSlug(raw);
-  if (!slug) {
-    showError('Invalid employer.');
-    return;
-  }
-  // Provisional title from the URL param while data loads.
+  if (!slug) { showError('Invalid employer.'); return; }
   applySeo(raw);
 
-  Promise.all([loadEmployer(slug), loadMeta()])
-    .then(([emp]) => {
-      if (!emp) { showError('Employer data not found.', true); return; }
+  // Load PERM + meta first; H-1B and rank resolve in parallel and we render once
+  // everything settles (H-1B/rank are best-effort — page still renders without them).
+  loadEmployer(slug)
+    .then(emp => {
+      if (!emp) { showError('Employer data not found.'); return; }
       applySeo(emp.name || raw);
-      renderEmployerProfile(emp);
-      if (typeof gtag === 'function') {
-        try { gtag('event', 'employer_profile_view', { employer_name: emp.name }); } catch (e) {}
-      }
-      // Lazy-load H-1B salaries for the same employer (slug join).
-      loadH1b(slug).then(renderH1bBody);
+      return Promise.all([
+        loadMeta().catch(() => null),
+        loadH1b(slug),
+        loadRank(emp.total)
+      ]).then(([, h1b, rankInfo]) => {
+        renderAll(emp, h1b, rankInfo);
+        if (typeof gtag === 'function') {
+          try { gtag('event', 'employer_profile_view', { employer_name: emp.name }); } catch (e) {}
+        }
+      });
     })
     .catch((err) => {
-      if (err && (err.message || '').includes('404')) {
-        showError('Employer data not found.', true);
-      } else {
-        showError('Failed to load employer data. Please try again.');
-      }
+      if (err && (err.message || '').includes('404')) showError('Employer data not found.');
+      else showError('Failed to load employer data. Please try again.');
     });
 })();
 </script>
@@ -728,7 +1067,6 @@ function showError(msg, notFound) {
     if (typeof gtag === 'function') {
       try { gtag('event', 'employer_selected', { employer_name: name }); } catch (e) {}
     }
-    // Navigate to the dedicated employer page (deep-linkable URL).
     window.location.href = 'employer.html?e=' + encodeURIComponent(name.trim());
   }
 })();
