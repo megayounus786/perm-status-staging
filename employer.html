@@ -793,7 +793,7 @@ function renderFilingsByYear(emp, h1b) {
     (hasLca  ? '<span class="fy-li"><span class="fy-sw fy-h1b"></span> H-1B (LCA) positions</span>' : '');
 
   return '<div class="panel" style="margin-top:16px;">' +
-      '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume (FY2020–2026)</span></div>' +
+      '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume (' + (years.length ? years[0] + '–' + String(years[years.length - 1]).slice(2) : 'FY2020–2026') + ')</span></div>' +
       '<div class="fy-chart">' + groupsHtml + '</div>' +
       '<div class="fy-legend">' + legendHtml + '</div>' +
       '<div class="trend-legend">PERM (green card) filings — certified, denied &amp; withdrawn — and certified H-1B LCA positions per fiscal year, from DOL OFLC disclosure data. FY2026 is year-to-date (partial).</div>' +
@@ -985,7 +985,7 @@ function renderOccupations(emp, h1b) {
     '</div>'
   ).join('') : '<div class="soon-inner" style="padding:24px 8px;"><div class="soon-msg">No PERM title data.</div></div>';
 
-  const h1bSub = h1bMulti ? '<span class="muted" style="font-weight:400;color:var(--text-dim);"> · FY2020–2026</span>' : '';
+  const h1bSub = h1bMulti ? '<span class="muted" style="font-weight:400;color:var(--text-dim);"> · ' + (fyRange(h1b.lcaByYear) || 'FY2020–2026') + '</span>' : '';
   const gcSub = gcMulti ? '<span class="muted" style="font-weight:400;color:var(--text-dim);"> · FY2020–2026</span>' : '';
   return '' +
   '<section class="emp-section">' +
@@ -1024,6 +1024,13 @@ function soonCard(title, eyebrow, sub, body) {
 // salaryTrend, socsAll, permTitlesAll. Each section degrades to a tasteful
 // placeholder if its data is absent (e.g. an older single-FY payload).
 const fyShort = (fy) => "'" + String(fy || '').slice(4);
+// Format the fiscal-year span of a *ByYear array as "FY2008–2026" (dynamic so
+// labels track the actual data coverage, e.g. LCA now reaches back to FY2008).
+const fyRange = (arr) => {
+  const fys = (arr || []).map(y => y && y.fy).filter(Boolean).sort();
+  if (!fys.length) return '';
+  return fys[0] + (fys.length > 1 ? '–' + String(fys[fys.length - 1]).slice(2) : '');
+};
 
 function liveSection(eyebrow, title, body, meta) {
   return '<section class="emp-section">' +
@@ -1159,7 +1166,7 @@ function renderFaqs(emp, ps, h1b, rankInfo) {
   }
 
   faqs.push(['How far back does the data for ' + name + ' go?',
-    'This profile now includes multi-year history: H-1B LCA and green-card (PERM) filings by fiscal year (FY2020–FY2026) and annual salary trends. FY2026 is year-to-date (partial). The real-time PERM case-status dashboard covers recent filings (Nov 2024 onward).']);
+    'This profile now includes multi-year history: certified H-1B LCA filings by fiscal year back to ' + ((h1b && fyRange(h1b.lcaByYear)) ? fyRange(h1b.lcaByYear).split('–')[0] : 'FY2008') + ', green-card (PERM) filings (FY2020–FY2026), and annual salary trends. FY2026 is year-to-date (partial). The real-time PERM case-status dashboard covers recent filings (Nov 2024 onward).']);
 
   const items = faqs.map((f, i) =>
     '<div class="faq-item' + (i === 0 ? ' open' : '') + '">' +
