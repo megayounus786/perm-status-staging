@@ -1259,26 +1259,33 @@ function renderAll(emp, h1b, rankInfo) {
   if (!slug) { showError('Invalid employer.'); return; }
   applySeo(raw);
 
-  // Load PERM + meta first; H-1B and rank resolve in parallel and we render once
-  // everything settles (H-1B/rank are best-effort — page still renders without them).
-  loadEmployer(slug)
-    .then(emp => {
+  // PERM detail, meta and H-1B all resolve in parallel. PERM detail is allowed
+  // to 404: employers that file H-1B LCAs but have no PERM (green-card) cases
+  // (e.g. H-1B-only consultancies) still get a page — we synthesize a minimal
+  // PERM-empty record from the H-1B payload so the H-1B sections render.
+  Promise.all([
+    loadEmployer(slug).catch(() => null),
+    loadMeta().catch(() => null),
+    loadH1b(slug)
+  ])
+    .then(([emp, , h1b]) => {
+      if (!emp && h1b) {
+        emp = { name: h1b.name || raw, total: 0, statuses: {}, topTitles: [],
+                monthlyFilings: [], certified: 0, denied: 0, certRate: null,
+                firstFiling: '', lastFiling: '', h1bOnly: true };
+      }
       if (!emp) { showError('Employer data not found.'); return; }
       applySeo(emp.name || raw);
-      return Promise.all([
-        loadMeta().catch(() => null),
-        loadH1b(slug),
-        loadRank(emp.total)
-      ]).then(([, h1b, rankInfo]) => {
+      // No PERM-volume rank for H-1B-only employers (total 0 → no rank badge).
+      return loadRank(emp.total ? emp.total : null).then(rankInfo => {
         renderAll(emp, h1b, rankInfo);
         if (typeof gtag === 'function') {
           try { gtag('event', 'employer_profile_view', { employer_name: emp.name }); } catch (e) {}
         }
       });
     })
-    .catch((err) => {
-      if (err && (err.message || '').includes('404')) showError('Employer data not found.');
-      else showError('Failed to load employer data. Please try again.');
+    .catch(() => {
+      showError('Failed to load employer data. Please try again.');
     });
 })();
 </script>
