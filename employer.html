@@ -156,11 +156,21 @@
   .trend-legend { font-size: 11px; color: var(--text-muted); margin-top: 14px; }
 
   /* Filings by Year — grouped annual bar chart (replaces sparse monthly trend) */
+  /* Horizontal-scroll wrapper: at 19 fiscal years the chart can exceed a narrow
+     viewport, so it scrolls instead of crushing bars/labels into each other. */
+  .fy-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  .fy-scroll::-webkit-scrollbar { height: 7px; }
+  .fy-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+  .fy-scroll::-webkit-scrollbar-track { background: transparent; }
+  .fy-scroll { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
   .fy-chart { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; height: 188px; padding: 22px 4px 0; border-bottom: 1px solid var(--card-border); }
   .fy-group { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; min-width: 0; }
   .fy-bars { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 100%; width: 100%; }
   .fy-bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1 1 0; max-width: 40px; }
-  .fy-val { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 7px; white-space: nowrap; letter-spacing: -0.2px; }
+  /* Per-bar dollar/count values were always-on labels that collided badly once
+     the chart spanned 19 fiscal years (esp. salary's 3 series). Values now live
+     in the hover/tap tooltip (.fy-tooltip) and the data tables below each chart. */
+  .fy-val { display: none; }
   .fy-bar { width: 100%; border-radius: 7px 7px 2px 2px; min-height: 4px; transition: opacity 0.15s, transform 0.15s; cursor: default; }
   .fy-bar:hover { opacity: 0.86; }
   .fy-bar.fy-perm { background: linear-gradient(180deg, #8079c4, #6f68b0); }
@@ -239,6 +249,19 @@
   .fy-bar.fy-gc { background: linear-gradient(180deg, #8079c4, #6f68b0); }
   .fy-sw.fy-pw { background: #858ea0; }
   .fy-sw.fy-gc { background: #7770ba; }
+  /* Floating tooltip for bar charts (replaces always-on per-bar value labels). */
+  .fy-bar { cursor: pointer; }
+  .fy-tooltip { position: fixed; z-index: 2000; pointer-events: none; opacity: 0; transform: translateY(2px);
+    transition: opacity 0.12s ease; background: var(--bg-card, #1b1d29); backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px); border: 1px solid var(--card-border); border-radius: 9px;
+    box-shadow: 0 12px 34px rgba(0,0,0,0.4); padding: 8px 11px; font-size: 12px; line-height: 1.5;
+    color: var(--text-primary); white-space: nowrap; max-width: 240px; }
+  .fy-tooltip.show { opacity: 1; transform: translateY(0); }
+  .fy-tooltip .ft-yr { font-weight: 700; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .fy-tooltip .ft-row { display: flex; align-items: center; gap: 7px; }
+  .fy-tooltip .ft-sw { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+  .fy-tooltip .ft-lbl { color: var(--text-secondary); }
+  .fy-tooltip .ft-v { margin-left: auto; font-weight: 700; padding-left: 14px; }
   .myr-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 14px; }
   .myr-table th { text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
   .myr-table th:first-child { text-align: left; }
@@ -305,6 +328,10 @@
     .nav-search-dropdown { width: calc(100vw - 28px); right: 14px; max-height: 60vh; }
     .emp-page { padding: 20px 14px 56px; }
     .emp-hero-title { font-size: 24px; }
+    /* Multi-year bar charts: denser layout on narrow screens; the .fy-scroll
+       wrapper provides horizontal scroll so 19 fiscal years stay legible. */
+    .fy-chart { gap: 9px !important; padding-top: 16px; }
+    .fy-year { font-size: 11px; }
     .salrow { grid-template-columns: 1fr 60px; grid-template-areas: "title pct" "range range"; row-gap: 8px; }
     .salrow .sal-title { grid-area: title; } .salrow .sal-pct { grid-area: pct; } .salrow .rangebar { grid-area: range; } .salrow .sal-n { display: none; }
     .salrow.head { display: none; }
@@ -794,7 +821,7 @@ function renderFilingsByYear(emp, h1b) {
 
   return '<div class="panel" style="margin-top:16px;">' +
       '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume (' + (years.length ? years[0] + '–' + String(years[years.length - 1]).slice(2) : 'FY2020–2026') + ')</span></div>' +
-      '<div class="fy-chart">' + groupsHtml + '</div>' +
+      fyScroll(groupsHtml, years.length, 30, 14) +
       '<div class="fy-legend">' + legendHtml + '</div>' +
       '<div class="trend-legend">PERM (green card) filings — certified, denied &amp; withdrawn — and certified H-1B LCA positions per fiscal year, from DOL OFLC disclosure data. FY2026 is year-to-date (partial).</div>' +
     '</div>';
@@ -877,7 +904,7 @@ function renderFilingsByYearLegacy(emp, h1b) {
 
   return '<div class="panel" style="margin-top:16px;">' +
       '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume</span></div>' +
-      '<div class="fy-chart">' + groupsHtml + '</div>' +
+      fyScroll(groupsHtml, groupYears.length, 30, 14) +
       '<div class="fy-legend">' + legendHtml + '</div>' +
       '<div class="trend-legend">' + noteParts.join('. ') + '.</div>' +
     '</div>';
@@ -1040,6 +1067,17 @@ function liveSection(eyebrow, title, body, meta) {
     '<span class="tag-live">● Live data</span></div>' + body + '</section>';
 }
 
+// Wrap a grouped bar chart in a horizontal-scroll container, sizing a min-width
+// (years × per-group px) so that at high year counts — e.g. 19 fiscal years —
+// bars and axis labels never crush together. On wide screens the chart fits and
+// the min-width is a no-op; on narrow/mobile screens it scrolls horizontally.
+function fyScroll(groupsHtml, count, perGroup, gap) {
+  const g = gap == null ? 14 : gap;
+  const mw = Math.max(0, count || 0) * (perGroup || 28);
+  const style = 'gap:' + g + 'px;' + (mw ? 'min-width:' + mw + 'px;' : '');
+  return '<div class="fy-scroll"><div class="fy-chart" style="' + style + '">' + groupsHtml + '</div></div>';
+}
+
 function fyBars(items, cls) {
   if (!items || !items.length) return '';
   const max = items.reduce((m, b) => Math.max(m, b.value || 0), 1);
@@ -1051,7 +1089,7 @@ function fyBars(items, cls) {
       '</div></div><div class="fy-year">' + esc(fyShort(b.fy)) +
       (b.partial ? '<span class="fy-tag">partial</span>' : '') + '</div></div>';
   }).join('');
-  return '<div class="fy-chart" style="gap:10px;">' + groups + '</div>';
+  return fyScroll(groups, items.length, 24, 10);
 }
 
 function myrTable(headers, rows) {
@@ -1100,24 +1138,29 @@ function renderSalaryTrend(h1b) {
     'Multi-year median offered, prevailing, and green-card salary trends will be charted here once historical wage data is loaded.',
     '<div class="panel">' + skChart(10) + '</div>');
   const max = t.reduce((m, y) => Math.max(m, y.h1b_offered || 0, y.prevailing || 0, y.gc || 0), 1);
-  const bar = (v, cls, lbl) => {
+  const bar = (v, cls, lbl, fy) => {
     if (v == null) return '<div class="fy-bar-wrap"></div>';
     const h = Math.max(4, Math.round(v / max * 80));
     return '<div class="fy-bar-wrap"><div class="fy-val">' + fmtK(v) + '</div>' +
-      '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(lbl + ' ' + fmtUSD(v)) + '"></div></div>';
+      '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(fy + ' · ' + lbl + ': ' + fmtUSD(v)) + '"></div></div>';
   };
   const groups = t.map(y => '<div class="fy-group"><div class="fy-bars" style="gap:5px;">' +
-    bar(y.h1b_offered, 'fy-h1b', 'H-1B offered') + bar(y.prevailing, 'fy-pw', 'Prevailing') + bar(y.gc, 'fy-gc', 'Green card') +
+    bar(y.h1b_offered, 'fy-h1b', 'H-1B offered', y.fy) + bar(y.prevailing, 'fy-pw', 'Prevailing', y.fy) + bar(y.gc, 'fy-gc', 'Green card', y.fy) +
     '</div><div class="fy-year">' + esc(fyShort(y.fy)) + (y.partial ? '<span class="fy-tag">partial</span>' : '') + '</div></div>').join('');
   const legend =
     '<span class="fy-li"><span class="fy-sw fy-h1b"></span> H-1B offered (median)</span>' +
     '<span class="fy-li"><span class="fy-sw fy-pw"></span> Prevailing wage (median)</span>' +
     '<span class="fy-li"><span class="fy-sw fy-gc"></span> Green card / PERM (median)</span>';
+  // Exact per-year medians live in this table (always readable, incl. mobile);
+  // the chart shows the trend shape and surfaces values on hover/tap.
+  const salRows = t.map(y => [esc(fyShort(y.fy)) + pTag(y.partial),
+    fmtUSD(y.h1b_offered), fmtUSD(y.prevailing), fmtUSD(y.gc)]);
   const meta = t[0].fy + '–' + t[t.length - 1].fy;
   return liveSection('Salaries', 'Annual Salary Trend',
     '<div class="panel"><div class="panel-title">Median Wages by Fiscal Year</div>' +
-      '<div class="fy-chart" style="gap:16px;">' + groups + '</div>' +
+      fyScroll(groups, t.length, 36, 14) +
       '<div class="fy-legend">' + legend + '</div>' +
+      myrTable(['FY', 'H-1B Offered', 'Prevailing', 'Green Card'], salRows) +
       '<div class="myr-note">Annualized medians of certified filings. H-1B offered &amp; prevailing wages from LCA disclosure; green-card wage from PERM offered wage. FY2026 partial.</div>' +
     '</div>', meta);
 }
@@ -1294,6 +1337,44 @@ function renderAll(emp, h1b, rankInfo) {
     .catch(() => {
       showError('Failed to load employer data. Please try again.');
     });
+})();
+
+// ── Bar-chart tooltips ──────────────────────────────────────────────────────
+// Per-bar dollar/count values used to be always-on labels; at 19 fiscal years
+// (and 3 salary series) they collided into an unreadable smear. They now appear
+// on hover/tap in this floating tooltip. The engine reads each bar's `title`,
+// moves it to `data-tip` (so the native browser tooltip doesn't double up), and
+// positions a styled box near the pointer. Delegated at the document level, so
+// it works for charts injected after the async data load.
+(function initFyTooltips() {
+  var tip = null;
+  function box() {
+    if (!tip) { tip = document.createElement('div'); tip.className = 'fy-tooltip'; document.body.appendChild(tip); }
+    return tip;
+  }
+  function tipText(bar) {
+    var t = bar.getAttribute('data-tip');
+    if (t == null) { t = bar.getAttribute('title') || ''; bar.setAttribute('data-tip', t); bar.removeAttribute('title'); }
+    return t;
+  }
+  function show(bar, x, y) {
+    var t = tipText(bar); if (!t) return;
+    var b = box(); b.textContent = t; b.classList.add('show');
+    var r = b.getBoundingClientRect();
+    var left = x - r.width / 2, top = y - r.height - 12;
+    if (left < 6) left = 6;
+    if (left + r.width > window.innerWidth - 6) left = window.innerWidth - 6 - r.width;
+    if (top < 6) top = y + 18;
+    b.style.left = Math.round(left) + 'px'; b.style.top = Math.round(top) + 'px';
+  }
+  function hide() { if (tip) tip.classList.remove('show'); }
+  function onMove(e) {
+    var bar = e.target && e.target.closest && e.target.closest('.fy-bar');
+    if (bar) show(bar, e.clientX, e.clientY); else hide();
+  }
+  document.addEventListener('pointermove', onMove, { passive: true });
+  document.addEventListener('pointerdown', onMove, { passive: true });
+  document.addEventListener('scroll', hide, { passive: true, capture: true });
 })();
 </script>
 
