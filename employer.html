@@ -1346,8 +1346,14 @@ function renderAll(emp, h1b, rankInfo) {
       }
       if (!emp) { showError('Employer data not found.'); return; }
       applySeo(emp.name || raw);
-      // No PERM-volume rank for H-1B-only employers (total 0 → no rank badge).
-      return loadRank(emp.total ? emp.total : null).then(rankInfo => {
+      // Rank against the SAME "PERM filings on record" total the profile
+      // headlines (sum of permByYear from the multi-year disclosure backfill),
+      // so the badge "#X of N" reconciles with the leaderboard row total. Falls
+      // back to the live-tracker total when no disclosure data exists; null
+      // (no badge) only when neither is available (pure H-1B-only employers).
+      const disc = permStatsFromDisclosure(h1b);
+      const rankTotal = (disc && disc.total != null) ? disc.total : (emp.total || null);
+      return loadRank(rankTotal ? rankTotal : null).then(rankInfo => {
         renderAll(emp, h1b, rankInfo);
         if (typeof gtag === 'function') {
           try { gtag('event', 'employer_profile_view', { employer_name: emp.name }); } catch (e) {}
