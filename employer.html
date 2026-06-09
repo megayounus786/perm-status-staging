@@ -95,6 +95,11 @@
   .emp-hero-badges { display: flex; flex-wrap: wrap; gap: 8px; }
   .emp-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: var(--tab-active); color: var(--text-secondary); border: 1px solid var(--card-border); }
   .emp-badge.rank { background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.18)); color: var(--text-primary); border-color: rgba(99,102,241,0.35); }
+  a.emp-badge.rank { text-decoration: none; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s; }
+  a.emp-badge.rank:hover { border-color: rgba(99,102,241,0.7); box-shadow: 0 2px 10px rgba(59,130,246,0.25); }
+  a.emp-badge.rank:active { transform: translateY(1px); }
+  a.emp-badge.rank .rank-arrow { font-weight: 800; opacity: 0.7; transition: transform 0.15s, opacity 0.15s; }
+  a.emp-badge.rank:hover .rank-arrow { opacity: 1; transform: translateX(2px); }
   .emp-badge .b-num { font-weight: 800; color: var(--text-primary); }
   .emp-hero-blurb { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-top: 16px; max-width: 760px; }
 
@@ -373,6 +378,7 @@
     <ul class="nav-links">
       <li><a href="./">Dashboard</a></li>
       <li><a href="estimate.html">Estimate</a></li>
+      <li><a href="leaderboard.html">Top Employers</a></li>
       <li><a href="visa-bulletin.html">Visa Bulletin</a></li>
       <li><a href="guides.html">Guides</a></li>
       <li><a href="about-perm.html">About PERM</a></li>
@@ -616,7 +622,8 @@ function renderHero(emp, ps, h1b, rankInfo) {
 
   let rankBadge = '';
   if (rankInfo) {
-    rankBadge = '<span class="emp-badge rank" title="Approximate rank by total PERM (green card) filing volume in the ImmiLane dataset.">🏅 Approx. PERM-volume rank <span class="b-num">#' + n(rankInfo.rank) + '</span> of ' + n(rankInfo.totalEmployers) + '</span>';
+    const lbHref = 'leaderboard.html?e=' + encodeURIComponent(emp.name);
+    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard by PERM (green card) filing volume — opens at this employer\'s position.">🏅 Approx. PERM-volume rank <span class="b-num">#' + n(rankInfo.rank) + '</span> of ' + n(rankInfo.totalEmployers) + ' <span class="rank-arrow">→</span></a>';
   }
 
   // Key stats

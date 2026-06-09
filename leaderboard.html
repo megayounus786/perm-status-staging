@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<title>Top Employers by PERM Filing Volume | ImmiLane</title>
+<meta name="description" content="Leaderboard of U.S. employers ranked by PERM (green card) labor certification filing volume. Search and browse all employers in the ImmiLane dataset, sorted from highest to lowest filing count.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://immilane.com/leaderboard.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Top Employers by PERM Filing Volume | ImmiLane">
+<meta property="og:description" content="Employers ranked by PERM green card filing volume.">
+<meta property="og:site_name" content="ImmiLane">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9676532944307230" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G8NXS7DNX1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-G8NXS7DNX1');</script>
+<script>if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-html: #0a0a12; --bg-body: #0a0a12; --text-primary: #f0f0f8; --text-secondary: #94a3b8; --text-muted: #64748b; --text-dim: #475569;
+    --card-bg: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.06); --card-hover: rgba(255,255,255,0.07); --card-border-hover: rgba(255,255,255,0.1);
+    --nav-bg: rgba(255,255,255,0.03); --nav-border: rgba(255,255,255,0.06);
+    --input-bg: rgba(255,255,255,0.06); --input-border: rgba(255,255,255,0.1); --input-focus: rgba(59,130,246,0.5);
+    --tab-bg: rgba(255,255,255,0.05); --tab-active: rgba(255,255,255,0.1);
+    --scrollbar-thumb: rgba(255,255,255,0.1); --sep: rgba(255,255,255,0.06);
+    --bg-card: rgba(15,15,24,0.92);
+    --gradient-start: rgba(59,130,246,0.08); --gradient-end: rgba(139,92,246,0.06);
+    --accent: #3b82f6; --accent-2: #8b5cf6;
+  }
+
+  html.light {
+    --bg-html: #f5f7fa; --bg-body: #f5f7fa; --text-primary: #1a1a2e; --text-secondary: #475569; --text-muted: #64748b; --text-dim: #94a3b8;
+    --card-bg: rgba(255,255,255,0.85); --card-border: rgba(0,0,0,0.08); --card-hover: rgba(255,255,255,0.95); --card-border-hover: rgba(0,0,0,0.12);
+    --nav-bg: rgba(255,255,255,0.85); --nav-border: rgba(0,0,0,0.08);
+    --input-bg: rgba(0,0,0,0.04); --input-border: rgba(0,0,0,0.12); --input-focus: rgba(59,130,246,0.4);
+    --tab-bg: rgba(0,0,0,0.04); --tab-active: rgba(0,0,0,0.08);
+    --scrollbar-thumb: rgba(0,0,0,0.12); --sep: rgba(0,0,0,0.08);
+    --bg-card: rgba(245,247,250,0.95);
+    --gradient-start: transparent; --gradient-end: transparent;
+  }
+
+  html { background: var(--bg-html); overflow-x: hidden; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-body); color: var(--text-primary); min-height: 100vh; min-width: 100%; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, var(--gradient-start) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, var(--gradient-end) 0%, transparent 50%); z-index: 0; pointer-events: none; }
+  a { color: inherit; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; backdrop-filter: blur(20px); background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; text-decoration: none; color: var(--text-primary); }
+  .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .nav-right { display: flex; align-items: center; gap: 24px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a.active, .nav-links a:hover { color: var(--text-primary); }
+  .nav-toggle { display: none; background: none; border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-primary); font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1; }
+  .theme-toggle { width: 40px; height: 22px; border-radius: 11px; border: none; cursor: pointer; background: rgba(255,255,255,0.1); position: relative; transition: background 0.3s; display: flex; align-items: center; padding: 0 3px; flex-shrink: 0; }
+  .theme-toggle::after { content: ''; width: 16px; height: 16px; border-radius: 50%; background: #f0f0f8; transition: transform 0.3s, background 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  html.light .theme-toggle { background: rgba(0,0,0,0.1); }
+  html.light .theme-toggle::after { transform: translateX(18px); background: #1a1a2e; }
+  .theme-toggle-icon { position: absolute; font-size: 11px; top: 50%; transform: translateY(-50%); pointer-events: none; line-height: 1; }
+  .theme-toggle-icon.sun { right: 5px; }
+  .theme-toggle-icon.moon { left: 5px; }
+  html:not(.light) .theme-toggle-icon.sun { opacity: 0.4; }
+  html:not(.light) .theme-toggle-icon.moon { opacity: 0; }
+  html.light .theme-toggle-icon.sun { opacity: 0; }
+  html.light .theme-toggle-icon.moon { opacity: 0.4; }
+  @media (max-width: 768px) {
+    .nav-toggle { display: flex; align-items: center; justify-content: center; order: -1; }
+    .nav-right { gap: 6px; order: 2; margin-left: auto; }
+    nav .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: #0f172a; border-bottom: 1px solid rgba(59, 130, 246, 0.2); padding: 8px 0; z-index: 1000; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    nav .nav-links li { width: 100%; }
+    nav .nav-links a { display: block; padding: 14px 24px; font-size: 15px; border-radius: 0; min-height: 44px; white-space: normal; box-sizing: border-box; }
+    nav .nav-links a:hover, nav .nav-links a.active { background: rgba(59,130,246,0.1); }
+    nav.nav-open .nav-links { display: flex; }
+    .light nav .nav-links { background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  }
+  footer { text-align: center; padding: 32px 24px; color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--sep); margin-top: 0; position: relative; z-index: 1; }
+  footer a { color: var(--text-muted); text-decoration: none; }
+  footer a:hover { color: var(--text-secondary); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes lb-flash { 0% { background: rgba(59,130,246,0.30); } 100% { background: transparent; } }
+
+  /* ── PAGE LAYOUT ── */
+  .lb-page { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 26px 24px 72px; }
+  .lb-breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  .lb-breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+  .lb-breadcrumb a:hover { color: var(--text-primary); }
+
+  /* ── HERO ── */
+  .lb-hero { background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(139,92,246,0.06)); border: 1px solid var(--card-border); border-radius: 18px; padding: 26px 26px 22px; margin-bottom: 22px; position: relative; overflow: hidden; }
+  .lb-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .lb-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .lb-title { font-size: 30px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.18; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .lb-blurb { font-size: 13px; color: var(--text-secondary); line-height: 1.6; max-width: 760px; }
+  .lb-blurb b { color: var(--text-primary); }
+
+  /* ── CONTROLS ── */
+  .lb-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .lb-search { position: relative; flex: 1; min-width: 220px; }
+  .lb-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; display: flex; }
+  .lb-search-input { width: 100%; padding: 11px 36px 11px 38px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-primary); font-size: 14px; font-family: inherit; border-radius: 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .lb-search-input::placeholder { color: var(--text-dim); }
+  .lb-search-input:focus { border-color: var(--input-focus); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+  .lb-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border: none; background: var(--tab-active); color: var(--text-secondary); font-size: 15px; line-height: 1; cursor: pointer; border-radius: 50%; display: none; align-items: center; justify-content: center; }
+  .lb-search-clear.visible { display: flex; }
+  .lb-count { font-size: 12.5px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+
+  /* ── TABLE ── */
+  .lb-tablewrap { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; }
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table thead th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--sep); background: var(--tab-bg); position: sticky; top: 57px; z-index: 2; }
+  .lb-table th.num, .lb-table td.num { text-align: right; }
+  .lb-table tbody tr { border-bottom: 1px solid var(--sep); transition: background 0.12s; }
+  .lb-table tbody tr:last-child { border-bottom: none; }
+  .lb-table tbody tr:hover { background: var(--card-hover); }
+  .lb-table td { padding: 13px 16px; font-size: 14px; vertical-align: middle; }
+  .lb-rank { font-weight: 800; font-size: 14px; color: var(--text-secondary); width: 64px; }
+  .lb-rank.top1 { color: #fbbf24; } .lb-rank.top2 { color: #cbd5e1; } .lb-rank.top3 { color: #f59e0b; }
+  .lb-medal { margin-right: 2px; }
+  .lb-name { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+  .lb-mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .lb-namelink { color: var(--text-primary); text-decoration: none; font-weight: 600; }
+  .lb-namelink:hover { color: var(--accent); text-decoration: underline; }
+  .lb-count-cell { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .lb-bar { height: 5px; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); margin-top: 5px; min-width: 2px; opacity: 0.85; }
+  .lb-barcell { width: 160px; }
+  tr.lb-highlight td { animation: lb-flash 2.4s ease-out; }
+  tr.lb-self { background: rgba(59,130,246,0.10); }
+  tr.lb-self:hover { background: rgba(59,130,246,0.16); }
+
+  .lb-more { display: flex; justify-content: center; padding: 18px; }
+  .lb-more button { background: var(--tab-active); color: var(--text-primary); border: 1px solid var(--card-border); border-radius: 10px; padding: 11px 22px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+  .lb-more button:hover { background: var(--card-hover); border-color: var(--card-border-hover); }
+  .lb-empty { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 14px; }
+  .lb-loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px 16px; color: var(--text-secondary); font-size: 14px; }
+  .lb-spinner { width: 22px; height: 22px; border: 3px solid var(--card-border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .lb-note { font-size: 11.5px; color: var(--text-dim); margin-top: 14px; line-height: 1.6; }
+
+  @media (max-width: 768px) {
+    .lb-page { padding: 20px 14px 60px; }
+    .lb-title { font-size: 24px; }
+    .lb-table thead th { top: 0; }
+    .lb-barcell, .lb-table td.lb-barcell { display: none; }
+    .lb-table td { padding: 12px 12px; font-size: 13.5px; }
+    .lb-table thead th { padding: 12px 12px; }
+    .lb-rank { width: 48px; }
+    .lb-mark { display: none; }
+  }
+  @media (max-width: 420px) {
+    .lb-count-head, td.lb-count-cell { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="./"><div class="logo-icon">🏛️</div>PERM Tracker</a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">&#9776;</button>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="./">Dashboard</a></li>
+      <li><a href="estimate.html">Estimate</a></li>
+      <li><a href="leaderboard.html" class="active">Top Employers</a></li>
+      <li><a href="visa-bulletin.html">Visa Bulletin</a></li>
+      <li><a href="guides.html">Guides</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+    </ul>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode"><span class="theme-toggle-icon moon">🌙</span><span class="theme-toggle-icon sun">☀️</span></button>
+  </div>
+</nav>
+
+<main class="lb-page">
+  <div class="lb-breadcrumb"><a href="./">Dashboard</a> &rsaquo; Top Employers</div>
+
+  <section class="lb-hero">
+    <div class="lb-eyebrow">Leaderboard</div>
+    <h1 class="lb-title">🏅 Top Employers by PERM Volume</h1>
+    <p class="lb-blurb">U.S. employers ranked by total <b>PERM (green card) labor certification</b> filing volume in the ImmiLane dataset, highest to lowest. Showing <b id="lb-total">…</b> employers across <b id="lb-cases">…</b> filings. Use the search box to jump to any employer, then click a name for its full PERM &amp; H-1B profile.</p>
+  </section>
+
+  <div class="lb-controls">
+    <div class="lb-search">
+      <span class="lb-search-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="text" class="lb-search-input" id="lb-search" placeholder="Search employers (e.g. Microsoft, Amazon, Cognizant)…" autocomplete="off" spellcheck="false" aria-label="Search employers">
+      <button type="button" class="lb-search-clear" id="lb-search-clear" aria-label="Clear search">&times;</button>
+    </div>
+    <div class="lb-count" id="lb-shown"></div>
+  </div>
+
+  <div class="lb-tablewrap">
+    <div class="lb-loading" id="lb-loading"><div class="lb-spinner"></div>Loading leaderboard…</div>
+    <table class="lb-table" id="lb-table" style="display:none">
+      <thead>
+        <tr>
+          <th class="lb-rank-head">Rank</th>
+          <th>Employer</th>
+          <th class="num lb-count-head">PERM Filings</th>
+          <th class="lb-barcell">Share</th>
+        </tr>
+      </thead>
+      <tbody id="lb-body"></tbody>
+    </table>
+    <div class="lb-more" id="lb-more" style="display:none"><button id="lb-more-btn" type="button">Load more</button></div>
+  </div>
+
+  <p class="lb-note">Rank reflects total PERM filing volume (all statuses) from FLAG.DOL.GOV data. An employer's individual profile page shows an "approximate" rank computed against its live total, which may differ by a position or two from this static snapshot.</p>
+</main>
+
+<footer>
+  Data sourced from <a href="https://flag.dol.gov/programs/lca" target="_blank" rel="noopener">FLAG.DOL.GOV</a> &middot; Updated daily &middot; <a href="guides.html">Guides</a> &middot; <a href="about-us.html">About</a> &middot; <a href="support.html">Contact</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="disclaimer.html">Disclaimer</a> &middot; &copy; 2026 ImmiLane
+</footer>
+
+<script>
+// THEME + NAV TOGGLE
+document.getElementById('theme-toggle').addEventListener('click', function() {
+  document.documentElement.classList.toggle('light');
+  localStorage.setItem('theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
+});
+document.getElementById('nav-toggle').addEventListener('click', function() {
+  document.querySelector('nav').classList.toggle('nav-open');
+});
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// TOP EMPLOYERS LEADERBOARD
+// Data source: data/employer_index.json — the same ~43k-employer index
+// (already sorted by PERM total `t` desc) used to compute the rank badge on
+// employer.html. We do NOT recompute anything; we render straight from it.
+// ═══════════════════════════════════════════════════════
+(function () {
+  var PAGE = 100;            // rows per "page" / load-more chunk
+  var rows = [];             // [{n, t, slug}] sorted desc (as stored)
+  var view = [];             // current filtered+ranked view
+  var shown = 0;             // how many of `view` are rendered
+  var deepTarget = -1;       // index in `view` to scroll/highlight to
+  var totalCases = 0;
+
+  var elBody    = document.getElementById('lb-body');
+  var elTable   = document.getElementById('lb-table');
+  var elLoading = document.getElementById('lb-loading');
+  var elMore    = document.getElementById('lb-more');
+  var elMoreBtn = document.getElementById('lb-more-btn');
+  var elShown   = document.getElementById('lb-shown');
+  var elSearch  = document.getElementById('lb-search');
+  var elClear   = document.getElementById('lb-search-clear');
+
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
+  function n(v){ return (v==null||isNaN(v))?'—':Number(v).toLocaleString(); }
+
+  function employerSlug(name){
+    if(!name) return '';
+    return String(name).toLowerCase().normalize('NFKD')
+      .replace(/[̀-ͯ]/g,'').replace(/&/g,' and ')
+      .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,200);
+  }
+  function initials(name){
+    var w=String(name||'').replace(/[^A-Za-z0-9 ]/g,' ').trim().split(/\s+/).filter(Boolean);
+    if(!w.length) return '—';
+    if(w.length===1) return w[0].slice(0,2).toUpperCase();
+    return (w[0][0]+w[1][0]).toUpperCase();
+  }
+  function getParam(k){ try{ return new URLSearchParams(window.location.search).get(k)||''; }catch(e){ return ''; } }
+
+  function rowHTML(item){
+    var rank = item.rank;
+    var medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    var rankCls = rank===1?'top1':rank===2?'top2':rank===3?'top3':'';
+    var pct = totalCases>0 ? Math.max(2, Math.round(item.t/maxCount*100)) : 0;
+    var selfCls = item.idx===deepTarget ? ' lb-self' : '';
+    var href = 'employer.html?e=' + encodeURIComponent(item.n);
+    return '<tr data-idx="'+item.idx+'"class="'+ (selfCls?selfCls.trim():'') +'">'
+      + '<td class="lb-rank '+rankCls+'">'+(medal?'<span class="lb-medal">'+medal+'</span>':'')+'#'+n(rank)+'</td>'
+      + '<td><span class="lb-name"><span class="lb-mark">'+esc(initials(item.n))+'</span>'
+        + '<a class="lb-namelink" href="'+href+'">'+esc(item.n)+'</a></span></td>'
+      + '<td class="num lb-count-cell">'+n(item.t)+'</td>'
+      + '<td class="lb-barcell"><div class="lb-bar" style="width:'+pct+'%"></div></td>'
+      + '</tr>';
+  }
+
+  var maxCount = 1;
+
+  function renderMore(){
+    var end = Math.min(view.length, shown + PAGE);
+    var html = '';
+    for (var i=shown; i<end; i++) html += rowHTML(view[i]);
+    elBody.insertAdjacentHTML('beforeend', html);
+    shown = end;
+    elMore.style.display = shown < view.length ? 'flex' : 'none';
+    updateShown();
+  }
+
+  function resetRender(){
+    elBody.innerHTML = '';
+    shown = 0;
+    renderMore();
+  }
+
+  function updateShown(){
+    if (!view.length){ elShown.textContent = ''; return; }
+    elShown.textContent = 'Showing ' + n(Math.min(shown, view.length)) + ' of ' + n(view.length)
+      + (view.length !== rows.length ? ' matches' : ' employers');
+  }
+
+  function applyFilter(q){
+    q = (q||'').trim().toLowerCase();
+    elClear.classList.toggle('visible', !!q);
+    if (!q){
+      view = rows;
+    } else {
+      view = rows.filter(function(r){ return r._l.indexOf(q) !== -1; });
+    }
+    deepTarget = -1;
+    resetRender();
+    if (!view.length){
+      elBody.innerHTML = '<tr><td colspan="4"><div class="lb-empty">No employers match “'+esc(q)+'”.</div></td></tr>';
+      elMore.style.display = 'none';
+    }
+  }
+
+  // Render enough pages to include `targetIdx`, then scroll+highlight.
+  function jumpTo(targetIdx){
+    deepTarget = targetIdx;
+    while (shown <= targetIdx && shown < view.length) renderMore();
+    resetRender(); // re-render so the self-row class applies cleanly
+    while (shown <= targetIdx && shown < view.length) renderMore();
+    var tr = elBody.querySelector('tr[data-idx="'+targetIdx+'"]');
+    if (tr){
+      tr.classList.add('lb-highlight');
+      tr.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }
+
+  function init(idx){
+    var emps = (idx && Array.isArray(idx.employers)) ? idx.employers : [];
+    totalCases = idx.totalCases || 0;
+    maxCount = emps.length ? (emps[0].t || 1) : 1;
+    // Stored order is already PERM-total desc; assign rank + precompute search key.
+    rows = emps.map(function(e, i){
+      return { n: e.n, t: e.t, idx: i, rank: i+1, _l: String(e.n||'').toLowerCase() };
+    });
+    view = rows;
+
+    document.getElementById('lb-total').textContent = n(idx.totalEmployers || rows.length);
+    document.getElementById('lb-cases').textContent = n(totalCases);
+
+    elLoading.style.display = 'none';
+    elTable.style.display = '';
+    resetRender();
+
+    // Deep link: ?e=<name> → scroll to that employer's row & highlight.
+    var target = getParam('e') || getParam('employer') || getParam('slug');
+    if (target){
+      var slug = employerSlug(target.trim());
+      var nameL = target.trim().toLowerCase();
+      var hit = -1;
+      for (var i=0;i<rows.length;i++){
+        if (rows[i]._l === nameL || employerSlug(rows[i].n) === slug){ hit = i; break; }
+      }
+      if (hit !== -1){
+        // pre-fill search? No — keep full list so neighbors are visible.
+        jumpTo(hit);
+      }
+    }
+  }
+
+  // Wire controls
+  var t;
+  elSearch.addEventListener('input', function(){
+    clearTimeout(t);
+    var q = this.value;
+    t = setTimeout(function(){ applyFilter(q); }, 120);
+  });
+  elClear.addEventListener('click', function(){
+    elSearch.value=''; applyFilter(''); elSearch.focus();
+  });
+  elMoreBtn.addEventListener('click', renderMore);
+
+  fetch('data/employer_index.json')
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(init)
+    .catch(function(){
+      elLoading.innerHTML = '<div class="lb-empty">Couldn’t load the leaderboard data. Please try again later.</div>';
+    });
+})();
+</script>
+
+</body>
+</html>
