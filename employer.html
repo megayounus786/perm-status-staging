@@ -134,6 +134,10 @@
   .emp-stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.55; word-break: break-word; }
   .emp-stat-value.cr-good { color: #22c55e; } .emp-stat-value.cr-med { color: #f59e0b; } .emp-stat-value.cr-bad { color: #ef4444; } .emp-stat-value.cr-na { color: var(--text-muted); }
   .emp-stat-disclaimer { font-size: 10px; color: var(--text-dim); margin-top: 10px; font-style: italic; line-height: 1.4; }
+  /* ── Currently-in-process (live AR/pending) stat ── */
+  .emp-stat-card.ar::before { background: linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent); opacity: 0.85; }
+  .emp-stat-value.ar-val { color: #f59e0b; }
+  .ar-live { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; letter-spacing: 0.4px; color: #f59e0b; background: rgba(245,158,11,0.13); border: 1px solid rgba(245,158,11,0.3); border-radius: 999px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; }
   .stat-details { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--sep); display: flex; flex-direction: column; gap: 4px; }
   .stat-detail-row { display: flex; justify-content: space-between; font-size: 11px; }
   .stat-detail-label { color: var(--text-muted); } .stat-detail-value { color: var(--text-secondary); font-weight: 600; }
@@ -562,6 +566,28 @@ function permStats(emp) {
            disclosure: false, periodLabel: null };
 }
 
+// ── Current AR / pending from the LIVE case-status tracker ──────────────────
+// The historical DOL disclosure dataset (used for the donut) only contains
+// completed/adjudicated cases (certified/denied/withdrawn) — it has no
+// "pending" bucket. The live scanner payload (emp.statuses) DOES track cases
+// currently in DOL Analyst Review / audit / RFI. This surfaces that count
+// separately, clearly labeled as live and over a different (recent) window,
+// so it is never blended into the historical FY2008–FY2026 distribution.
+function livePendingStats(emp) {
+  const statuses = (emp && emp.statuses) || {};
+  let pending = 0;
+  const breakdown = [];
+  Object.entries(statuses).forEach(([k, v]) => {
+    if (PENDING_STATUSES.has(k) && v > 0) {
+      pending += v;
+      breakdown.push({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR });
+    }
+  });
+  breakdown.sort((a, b) => b.value - a.value);
+  const trackedTotal = Object.values(statuses).reduce((s, v) => s + v, 0);
+  return { pending, breakdown, trackedTotal };
+}
+
 // PERM headline stats sourced from the multi-year DOL disclosure dataset
 // (h1b.permByYear, FY2020–FY2026) so the headline TOTAL reconciles exactly with
 // the by-year PERM breakdown rendered below it. "Total PERM Filings" = the sum
@@ -712,6 +738,23 @@ function renderPermSection(emp, ps, h1b) {
     '<span class="legend-value">' + n(item.value) + ' (' + item.pct + '%)</span></div>'
   ).join('');
 
+  // Live AR / pending card — surfaced separately and only when the donut is in
+  // historical-disclosure mode (so it never duplicates a live-data donut
+  // segment, and is never blended into the FY2008–FY2026 adjudicated donut).
+  const live = livePendingStats(emp);
+  const showAr = ps.disclosure && live.pending > 0;
+  const arSub = live.breakdown.length > 1
+    ? 'Cases currently pending with DOL: ' + live.breakdown.map(b => esc(b.label) + ' ' + n(b.value)).join(' · ') + '.'
+    : 'Cases currently in DOL ' + esc(live.breakdown[0] ? live.breakdown[0].label : 'Analyst Review') + ' — awaiting adjudication.';
+  const arCard = showAr ?
+    '<div class="emp-stat-card ar">' +
+      '<div class="emp-stat-label">Currently in Process<span class="ar-live">● Live</span></div>' +
+      '<div class="emp-stat-value ar-val">' + n(live.pending) + '</div>' +
+      '<div class="emp-stat-sub">' + arSub + '</div>' +
+      '<div class="emp-stat-disclaimer">From the live case-status tracker' + (firstStr ? ' (cases filed since ' + esc(firstStr) + ')' : '') + ' — separate from the historical adjudicated distribution shown here, which counts only completed cases.</div>' +
+    '</div>'
+    : '';
+
   // filings-by-year (replaces the old sparse monthly trend)
   const filingsByYear = renderFilingsByYear(emp, h1b);
 
@@ -762,6 +805,7 @@ function renderPermSection(emp, ps, h1b) {
           '<div class="emp-stat-sub">' + (ps.adjudicated > 0 ? n(ps.certCount) + ' certified of ' + n(ps.adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
           '<div class="emp-stat-disclaimer">Based on filings ' + (ps.disclosure ? esc(sinceLabel) : 'since ' + esc(sinceLabel)) + '</div>' +
         '</div>' +
+        arCard +
       '</div>' +
       (donutTotal > 0 ?
       '<div class="panel">' +
