@@ -1286,20 +1286,6 @@ function fyScroll(groupsHtml, count, perGroup, gap) {
   return '<div class="fy-scroll"><div class="fy-chart" style="' + style + '">' + groupsHtml + '</div></div>';
 }
 
-function fyBars(items, cls) {
-  if (!items || !items.length) return '';
-  const max = items.reduce((m, b) => Math.max(m, b.value || 0), 1);
-  const groups = items.map(b => {
-    const h = Math.max(4, Math.round((b.value || 0) / max * 80));
-    return '<div class="fy-group"><div class="fy-bars"><div class="fy-bar-wrap">' +
-      '<div class="fy-val">' + n(b.value) + '</div>' +
-      '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(b.fy + ': ' + n(b.value)) + '"></div>' +
-      '</div></div><div class="fy-year">' + esc(fyShort(b.fy)) +
-      (b.partial ? '<span class="fy-tag">partial</span>' : '') + '</div></div>';
-  }).join('');
-  return fyScroll(groups, items.length, 24, 10);
-}
-
 function myrTable(headers, rows) {
   return '<table class="myr-table"><thead><tr>' +
     headers.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
@@ -1319,21 +1305,19 @@ function renderByYear(h1b) {
       '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B LCAs by Year</div>' + skChart(8) +
       '</div><div class="panel"><div class="panel-title">Green Card (PERM) by Year</div>' + skChart(8) + '</div></div>');
   }
-  const lcaBars = fyBars(lca.map(y => ({ fy: y.fy, value: y.total, partial: y.partial })), 'fy-h1b');
+  // Per-year mini bar charts removed — they restated the combined "Filings by
+  // Year" chart above. These detailed tables (cert/denied/withdrawn breakdown)
+  // are the unique data this section carries.
   const lcaRows = lca.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
-  // PERM bar value = all disclosed filings (cert+denied+withdrawn) so the sum of
-  // the by-year bars reconciles exactly with the Total PERM Filings headline.
-  const permFilings = y => (y.cert || 0) + (y.denied || 0) + (y.withdrawn || 0);
-  const permBars = fyBars(perm.map(y => ({ fy: y.fy, value: permFilings(y), partial: y.partial })), 'fy-gc');
   const permRows = perm.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
   const allFy = lca.concat(perm).map(y => y.fy).sort();
   const meta = allFy.length ? (allFy[0] + '–' + allFy[allFy.length - 1]) : '';
   return liveSection('History', 'H-1B LCAs & Green Card by Year',
     '<div class="placeholder-grid">' +
       '<div class="panel"><div class="panel-title">H-1B LCAs by Year <span class="muted">· positions</span></div>' +
-        lcaBars + (lcaRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], lcaRows) : '') + '</div>' +
+        (lcaRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], lcaRows) : '') + '</div>' +
       '<div class="panel"><div class="panel-title">Green Card (PERM) by Year <span class="muted">· filings</span></div>' +
-        permBars + (permRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], permRows) : '') + '</div>' +
+        (permRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], permRows) : '') + '</div>' +
     '</div>' +
     '<div class="myr-note">LCA = H-1B Labor Condition Applications (certified positions, DOL OFLC ETA-9035). PERM = green-card labor certifications (DOL OFLC ETA-9089). FY2026 is partial (year-to-date).</div>',
     meta);
