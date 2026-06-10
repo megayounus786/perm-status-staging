@@ -1507,6 +1507,29 @@ function renderAll(emp, h1b, rankInfo) {
     renderFaqs(emp, ps, h1b, rankInfo);
   wireDonut(ps, emp);
   wireFaq();
+  scrollChartsToLatest();
+}
+
+// The by-year charts (Filings-by-Year .fyx-scroll and Salary-trend .fy-scroll)
+// render chronologically oldest→newest. When the plot overflows (mobile/narrow),
+// default the horizontal scroll to the NEWEST end so the latest fiscal year shows
+// first; the reader scrolls left to reveal older years. Harmless on wide screens
+// where everything fits (scrollWidth ≤ clientWidth → max ≤ 0 → no-op). Run after
+// layout settles via double-rAF, fonts-ready, and a timeout fallback so bar/label
+// widths are final before we measure.
+function scrollChartsToLatest() {
+  const sels = ['.fyx-scroll', '.fy-scroll'];
+  const apply = () => {
+    sels.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (el) {
+        const max = el.scrollWidth - el.clientWidth;
+        if (max > 0) el.scrollLeft = max;
+      });
+    });
+  };
+  requestAnimationFrame(function () { requestAnimationFrame(apply); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(apply).catch(function () {});
+  setTimeout(apply, 250);
 }
 
 (function initEmployerPage() {
