@@ -353,6 +353,10 @@
   .myr-table tr:last-child td { border-bottom: none; }
   .myr-partial { font-size: 9px; color: var(--text-dim); margin-left: 5px; font-weight: 500; }
   .myr-note { font-size: 11px; color: var(--text-muted); margin-top: 12px; line-height: 1.5; }
+  /* Divider sub-label separating the combined chart from the detail tables in
+     the unified "by year" section. */
+  .myr-subhead { font-size: 13px; font-weight: 700; letter-spacing: -0.2px; color: var(--text-primary); margin: 22px 0 14px; padding-top: 18px; border-top: 1px solid var(--sep); }
+  .myr-subhead .muted { color: var(--text-dim); font-weight: 400; font-size: 11.5px; }
 
   /* ── FAQ ── */
   .faq-item { border-bottom: 1px solid var(--sep); }
@@ -832,9 +836,6 @@ function renderPermSection(emp, ps, h1b) {
     '</div>'
     : '';
 
-  // filings-by-year (replaces the old sparse monthly trend)
-  const filingsByYear = renderFilingsByYear(emp, h1b);
-
   // PERM job titles — ALL available titles from the multi-year disclosure
   // dataset (h1b.permTitlesAll), falling back to the live-tracker topTitles.
   // Rendered into a fixed-height scroll container (~10 visible, rest scrolls).
@@ -903,7 +904,6 @@ function renderPermSection(emp, ps, h1b) {
         '</div>' +
       '</div>' : '<div class="panel"><div class="soon-inner"><div class="soon-msg">No status breakdown available.</div></div></div>') +
     '</div>' +
-    filingsByYear +
     (titles.length ?
     '<div class="panel" style="margin-top:16px;">' +
       '<div class="panel-title">PERM Job Titles ' +
@@ -1295,24 +1295,35 @@ function myrTable(headers, rows) {
 
 function pTag(partial) { return partial ? '<span class="myr-partial">partial</span>' : ''; }
 
-function renderByYear(h1b) {
+// Unified "by year" section: the combined Filings-by-Year grouped bar chart
+// (PERM filings vs H-1B LCA positions) headlines the section, with the detailed
+// per-fiscal-year cert/denied/withdrawn tables (H-1B + PERM) sitting directly
+// below it — chart and tables live together in one card, separated by a divider
+// sub-label. Falls back gracefully for older single-FY payloads.
+function renderByYear(emp, h1b) {
   const lca = (h1b && Array.isArray(h1b.lcaByYear)) ? h1b.lcaByYear : [];
   const perm = (h1b && Array.isArray(h1b.permByYear)) ? h1b.permByYear : [];
+  // The grouped-bar chart leads the section; its own panel-title ("Filings by
+  // Year · Annual sponsorship volume …") acts as the chart sub-header.
+  const chart = renderFilingsByYear(emp, h1b);
+
   if (!lca.length && !perm.length) {
-    // graceful fallback for older single-FY payloads
-    return soonCard('H-1B LCAs & Green Card by Year', 'History',
-      'Year-by-year LCA and PERM filing counts will appear here once multi-year DOL disclosure files are ingested.',
+    // graceful fallback for older single-FY payloads (chart falls back too)
+    return liveSection('History', 'H-1B LCAs & Green Card by Year',
+      chart +
+      '<div class="myr-subhead">By fiscal year <span class="muted">· Certified / Denied / Withdrawn</span></div>' +
       '<div class="placeholder-grid"><div class="panel"><div class="panel-title">H-1B LCAs by Year</div>' + skChart(8) +
-      '</div><div class="panel"><div class="panel-title">Green Card (PERM) by Year</div>' + skChart(8) + '</div></div>');
+      '</div><div class="panel"><div class="panel-title">Green Card (PERM) by Year</div>' + skChart(8) + '</div></div>',
+      '');
   }
-  // Per-year mini bar charts removed — they restated the combined "Filings by
-  // Year" chart above. These detailed tables (cert/denied/withdrawn breakdown)
-  // are the unique data this section carries.
+
   const lcaRows = lca.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
   const permRows = perm.map(y => [esc(fyShort(y.fy)) + pTag(y.partial), n(y.cert), n(y.denied), n(y.withdrawn)]);
   const allFy = lca.concat(perm).map(y => y.fy).sort();
   const meta = allFy.length ? (allFy[0] + '–' + allFy[allFy.length - 1]) : '';
   return liveSection('History', 'H-1B LCAs & Green Card by Year',
+    chart +
+    '<div class="myr-subhead">By fiscal year <span class="muted">· Certified / Denied / Withdrawn</span></div>' +
     '<div class="placeholder-grid">' +
       '<div class="panel"><div class="panel-title">H-1B LCAs by Year <span class="muted">· positions</span></div>' +
         (lcaRows.length ? myrTable(['FY', 'Certified', 'Denied', 'W/drawn'], lcaRows) : '') + '</div>' +
@@ -1357,12 +1368,10 @@ function renderSalaryTrend(h1b) {
     '</div>', meta);
 }
 
-function renderMultiYear(emp, h1b) {
-  // Worksite Locations section removed per review (not yet ingested).
-  // USCIS petition-history section removed: bulk USCIS data was only complete
-  // through FY2023, so the partial layer was dropped (LCA/PERM run to FY2026).
-  return renderByYear(h1b) + renderSalaryTrend(h1b);
-}
+// Salary trend stands alone now; the by-year filings chart + tables render as
+// their own unified section (renderByYear), placed up high right after the PERM
+// section. (Worksite Locations and USCIS petition-history sections were removed
+// per review — not ingested / only complete through FY2023.)
 
 function renderFaqs(emp, ps, h1b, rankInfo) {
   const name = emp.name;
@@ -1483,9 +1492,10 @@ function renderAll(emp, h1b, rankInfo) {
     '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
     renderHero(emp, ps, h1b, rankInfo) +
     renderPermSection(emp, ps, h1b) +
+    renderByYear(emp, h1b) +
     renderH1bSection(h1b) +
     renderOccupations(emp, h1b) +
-    renderMultiYear(emp, h1b) +
+    renderSalaryTrend(h1b) +
     renderFaqs(emp, ps, h1b, rankInfo);
   wireDonut(ps, emp);
   wireFaq();
