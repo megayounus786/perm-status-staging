@@ -33,6 +33,7 @@
     --tab-bg: rgba(255,255,255,0.05); --tab-active: rgba(255,255,255,0.1);
     --scrollbar-thumb: rgba(255,255,255,0.1); --sep: rgba(255,255,255,0.06);
     --modal-bg: #0e0e1a; --modal-backdrop: rgba(0,0,0,0.65); --modal-border: rgba(255,255,255,0.08);
+    --myr-sticky-bg: #14141c;
     --bg-card: rgba(15,15,24,0.92);
     --gradient-start: rgba(59,130,246,0.08); --gradient-end: rgba(139,92,246,0.06);
     --accent: #3b82f6; --accent-2: #8b5cf6;
@@ -47,6 +48,7 @@
     --tab-bg: rgba(0,0,0,0.04); --tab-active: rgba(0,0,0,0.08);
     --scrollbar-thumb: rgba(0,0,0,0.12); --sep: rgba(0,0,0,0.08);
     --modal-bg: #fff; --modal-backdrop: rgba(0,0,0,0.3); --modal-border: rgba(0,0,0,0.1);
+    --myr-sticky-bg: #fbfcfe;
     --bg-card: rgba(245,247,250,0.95);
     --gradient-start: transparent; --gradient-end: transparent;
     --skeleton: rgba(0,0,0,0.05); --skeleton-shine: rgba(0,0,0,0.09);
@@ -346,12 +348,24 @@
   .fy-tooltip .ft-sw { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
   .fy-tooltip .ft-lbl { color: var(--text-secondary); }
   .fy-tooltip .ft-v { margin-left: auto; font-weight: 700; padding-left: 14px; }
-  .myr-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 14px; }
+  /* Horizontally-scrollable wrapper so value columns can scroll within the card
+     on narrow screens instead of overflowing the page (FY column stays frozen). */
+  .myr-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; margin-top: 14px; }
+  .myr-table { width: 100%; min-width: max-content; border-collapse: separate; border-spacing: 0; font-size: 12px; }
   .myr-table th { text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--card-border); white-space: nowrap; }
   .myr-table th:first-child { text-align: left; }
   .myr-table td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--sep); color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
   .myr-table td:first-child { text-align: left; color: var(--text-primary); }
   .myr-table tr:last-child td { border-bottom: none; }
+  /* Sticky FY (first) column: stays pinned while the dollar/count columns scroll
+     under it. Solid theme-matched background + subtle right divider so it reads
+     as frozen with no see-through overlap. */
+  .myr-table th:first-child, .myr-table td:first-child {
+    position: sticky; left: 0; z-index: 1;
+    background: var(--myr-sticky-bg);
+    box-shadow: inset -1px 0 0 var(--card-border), 2px 0 6px -2px rgba(0,0,0,0.35);
+  }
+  .myr-table th:first-child { z-index: 2; }
   .myr-partial { font-size: 9px; color: var(--text-dim); margin-left: 5px; font-weight: 500; }
   .myr-note { font-size: 11px; color: var(--text-muted); margin-top: 12px; line-height: 1.5; }
   /* Divider sub-label separating the combined chart from the detail tables in
@@ -1295,10 +1309,10 @@ function fyScroll(groupsHtml, count, perGroup, gap) {
 }
 
 function myrTable(headers, rows) {
-  return '<table class="myr-table"><thead><tr>' +
+  return '<div class="myr-scroll"><table class="myr-table"><thead><tr>' +
     headers.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
     rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') +
-    '</tbody></table>';
+    '</tbody></table></div>';
 }
 
 function pTag(partial) { return partial ? '<span class="myr-partial">partial</span>' : ''; }
@@ -1784,6 +1798,156 @@ function scrollChartsToLatest() {
     }
     window.location.href = 'employer.html?e=' + encodeURIComponent(name.trim());
   }
+})();
+</script>
+
+
+<!-- Feedback Widget (shared across all pages) -->
+<style>
+  /* Theme vars the feedback widget relies on — values match the site design
+     system; redefining is a harmless no-op on pages that already set them. */
+  :root { --modal-bg: #0e0e1a; --modal-backdrop: rgba(0,0,0,0.65); --modal-border: rgba(255,255,255,0.08); --input-bg: rgba(255,255,255,0.06); --input-border: rgba(255,255,255,0.1); --input-focus: rgba(59,130,246,0.5); }
+  html.light { --modal-bg: #fff; --modal-backdrop: rgba(0,0,0,0.3); --modal-border: rgba(0,0,0,0.1); --input-bg: rgba(0,0,0,0.04); --input-border: rgba(0,0,0,0.12); --input-focus: rgba(59,130,246,0.4); }
+  .fb-trigger { position: fixed; bottom: 24px; right: 24px; z-index: 900; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; border: none; border-radius: 14px; padding: 12px 20px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; box-shadow: 0 4px 20px rgba(59,130,246,0.4); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 8px; }
+  .fb-trigger:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.5); }
+  .fb-trigger svg { width: 16px; height: 16px; }
+  .fb-backdrop { display: none; position: fixed; inset: 0; background: var(--modal-backdrop); z-index: 950; }
+  .fb-backdrop.open { display: block; }
+  .fb-modal { display: none; position: fixed; bottom: 80px; right: 24px; z-index: 960; width: 380px; max-width: calc(100vw - 32px); background: var(--modal-bg); border: 1px solid var(--modal-border); border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.4); padding: 24px; }
+  .fb-modal.open { display: block; }
+  .fb-modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .fb-modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  .fb-close { position: absolute; top: 14px; right: 14px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+  .fb-close:hover { color: var(--text-primary); }
+  .fb-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .fb-field { margin-bottom: 14px; }
+  .fb-select, .fb-textarea, .fb-input { width: 100%; font-family: inherit; font-size: 13px; color: var(--text-primary); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; padding: 10px 12px; transition: border-color 0.2s; outline: none; }
+  .fb-select:focus, .fb-textarea:focus, .fb-input:focus { border-color: var(--input-focus); }
+  .fb-textarea { resize: vertical; min-height: 90px; max-height: 200px; }
+  .fb-select { cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  .fb-select option { background: var(--modal-bg); color: var(--text-primary); }
+  .fb-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+  .fb-submit { width: 100%; padding: 11px; border: none; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .fb-submit:hover { opacity: 0.9; }
+  .fb-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .fb-success { text-align: center; padding: 20px 0; }
+  .fb-success-icon { font-size: 36px; margin-bottom: 8px; }
+  .fb-success-msg { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .fb-success-sub { font-size: 12px; color: var(--text-muted); }
+  .fb-error { font-size: 12px; color: #ef4444; margin-bottom: 10px; display: none; }
+  @media (max-width: 480px) {
+    .fb-trigger { bottom: 16px; right: 16px; padding: 10px 16px; font-size: 12px; border-radius: 12px; }
+    .fb-modal { bottom: 70px; right: 16px; padding: 20px; }
+  }
+</style>
+
+<!-- Feedback Widget -->
+<button class="fb-trigger" id="fb-trigger" aria-label="Send feedback">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  Feedback
+</button>
+<div class="fb-backdrop" id="fb-backdrop"></div>
+<div class="fb-modal" id="fb-modal" role="dialog" aria-modal="true">
+  <button class="fb-close" id="fb-close" aria-label="Close feedback">&times;</button>
+  <div id="fb-form-view">
+    <div class="fb-modal-title">Send Feedback</div>
+    <div class="fb-modal-sub">We value your feedback and will work on every suggestion to improve how we serve you.</div>
+    <div class="fb-error" id="fb-error"></div>
+    <div class="fb-field">
+      <label class="fb-label" for="fb-type">Category</label>
+      <select class="fb-select" id="fb-type">
+        <option value="">Select a category...</option>
+        <option value="feature_request">New Feature Request</option>
+        <option value="bug_report">Bug Report</option>
+        <option value="incorrect_data">Incorrect Data</option>
+        <option value="general">General Feedback</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="fb-field">
+      <label class="fb-label" for="fb-message">Your feedback</label>
+      <textarea class="fb-textarea" id="fb-message" placeholder="Tell us what's on your mind..." maxlength="2000"></textarea>
+    </div>
+    <div class="fb-field">
+      <label class="fb-label" for="fb-email">Email <span style="font-weight:400;color:var(--text-dim)">(optional)</span></label>
+      <input class="fb-input" id="fb-email" type="email" placeholder="you@example.com">
+      <div class="fb-hint">Only needed if you'd like us to follow up.</div>
+    </div>
+    <button class="fb-submit" id="fb-submit">Submit Feedback</button>
+  </div>
+  <div id="fb-success-view" class="fb-success" style="display:none">
+    <div class="fb-success-icon">&#10003;</div>
+    <div class="fb-success-msg">Thank you!</div>
+    <div class="fb-success-sub">Your feedback has been received.</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var h = window.location.hostname;
+  var API = h === 'localhost' || h === '127.0.0.1' ? 'http://127.0.0.1:8787'
+    : h === 'immilane.com' || h === 'www.immilane.com' ? 'https://immilane-api.younusahamad.workers.dev'
+    : 'https://immilane-api-staging.younusahamad.workers.dev';
+
+  var trigger = document.getElementById('fb-trigger');
+  var backdrop = document.getElementById('fb-backdrop');
+  var modal = document.getElementById('fb-modal');
+  var closeBtn = document.getElementById('fb-close');
+  var submitBtn = document.getElementById('fb-submit');
+  var formView = document.getElementById('fb-form-view');
+  var successView = document.getElementById('fb-success-view');
+  var errorEl = document.getElementById('fb-error');
+
+  function open() { backdrop.classList.add('open'); modal.classList.add('open'); }
+  function close() { backdrop.classList.remove('open'); modal.classList.remove('open'); }
+  function reset() {
+    formView.style.display = '';
+    successView.style.display = 'none';
+    errorEl.style.display = 'none';
+    document.getElementById('fb-type').value = '';
+    document.getElementById('fb-message').value = '';
+    document.getElementById('fb-email').value = '';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Feedback';
+  }
+
+  trigger.addEventListener('click', function() { reset(); open(); });
+  backdrop.addEventListener('click', close);
+  closeBtn.addEventListener('click', close);
+
+  submitBtn.addEventListener('click', function() {
+    errorEl.style.display = 'none';
+    var type = document.getElementById('fb-type').value;
+    var message = document.getElementById('fb-message').value.trim();
+    var email = document.getElementById('fb-email').value.trim();
+
+    if (!type) { showErr('Please select a category.'); return; }
+    if (!message) { showErr('Please enter your feedback.'); return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Please enter a valid email.'); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    fetch(API + '/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: type, message: message, email: email || undefined })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (!res.ok) { showErr(res.data.error ? res.data.error.message : 'Something went wrong.'); submitBtn.disabled = false; submitBtn.textContent = 'Submit Feedback'; return; }
+      formView.style.display = 'none';
+      successView.style.display = '';
+      setTimeout(close, 2500);
+    })
+    .catch(function() {
+      showErr('Network error. Please try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Feedback';
+    });
+  });
+
+  function showErr(msg) { errorEl.textContent = msg; errorEl.style.display = 'block'; }
 })();
 </script>
 
