@@ -94,7 +94,10 @@
   .emp-hero-title { font-size: 30px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.18; margin-bottom: 8px; }
   .emp-hero-badges { display: flex; flex-wrap: wrap; gap: 8px; }
   .emp-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: var(--tab-active); color: var(--text-secondary); border: 1px solid var(--card-border); }
-  .emp-badge.rank { background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.18)); color: var(--text-primary); border-color: rgba(99,102,241,0.35); }
+  .emp-badge.rank { background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.18)); color: var(--text-primary); border-color: rgba(99,102,241,0.35); flex-wrap: wrap; row-gap: 2px; }
+  .emp-badge.rank .rank-label { line-height: 1.25; }
+  .emp-badge.rank .rank-val { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .emp-badge.rank .rank-of { white-space: nowrap; }
   a.emp-badge.rank { text-decoration: none; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s; }
   a.emp-badge.rank:hover { border-color: rgba(99,102,241,0.7); box-shadow: 0 2px 10px rgba(59,130,246,0.25); }
   a.emp-badge.rank:active { transform: translateY(1px); }
@@ -623,7 +626,7 @@ function renderHero(emp, ps, h1b, rankInfo) {
   let rankBadge = '';
   if (rankInfo) {
     const lbHref = 'leaderboard.html?e=' + encodeURIComponent(emp.name);
-    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard by PERM (green card) filing volume — opens at this employer\'s position.">🏅 Approx. PERM-volume rank <span class="b-num">#' + n(rankInfo.rank) + '</span> of ' + n(rankInfo.totalEmployers) + ' <span class="rank-arrow">→</span></a>';
+    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard by PERM (green card) filing volume — opens at this employer\'s position.">🏅 <span class="rank-label">Approx. PERM-volume rank</span> <span class="rank-val"><span class="b-num">#' + n(rankInfo.rank) + '</span> <span class="rank-of">of ' + n(rankInfo.totalEmployers) + '</span> <span class="rank-arrow">→</span></span></a>';
   }
 
   // Key stats
