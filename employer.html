@@ -634,6 +634,17 @@ function renderHero(emp, ps, h1b, rankInfo) {
   const h1bMedian = (h1b && h1b.wage_median_all != null) ? h1b.wage_median_all : null;
   const abovePct = h1bAbovePct(h1b);
 
+  // H-1B LCA headline = CUMULATIVE certified positions across all disclosed
+  // fiscal years (FY2008–FY2026), to parallel the cumulative Green Card /
+  // Total PERM Filings headline. Sourced from the same on-record lcaByYear data
+  // the rest of the profile uses (sum of .cert), NOT the single-FY realtime
+  // total. FY range mirrors the PERM periodLabel wording ("FY2008 – FY2026").
+  const lcaYears = (h1b && Array.isArray(h1b.lcaByYear)) ? h1b.lcaByYear : [];
+  const h1bCertCumulative = lcaYears.length ? lcaYears.reduce((s, y) => s + (y.cert || 0), 0) : null;
+  const lcaFys = lcaYears.map(y => y && y.fy).filter(Boolean).sort();
+  const lcaPeriodLabel = lcaFys.length ? (lcaFys[0] + ' – ' + lcaFys[lcaFys.length - 1]) : null;
+  const h1bMedianFy = (h1b && h1b.fy) || 'FY2025';
+
   const blurb = esc(emp.name) + ' has <b>' + n(ps.total) + '</b> PERM (green card) labor certification filings on record' +
     (period !== '—' ? ' (' + esc(period) + ')' : '') +
     (h1bTotal != null ? ' and <b>' + n(h1bTotal) + '</b> certified H-1B LCA positions in FY2025' : '') +
@@ -655,13 +666,15 @@ function renderHero(emp, ps, h1b, rankInfo) {
     '</div>' +
     '<p class="emp-hero-blurb">' + blurb + '</p>' +
     '<div class="emp-keystats">' +
-      keystat('H-1B LCAs (FY2025)', h1bTotal != null ? n(h1bTotal) : '—', 'Certified LCA positions', '') +
+      keystat('H-1B LCAs' + (lcaPeriodLabel ? ' (' + lcaPeriodLabel + ')' : ''),
+              h1bCertCumulative != null ? n(h1bCertCumulative) : (h1bTotal != null ? n(h1bTotal) : '—'),
+              'Certified LCA positions', '') +
       keystat('Green Card (PERM)', n(ps.total), 'Labor cert. filings', '') +
       keystat('PERM Cert. Rate', ps.certRate != null ? ps.certRate.toFixed(1) + '%' : '—',
               ps.adjudicated > 0 ? n(ps.certCount) + ' of ' + n(ps.adjudicated) + ' adjudicated' : 'None adjudicated yet',
               ps.certClass.replace('cr-', '')) +
       keystat('Median H-1B Salary', h1bMedian != null ? fmtUSD(h1bMedian) : '—',
-              abovePct != null ? abovePct + '% at/above prevailing' : 'FY2025 offered wage', '') +
+              (abovePct != null ? abovePct + '% at/above prevailing' : 'Offered wage') + ' · ' + h1bMedianFy, '') +
     '</div>' +
   '</div>';
 }
@@ -678,15 +691,6 @@ function renderPermSection(emp, ps, h1b) {
   const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
   const period = ps.periodLabel || (firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—'));
   const sinceLabel = ps.periodLabel || firstStr || '—';
-
-  // cert-rate breakdown rows
-  const crRows = [];
-  if (ps.certCount)     crRows.push({ label: 'Certified', val: ps.certCount, color: '#22c55e' });
-  if (ps.deniedCount)   crRows.push({ label: 'Denied', val: ps.deniedCount, color: '#ef4444' });
-  if (ps.withdrawnCount)crRows.push({ label: 'Withdrawn', val: ps.withdrawnCount, color: '#6b7280' });
-  const crBreakdown = crRows.map(r =>
-    '<div class="stat-detail-row"><span class="stat-detail-label" style="color:' + r.color + '">' + r.label + '</span><span class="stat-detail-value">' + n(r.val) + '</span></div>'
-  ).join('');
 
   // donut
   const donutItems = Object.entries(ps.statuses)
@@ -741,22 +745,21 @@ function renderPermSection(emp, ps, h1b) {
         '<div class="emp-stat-card">' +
           '<div class="emp-stat-label">Total PERM Filings</div>' +
           '<div class="emp-stat-value">' + n(ps.total) + '</div>' +
-          '<div class="stat-details">' +
-            (ps.disclosure ?
-              '<div class="stat-detail-row"><span class="stat-detail-label">Certified</span><span class="stat-detail-value">' + n(ps.certCount) + '</span></div>' +
-              '<div class="stat-detail-row"><span class="stat-detail-label">Denied</span><span class="stat-detail-value">' + n(ps.deniedCount) + '</span></div>' +
-              '<div class="stat-detail-row"><span class="stat-detail-label">Withdrawn</span><span class="stat-detail-value">' + n(ps.withdrawnCount) + '</span></div>'
-            :
+          (ps.disclosure ?
+            // Certified/denied/withdrawn breakdown lives once — in the Status
+            // Distribution donut — so this card stays clean (no duplicate list).
+            '<div class="emp-stat-sub">All disclosed filings (certified + denied + withdrawn)</div>'
+          :
+            '<div class="stat-details">' +
               '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(ps.pendingCount) + '</span></div>' +
-              '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(ps.resolved) + '</span></div>'
-            ) +
-          '</div>' +
+              '<div class="stat-detail-row"><span class="stat-detail-label">Resolved</span><span class="stat-detail-value">' + n(ps.resolved) + '</span></div>' +
+            '</div>'
+          ) +
         '</div>' +
         '<div class="emp-stat-card">' +
           '<div class="emp-stat-label">Certification Rate</div>' +
           '<div class="emp-stat-value ' + ps.certClass + '">' + (ps.certRate != null ? ps.certRate.toFixed(1) + '%' : '—') + '</div>' +
           '<div class="emp-stat-sub">' + (ps.adjudicated > 0 ? n(ps.certCount) + ' certified of ' + n(ps.adjudicated) + ' adjudicated' : 'No cases adjudicated yet') + '</div>' +
-          (crRows.length ? '<div class="stat-details">' + crBreakdown + '</div>' : '') +
           '<div class="emp-stat-disclaimer">Based on filings ' + (ps.disclosure ? esc(sinceLabel) : 'since ' + esc(sinceLabel)) + '</div>' +
         '</div>' +
       '</div>' +
