@@ -145,6 +145,7 @@
   /* Donut footnote: distinguishes the live AR window from historical adjudicated */
   .donut-foot { font-size: 10.5px; color: var(--text-dim); line-height: 1.55; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--sep); }
   .donut-foot .foot-amber { color: #f59e0b; font-weight: 700; white-space: nowrap; }
+  .donut-foot .foot-green { color: #22c55e; font-weight: 700; white-space: nowrap; }
   .donut-foot b { color: var(--text-secondary); font-weight: 600; }
   /* PERM section: balance the cards column against the donut (equal-height, centered donut) */
   .perm-grid { align-items: stretch; }
@@ -875,8 +876,7 @@ function renderPermSection(emp, ps, h1b) {
           (ps.disclosure ?
             // Certified/denied/withdrawn breakdown lives once — in the Status
             // Distribution donut — so this card stays clean (no duplicate list).
-            '<div class="emp-stat-sub">Adjudicated filings on record (certified + denied + withdrawn)' + (showAr ? '. <b>' + n(live.pending) + '</b> more currently in process — see donut.' : '') + '</div>' +
-            (showZeroInProcess ? '<div class="emp-stat-disclaimer">0 cases currently in process — all recent filings resolved (live case-status tracker).</div>' : '')
+            '<div class="emp-stat-sub">Adjudicated filings on record (certified + denied + withdrawn)' + (showAr ? '. <b>' + n(live.pending) + '</b> more currently in process — see donut.' : (showZeroInProcess ? '. <b>0</b> currently in process — see donut.' : '')) + '</div>'
           :
             '<div class="stat-details">' +
               '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(ps.pendingCount) + '</span></div>' +
@@ -908,6 +908,7 @@ function renderPermSection(emp, ps, h1b) {
             '<div class="legend">' + legend + '</div>' +
           '</div>' +
           (showAr ? '<div class="donut-foot"><span class="foot-amber">● In Process (AR)</span> = cases currently with DOL, from the live tracker' + (firstStr ? ' (filed since ' + esc(firstStr) + ')' : '') + '. <b>Certified · Withdrawn · Denied</b> are historically adjudicated (' + esc(period) + ').</div>' : '') +
+          (showZeroInProcess ? '<div class="donut-foot"><span class="foot-green">● In Process (AR)</span> = <b>0 cases</b> currently with DOL — all recent filings resolved (live case-status tracker). <b>Certified · Withdrawn · Denied</b> are historically adjudicated (' + esc(period) + ').</div>' : '') +
         '</div>' +
       '</div>' : '<div class="panel"><div class="soon-inner"><div class="soon-msg">No status breakdown available.</div></div></div>') +
     '</div>' +
