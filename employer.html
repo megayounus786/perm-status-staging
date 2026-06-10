@@ -1417,6 +1417,29 @@ function renderAll(emp, h1b, rankInfo) {
 
   let activeIdx = -1, lastMatches = [], debounceTimer = null, searchSeq = 0;
 
+  // Totals shown in the dropdown come from the static employer index
+  // (data/employer_index.json field `t`) — the same on-record source the
+  // leaderboard and this profile's headline use — NOT the worker's realtime
+  // `total`, which predates the FY2008–2019 PERM backfill. The index is sorted
+  // by on-record total desc, so substring matches rank highest-volume first
+  // (e.g. "Micro" → Microsoft 39,529 above Micron / AMD). API is a fallback only.
+  let searchIndex = null;              // [{ n, t, lc }] sorted by t desc
+  let searchIndexPromise = null;
+  function loadSearchIndex() {
+    if (searchIndexPromise) return searchIndexPromise;
+    searchIndexPromise = fetch('data/employer_index.json')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(idx => {
+        const emps = (idx && Array.isArray(idx.employers)) ? idx.employers : [];
+        searchIndex = emps
+          .map(e => ({ n: e.n, t: e.t, lc: String(e.n || '').toLowerCase() }))
+          .sort((a, b) => b.t - a.t);
+        return searchIndex;
+      });
+    return searchIndexPromise;
+  }
+  loadSearchIndex();
+
   function toggleClearBtn() { if (clearBtn) clearBtn.classList.toggle('visible', searchInput.value.length > 0); }
   if (clearBtn) {
     clearBtn.addEventListener('click', function() {
@@ -1465,6 +1488,26 @@ function renderAll(emp, h1b, rankInfo) {
     const seq = ++searchSeq;
     dropdown.innerHTML = '<div class="nav-search-empty">Searching…</div>';
     dropdown.classList.add('open');
+    loadSearchIndex().then(idx => {
+      if (seq !== searchSeq) return;
+      const needle = q.toLowerCase();
+      const matches = [];
+      for (let i = 0; i < idx.length && matches.length < EMPLOYER_API_LIMIT; i++) {
+        if (idx[i].lc.indexOf(needle) !== -1) matches.push({ n: idx[i].n, t: idx[i].t });
+      }
+      lastMatches = matches;
+      activeIdx = lastMatches.length > 0 ? 0 : -1;
+      renderDropdown();
+      if (typeof gtag === 'function') {
+        try { gtag('event', 'employer_search', { search_term: q, results_count: matches.length }); } catch (e) {}
+      }
+    }).catch(() => {
+      if (seq !== searchSeq) return;
+      runSearchApiFallback(seq, q);
+    });
+  }
+
+  function runSearchApiFallback(seq, q) {
     const url = EMPLOYER_API_BASE + '/api/employers?q=' + encodeURIComponent(q) + '&limit=' + EMPLOYER_API_LIMIT;
     fetch(url)
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -1474,9 +1517,6 @@ function renderAll(emp, h1b, rankInfo) {
         lastMatches = results.map(r => ({ n: r.name, t: r.total }));
         activeIdx = lastMatches.length > 0 ? 0 : -1;
         renderDropdown();
-        if (typeof gtag === 'function') {
-          try { gtag('event', 'employer_search', { search_term: q, results_count: results.length }); } catch (e) {}
-        }
       })
       .catch(() => {
         if (seq !== searchSeq) return;

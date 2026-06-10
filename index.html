@@ -2384,6 +2384,31 @@ function employerSlug(name) {
   let debounceTimer = null;
   let searchSeq     = 0;
 
+  // On-record totals come from the static employer index (data/employer_index.json
+  // field `t`) — the SAME source the leaderboard and employer profile use — NOT
+  // the worker's realtime `total`, which predates the FY2008–2019 PERM backfill
+  // (e.g. Microsoft realtime 1,569 vs on-record 39,529). Driving the dropdown
+  // from this pre-sorted index keeps the search number identical to the
+  // leaderboard/profile and ranks employers by on-record total ("Micro" →
+  // Microsoft 39,529 above Micron / AMD). The worker API is only a degraded
+  // fallback if the static index can't load.
+  let employerIndex = null;            // [{ n, t, lc }] sorted by t desc
+  let indexPromise  = null;
+  function loadEmployerIndex() {
+    if (indexPromise) return indexPromise;
+    indexPromise = fetch('data/employer_index.json')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(idx => {
+        const emps = (idx && Array.isArray(idx.employers)) ? idx.employers : [];
+        employerIndex = emps
+          .map(e => ({ n: e.n, t: e.t, lc: String(e.n || '').toLowerCase() }))
+          .sort((a, b) => b.t - a.t);   // defensive: keep on-record total desc
+        return employerIndex;
+      });
+    return indexPromise;
+  }
+  loadEmployerIndex();
+
   function closeDropdown() {
     dropdown.classList.remove('open');
     dropdown.innerHTML = '';
@@ -2443,22 +2468,41 @@ function employerSlug(name) {
     const seq = ++searchSeq;
     dropdown.innerHTML = '<div class="nav-search-empty">Searching…</div>';
     dropdown.classList.add('open');
+    loadEmployerIndex().then(idx => {
+      if (seq !== searchSeq) return;   // user kept typing — drop stale render
+      const needle = q.toLowerCase();
+      const matches = [];
+      // idx is sorted by on-record total desc, so the first LIMIT substring
+      // matches are the highest-volume employers (e.g. "Micro" → Microsoft first).
+      for (let i = 0; i < idx.length && matches.length < EMPLOYER_API_LIMIT; i++) {
+        if (idx[i].lc.indexOf(needle) !== -1) matches.push({ n: idx[i].n, t: idx[i].t });
+      }
+      lastMatches = matches;
+      activeIdx = lastMatches.length > 0 ? 0 : -1;
+      renderDropdown();
+      if (typeof gtag === 'function') {
+        try { gtag('event', 'employer_search', { search_term: q, results_count: matches.length }); } catch(e){}
+      }
+    }).catch(() => {
+      if (seq !== searchSeq) return;
+      // Degraded fallback: static index unavailable → use the worker API so
+      // search still functions (totals are realtime in this path only).
+      runSearchApiFallback(seq, q);
+    });
+  }
+
+  function runSearchApiFallback(seq, q) {
     const url = EMPLOYER_API_BASE + '/api/employers'
       + '?q=' + encodeURIComponent(q)
       + '&limit=' + EMPLOYER_API_LIMIT;
     fetch(url)
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(payload => {
-        // Drop stale responses if the user kept typing.
         if (seq !== searchSeq) return;
         const results = (payload && Array.isArray(payload.results)) ? payload.results : [];
-        // Map API shape {name,total} to the {n,t} shape the renderer expects.
         lastMatches = results.map(r => ({ n: r.name, t: r.total }));
         activeIdx = lastMatches.length > 0 ? 0 : -1;
         renderDropdown();
-        if (typeof gtag === 'function') {
-          try { gtag('event', 'employer_search', { search_term: q, results_count: results.length }); } catch(e){}
-        }
       })
       .catch(() => {
         if (seq !== searchSeq) return;
