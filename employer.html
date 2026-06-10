@@ -215,6 +215,52 @@
   .fy-sw.fy-perm { background: #7770ba; }
   .fy-sw.fy-h1b { background: #5a82ae; }
 
+  /* ── Filings by Year — premium grouped bar chart w/ y-axis + gridlines ──
+     Scoped under .fyx- so the other by-year charts (H-1B/PERM/salary) that
+     share .fy- classes are untouched. A fixed y-axis column sits left of a
+     horizontally-scrollable plot; gridlines + axis ticks give magnitude a
+     reference, and the x-labels row below scrolls in lock-step with the bars. */
+  .fyx { display: flex; align-items: stretch; gap: 11px; margin-top: 4px; }
+  .fyx-yaxis { position: relative; flex: 0 0 auto; width: 30px; height: 200px; }
+  .fyx-yaxis span { position: absolute; right: 0; transform: translateY(-50%); font-size: 9.5px; font-weight: 500; color: var(--text-dim); line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .fyx-scroll { flex: 1 1 0; min-width: 0; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  .fyx-scroll::-webkit-scrollbar { height: 7px; }
+  .fyx-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+  .fyx-scroll::-webkit-scrollbar-track { background: transparent; }
+  .fyx-scroll { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+  .fyx-inner { display: flex; flex-direction: column; }
+  .fyx-plot { position: relative; height: 200px; }
+  .fyx-grid { position: absolute; inset: 0; pointer-events: none; }
+  .fyx-grid i { position: absolute; left: 0; right: 0; height: 1px; background: var(--card-border); opacity: 0.5; }
+  .fyx-grid i.base { opacity: 1; background: var(--card-border-hover); }
+  .fyx-row { position: absolute; inset: 0; display: flex; align-items: flex-end; gap: 6px; }
+  .fyx-group { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+  .fyx-bars { display: flex; align-items: flex-end; justify-content: center; gap: 3px; width: 100%; height: 100%; }
+  .fyx-bar-wrap { flex: 1 1 0; max-width: 13px; height: 100%; display: flex; align-items: flex-end; }
+  .fyx-bar { width: 100%; min-height: 3px; border-radius: 3px 3px 1px 1px; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18); transition: filter 0.14s ease, transform 0.14s ease; }
+  .fyx-bar:hover { filter: brightness(1.13); transform: translateY(-2px); }
+  .fyx-bar.fyx-perm { background: linear-gradient(180deg, #a78bfa 0%, #8b7fd6 55%, #7468be 100%); }
+  .fyx-bar.fyx-h1b  { background: linear-gradient(180deg, #60a5fa 0%, #5b8fc9 55%, #4f7daf 100%); }
+  .fyx-xlabels { display: flex; gap: 6px; margin-top: 9px; }
+  .fyx-xcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .fyx-xyr { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: -0.2px; font-variant-numeric: tabular-nums; }
+  .fyx-xtag { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #c4b1ff; background: rgba(167,139,250,0.14); border: 1px solid rgba(167,139,250,0.32); border-radius: 4px; padding: 1px 4px; line-height: 1.25; white-space: nowrap; }
+  .fyx-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center; margin-top: 18px; }
+  .fyx-li { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 500; color: var(--text-secondary); }
+  .fyx-sw { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+  .fyx-sw.fyx-perm { background: linear-gradient(180deg, #a78bfa, #7468be); }
+  .fyx-sw.fyx-h1b { background: linear-gradient(180deg, #60a5fa, #4f7daf); }
+  .fyx-foot { font-size: 10.5px; line-height: 1.55; color: var(--text-muted); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--sep); }
+  @media (max-width: 560px) {
+    .fyx { gap: 8px; }
+    .fyx-yaxis, .fyx-plot { height: 152px; }
+    .fyx-yaxis { width: 24px; }
+    .fyx-yaxis span { font-size: 9px; }
+    .fyx-xyr { font-size: 10px; }
+    .fyx-bar-wrap { max-width: 11px; }
+    .fyx-legend { gap: 6px 16px; margin-top: 15px; }
+  }
+
   /* ── ROWS (Top Titles + occupations) ── */
   .rowlist { display: flex; flex-direction: column; }
   /* Fixed-height scroll container: ~10 rows visible, rest scrollable. */
@@ -900,35 +946,93 @@ function renderFilingsByYear(emp, h1b) {
   });
 
   const hasPerm = perm.length > 0, hasLca = lca.length > 0;
-  const barFor = (val, cls, lbl, fy) => {
-    if (val == null) return '';
-    const h = Math.max(4, Math.round(val / maxVal * 84));
-    return '<div class="fy-bar-wrap">' +
-        '<div class="fy-val">' + n(val) + '</div>' +
-        '<div class="fy-bar ' + cls + '" style="height:' + h + '%;" title="' + esc(lbl + ' ' + fy + ': ' + n(val)) + '"></div>' +
-      '</div>';
+
+  // Scale bars to a "nice" rounded axis max (step×4) so gridlines land on clean
+  // values (e.g. 0 / 1.5k / 3k / 4.5k / 6k) and bars use the full plot height.
+  const niceMax = fyNiceMax(maxVal);
+  const DIV = 4; // gridline intervals (5 lines incl. baseline)
+  let gridHtml = '', axisHtml = '';
+  for (let i = 0; i <= DIV; i++) {
+    const frac = i / DIV;                 // 0 = baseline … 1 = top
+    const topPct = ((1 - frac) * 100).toFixed(3);
+    gridHtml += '<i class="' + (i === 0 ? 'base' : '') + '" style="top:' + topPct + '%;"></i>';
+    axisHtml += '<span style="top:' + topPct + '%;">' + fyAxisFmt(niceMax * frac) + '</span>';
+  }
+
+  // Each bar carries its year's PERM + H-1B counts as data-* so the shared
+  // tooltip engine can render one combined, colour-coded card per year.
+  const barFor = (val, cls, fy, pv, lv, partial) => {
+    if (val == null) return '<div class="fyx-bar-wrap"></div>';
+    const h = Math.max(1.2, val / niceMax * 100);
+    return '<div class="fyx-bar-wrap"><div class="fyx-bar ' + cls + '" style="height:' + h.toFixed(2) + '%;"' +
+      ' data-fy="' + esc(fy) + '"' +
+      (pv != null ? ' data-perm="' + pv + '"' : '') +
+      (lv != null ? ' data-h1b="' + lv + '"' : '') +
+      (partial ? ' data-partial="1"' : '') + '></div></div>';
   };
+
   const groupsHtml = years.map(fy => {
     const pY = permMap[fy], lY = lcaMap[fy];
     const partial = (pY && pY.partial) || (lY && lY.partial);
-    const bars = (hasPerm ? barFor(permVal(pY), 'fy-perm', 'Green Card · PERM', fy) : '') +
-                 (hasLca  ? barFor(lcaVal(lY),  'fy-h1b',  'H-1B · LCA', fy) : '');
-    return '<div class="fy-group">' +
-        '<div class="fy-bars">' + bars + '</div>' +
-        '<div class="fy-year">' + esc(fyShort(fy)) + (partial ? '<span class="fy-tag">partial</span>' : '') + '</div>' +
-      '</div>';
+    const pv = hasPerm ? permVal(pY) : null;
+    const lv = hasLca ? lcaVal(lY) : null;
+    const bars = (hasPerm ? barFor(pv, 'fyx-perm', fy, pv, lv, partial) : '') +
+                 (hasLca  ? barFor(lv, 'fyx-h1b',  fy, pv, lv, partial) : '');
+    return '<div class="fyx-group"><div class="fyx-bars">' + bars + '</div></div>';
   }).join('');
 
+  const labelsHtml = years.map(fy => {
+    const pY = permMap[fy], lY = lcaMap[fy];
+    const partial = (pY && pY.partial) || (lY && lY.partial);
+    return '<div class="fyx-xcol"><span class="fyx-xyr">' + esc(fyShort(fy)) + '</span>' +
+      (partial ? '<span class="fyx-xtag">partial</span>' : '') + '</div>';
+  }).join('');
+
+  // Min content width keeps bars legible; the plot scrolls when it can't fit.
+  const minW = Math.max(0, years.length) * 32;
+
   const legendHtml =
-    (hasPerm ? '<span class="fy-li"><span class="fy-sw fy-perm"></span> Green Card (PERM) filings</span>' : '') +
-    (hasLca  ? '<span class="fy-li"><span class="fy-sw fy-h1b"></span> H-1B (LCA) positions</span>' : '');
+    (hasPerm ? '<span class="fyx-li"><span class="fyx-sw fyx-perm"></span> Green Card (PERM) filings</span>' : '') +
+    (hasLca  ? '<span class="fyx-li"><span class="fyx-sw fyx-h1b"></span> H-1B (LCA) positions</span>' : '');
 
   return '<div class="panel" style="margin-top:16px;">' +
       '<div class="panel-title">Filings by Year <span class="muted">· Annual sponsorship volume (' + (years.length ? years[0] + '–' + String(years[years.length - 1]).slice(2) : 'FY2020–2026') + ')</span></div>' +
-      fyScroll(groupsHtml, years.length, 30, 14) +
-      '<div class="fy-legend">' + legendHtml + '</div>' +
-      '<div class="trend-legend">PERM (green card) filings — certified, denied &amp; withdrawn — and certified H-1B LCA positions per fiscal year, from DOL OFLC disclosure data. FY2026 is year-to-date (partial).</div>' +
+      '<div class="fyx">' +
+        '<div class="fyx-yaxis">' + axisHtml + '</div>' +
+        '<div class="fyx-scroll"><div class="fyx-inner" style="min-width:' + minW + 'px;">' +
+          '<div class="fyx-plot"><div class="fyx-grid">' + gridHtml + '</div>' +
+            '<div class="fyx-row">' + groupsHtml + '</div></div>' +
+          '<div class="fyx-xlabels">' + labelsHtml + '</div>' +
+        '</div></div>' +
+      '</div>' +
+      '<div class="fyx-legend">' + legendHtml + '</div>' +
+      '<div class="fyx-foot">PERM (green card) filings — certified, denied &amp; withdrawn — and certified H-1B LCA positions per fiscal year, from DOL OFLC disclosure data. FY2026 is year-to-date (partial).</div>' +
     '</div>';
+}
+
+// Round a value up to a clean axis maximum: pick a "nice" step (1/1.5/2/2.5/3/
+// 4/5/6/8 ×10ⁿ) for one quarter of the data max, then ×4 so the four gridline
+// intervals all land on tidy numbers.
+function fyNiceMax(v) {
+  if (!(v > 0)) return 1;
+  const q = v / 4;
+  const exp = Math.floor(Math.log10(q));
+  const base = Math.pow(10, exp);
+  const f = q / base;
+  const steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+  let step = 10;
+  for (let i = 0; i < steps.length; i++) { if (f <= steps[i] + 1e-9) { step = steps[i]; break; } }
+  return step * base * 4;
+}
+
+// Compact axis tick formatter: 0, 950, 1.5k, 12k …
+function fyAxisFmt(v) {
+  v = Math.round(v);
+  if (v >= 1000) {
+    const k = v / 1000;
+    return (k >= 10 ? Math.round(k) : Math.round(k * 10) / 10) + 'k';
+  }
+  return String(v);
 }
 
 // Legacy fallback: monthly-bucketed calendar-year chart for older single-FY
@@ -1464,9 +1568,30 @@ function renderAll(emp, h1b, rankInfo) {
     if (t == null) { t = bar.getAttribute('title') || ''; bar.setAttribute('data-tip', t); bar.removeAttribute('title'); }
     return t;
   }
+  // Filings-by-Year bars carry per-year PERM + H-1B counts as data-* attributes;
+  // render them as one combined, colour-coded card (year header + a row per
+  // series). Returns '' for the legacy single-value bars so they fall back to
+  // the plain-text path below.
+  function richHtml(bar) {
+    if (!bar.classList.contains('fyx-bar')) return '';
+    var num = function (a) { var v = bar.getAttribute(a); return (v == null || v === '') ? null : Number(v); };
+    var pv = num('data-perm'), hv = num('data-h1b');
+    var fy = bar.getAttribute('data-fy') || '';
+    var partial = bar.getAttribute('data-partial') === '1';
+    var row = function (color, lbl, v) {
+      if (v == null) return '';
+      return '<div class="ft-row"><span class="ft-sw" style="background:' + color + ';"></span>' +
+        '<span class="ft-lbl">' + lbl + '</span><span class="ft-v">' + v.toLocaleString() + '</span></div>';
+    };
+    return '<div class="ft-yr">' + fy + (partial ? ' · year-to-date' : '') + '</div>' +
+      row('#a78bfa', 'Green Card (PERM)', pv) + row('#60a5fa', 'H-1B (LCA)', hv);
+  }
   function show(bar, x, y) {
-    var t = tipText(bar); if (!t) return;
-    var b = box(); b.textContent = t; b.classList.add('show');
+    var b = box();
+    var html = richHtml(bar);
+    if (html) { b.innerHTML = html; }
+    else { var t = tipText(bar); if (!t) { hide(); return; } b.textContent = t; }
+    b.classList.add('show');
     var r = b.getBoundingClientRect();
     var left = x - r.width / 2, top = y - r.height - 12;
     if (left < 6) left = 6;
@@ -1476,7 +1601,7 @@ function renderAll(emp, h1b, rankInfo) {
   }
   function hide() { if (tip) tip.classList.remove('show'); }
   function onMove(e) {
-    var bar = e.target && e.target.closest && e.target.closest('.fy-bar');
+    var bar = e.target && e.target.closest && e.target.closest('.fy-bar, .fyx-bar');
     if (bar) show(bar, e.clientX, e.clientY); else hide();
   }
   document.addEventListener('pointermove', onMove, { passive: true });
