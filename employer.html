@@ -138,6 +138,18 @@
   .emp-stat-card.ar::before { background: linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent); opacity: 0.85; }
   .emp-stat-value.ar-val { color: #f59e0b; }
   .ar-live { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; letter-spacing: 0.4px; color: #f59e0b; background: rgba(245,158,11,0.13); border: 1px solid rgba(245,158,11,0.3); border-radius: 999px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; }
+  /* Live AR row highlighted in the donut legend */
+  .legend-item.live { color: #f59e0b; font-weight: 600; }
+  .legend-item.live .ar-live { font-size: 8.5px; padding: 1px 6px; margin-left: 4px; }
+  .legend-item.live .legend-value { color: #f59e0b; }
+  /* Donut footnote: distinguishes the live AR window from historical adjudicated */
+  .donut-foot { font-size: 10.5px; color: var(--text-dim); line-height: 1.55; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--sep); }
+  .donut-foot .foot-amber { color: #f59e0b; font-weight: 700; white-space: nowrap; }
+  .donut-foot b { color: var(--text-secondary); font-weight: 600; }
+  /* PERM section: balance the cards column against the donut (equal-height, centered donut) */
+  .perm-grid { align-items: stretch; }
+  .perm-grid .panel { display: flex; flex-direction: column; }
+  .perm-grid .donut-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0; }
   .stat-details { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--sep); display: flex; flex-direction: column; gap: 4px; }
   .stat-detail-row { display: flex; justify-content: space-between; font-size: 11px; }
   .stat-detail-label { color: var(--text-muted); } .stat-detail-value { color: var(--text-secondary); font-weight: 600; }
@@ -712,18 +724,36 @@ function keystat(label, value, sub, cls) {
   '</div>';
 }
 
+// Donut segments, shared by renderPermSection and wireDonut so the rendered
+// arcs and the hover handlers stay in lock-step. In historical-disclosure mode
+// the live current-AR/pending count is appended as a distinct amber segment
+// (so AR is visible in the donut alongside the historical adjudicated outcomes);
+// in live-data fallback mode ps.statuses already includes AR, so nothing extra
+// is added. Cert/withdrawn/denied (historical, FY-wide) and AR (live, recent
+// window) are disjoint sets — a case in AR is not yet adjudicated — so summing
+// them does not double-count.
+function buildDonutItems(ps, emp) {
+  const items = Object.entries(ps.statuses)
+    .map(([k, v]) => ({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR }))
+    .sort((a, b) => b.value - a.value);
+  if (ps.disclosure) {
+    const live = livePendingStats(emp);
+    if (live.pending > 0) items.push({ label: 'In Process (AR)', value: live.pending, color: '#f59e0b', live: true });
+  }
+  const total = items.reduce((s, i) => s + i.value, 0);
+  items.forEach(i => { i.pct = total ? +(i.value / total * 100).toFixed(1) : 0; });
+  return items;
+}
+
 function renderPermSection(emp, ps, h1b) {
   const firstStr = fmtMonthYear(emp.firstFiling);
   const lastStr  = fmtMonthYear(globalLastFiling || emp.lastFiling);
   const period = ps.periodLabel || (firstStr && lastStr ? (firstStr + ' → ' + lastStr) : (firstStr || lastStr || '—'));
   const sinceLabel = ps.periodLabel || firstStr || '—';
 
-  // donut
-  const donutItems = Object.entries(ps.statuses)
-    .map(([k, v]) => ({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR }))
-    .sort((a, b) => b.value - a.value);
+  // donut — historical adjudicated outcomes, plus the live AR segment (disclosure mode)
+  const donutItems = buildDonutItems(ps, emp);
   const donutTotal = donutItems.reduce((s, i) => s + i.value, 0);
-  donutItems.forEach(i => { i.pct = donutTotal ? +(i.value / donutTotal * 100).toFixed(1) : 0; });
   const r = 70, circ = 2 * Math.PI * r;
   let off = 0, segs = '';
   donutItems.forEach((item, i) => {
@@ -734,7 +764,8 @@ function renderPermSection(emp, ps, h1b) {
     off += len;
   });
   const legend = donutItems.map(item =>
-    '<div class="legend-item"><div class="legend-dot" style="background:' + item.color + ';"></div>' + esc(item.label) +
+    '<div class="legend-item' + (item.live ? ' live' : '') + '"><div class="legend-dot" style="background:' + item.color + ';"></div>' + esc(item.label) +
+    (item.live ? '<span class="ar-live">● Live</span>' : '') +
     '<span class="legend-value">' + n(item.value) + ' (' + item.pct + '%)</span></div>'
   ).join('');
 
@@ -751,7 +782,7 @@ function renderPermSection(emp, ps, h1b) {
       '<div class="emp-stat-label">Currently in Process<span class="ar-live">● Live</span></div>' +
       '<div class="emp-stat-value ar-val">' + n(live.pending) + '</div>' +
       '<div class="emp-stat-sub">' + arSub + '</div>' +
-      '<div class="emp-stat-disclaimer">From the live case-status tracker' + (firstStr ? ' (cases filed since ' + esc(firstStr) + ')' : '') + ' — separate from the historical adjudicated distribution shown here, which counts only completed cases.</div>' +
+      '<div class="emp-stat-disclaimer">From the live case-status tracker' + (firstStr ? ' (cases filed since ' + esc(firstStr) + ')' : '') + ' — shown as the amber segment in the distribution. Not part of the historical adjudicated totals.</div>' +
     '</div>'
     : '';
 
@@ -783,7 +814,7 @@ function renderPermSection(emp, ps, h1b) {
       '<span class="emp-section-meta">' + esc(period) + '</span>' +
       '<span class="tag-live">● ' + (ps.disclosure ? 'DOL disclosure' : 'Live data') + '</span>' +
     '</div>' +
-    '<div class="emp-grid-2">' +
+    '<div class="emp-grid-2 perm-grid">' +
       '<div class="emp-cards-col">' +
         '<div class="emp-stat-card">' +
           '<div class="emp-stat-label">Total PERM Filings</div>' +
@@ -791,7 +822,7 @@ function renderPermSection(emp, ps, h1b) {
           (ps.disclosure ?
             // Certified/denied/withdrawn breakdown lives once — in the Status
             // Distribution donut — so this card stays clean (no duplicate list).
-            '<div class="emp-stat-sub">All disclosed filings (certified + denied + withdrawn)</div>'
+            '<div class="emp-stat-sub">Adjudicated filings on record (certified + denied + withdrawn)' + (showAr ? '. <b>' + n(live.pending) + '</b> more currently in process — see donut.' : '') + '</div>'
           :
             '<div class="stat-details">' +
               '<div class="stat-detail-row"><span class="stat-detail-label">Pending</span><span class="stat-detail-value">' + n(ps.pendingCount) + '</span></div>' +
@@ -810,16 +841,19 @@ function renderPermSection(emp, ps, h1b) {
       (donutTotal > 0 ?
       '<div class="panel">' +
         '<div class="panel-title">Status Distribution <span class="muted">· ' + esc(period) + '</span></div>' +
-        '<div class="donut-container">' +
-          '<div class="donut-wrap">' +
-            '<svg class="donut-svg" viewBox="0 0 168 168" id="emp-donut-svg">' + segs + '</svg>' +
-            '<div class="donut-center">' +
-              '<div class="donut-number" id="emp-donut-num">' + n(donutTotal) + '</div>' +
-              '<div class="donut-label" id="emp-donut-lbl">Total Cases</div>' +
-              '<div class="donut-pct" id="emp-donut-pct" style="display:none;"></div>' +
+        '<div class="donut-body">' +
+          '<div class="donut-container">' +
+            '<div class="donut-wrap">' +
+              '<svg class="donut-svg" viewBox="0 0 168 168" id="emp-donut-svg">' + segs + '</svg>' +
+              '<div class="donut-center">' +
+                '<div class="donut-number" id="emp-donut-num">' + n(donutTotal) + '</div>' +
+                '<div class="donut-label" id="emp-donut-lbl">Total Cases</div>' +
+                '<div class="donut-pct" id="emp-donut-pct" style="display:none;"></div>' +
+              '</div>' +
             '</div>' +
+            '<div class="legend">' + legend + '</div>' +
           '</div>' +
-          '<div class="legend">' + legend + '</div>' +
+          (showAr ? '<div class="donut-foot"><span class="foot-amber">● In Process (AR)</span> = cases currently with DOL, from the live tracker' + (firstStr ? ' (filed since ' + esc(firstStr) + ')' : '') + '. <b>Certified · Withdrawn · Denied</b> are historically adjudicated (' + esc(period) + ').</div>' : '') +
         '</div>' +
       '</div>' : '<div class="panel"><div class="soon-inner"><div class="soon-msg">No status breakdown available.</div></div></div>') +
     '</div>' +
@@ -1295,14 +1329,11 @@ function renderFaqs(emp, ps, h1b, rankInfo) {
 }
 
 // ── Donut hover interactions (attached after render) ─────────────────────────
-function wireDonut(ps) {
+function wireDonut(ps, emp) {
   const svg = document.getElementById('emp-donut-svg');
   if (!svg) return;
-  const donutItems = Object.entries(ps.statuses)
-    .map(([k, v]) => ({ label: titleCase(k), value: v, color: STATUS_COLORS[k] || DEFAULT_COLOR }))
-    .sort((a, b) => b.value - a.value);
+  const donutItems = buildDonutItems(ps, emp);
   const donutTotal = donutItems.reduce((s, i) => s + i.value, 0);
-  donutItems.forEach(i => { i.pct = donutTotal ? +(i.value / donutTotal * 100).toFixed(1) : 0; });
   const numEl = document.getElementById('emp-donut-num');
   const lblEl = document.getElementById('emp-donut-lbl');
   const pctEl = document.getElementById('emp-donut-pct');
@@ -1368,7 +1399,7 @@ function renderAll(emp, h1b, rankInfo) {
     renderOccupations(emp, h1b) +
     renderMultiYear(emp, h1b) +
     renderFaqs(emp, ps, h1b, rankInfo);
-  wireDonut(ps);
+  wireDonut(ps, emp);
   wireFaq();
 }
 
