@@ -94,6 +94,9 @@
   .emp-hero-mark { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 6px 20px rgba(59,130,246,0.3); }
   .emp-hero-head { flex: 1; min-width: 220px; }
   .emp-hero-title { font-size: 30px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.18; margin-bottom: 8px; }
+  .emp-hero-aliases { font-size: 12.5px; color: var(--muted, #6b7280); margin: 0 0 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .emp-alias-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(99,102,241,0.10); color: #4f5bd5; border: 1px solid rgba(99,102,241,0.18); font-weight: 600; font-size: 11.5px; }
+  .emp-alias-more { color: var(--muted, #6b7280); font-style: italic; }
   .emp-hero-badges { display: flex; flex-wrap: wrap; gap: 8px; }
   .emp-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: var(--tab-active); color: var(--text-secondary); border: 1px solid var(--card-border); }
   .emp-badge.rank { background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.18)); color: var(--text-primary); border-color: rgba(99,102,241,0.35); flex-wrap: wrap; row-gap: 2px; }
@@ -748,6 +751,17 @@ function renderHero(emp, ps, h1b, rankInfo) {
   const lcaPeriodLabel = lcaFys.length ? (lcaFys[0] + ' – ' + lcaFys[lcaFys.length - 1]) : null;
   const h1bMedianFy = (h1b && h1b.fy) || 'FY2025';
 
+  // Method-B reunification: alternate name spellings that folded into this
+  // canonical employer (e.g. "ADVANCED MICRO DEVICES, INC. (AMD)"). Shown as a
+  // subtle "also filed as" line so users recognize the merged history.
+  const aliasNames = (h1b && Array.isArray(h1b.aliasNames)) ? h1b.aliasNames.filter(Boolean) : [];
+  const aliasLine = aliasNames.length
+    ? '<div class="emp-hero-aliases">also filed as ' +
+        aliasNames.slice(0, 4).map(a => '<span class="emp-alias-chip">' + esc(a) + '</span>').join(' ') +
+        (aliasNames.length > 4 ? ' <span class="emp-alias-more">+' + (aliasNames.length - 4) + ' more</span>' : '') +
+      '</div>'
+    : '';
+
   const blurb = esc(emp.name) + ' has <b>' + n(ps.total) + '</b> PERM (green card) labor certification filings on record' +
     (period !== '—' ? ' (' + esc(period) + ')' : '') +
     (h1bTotal != null ? ' and <b>' + n(h1bTotal) + '</b> certified H-1B LCA positions in FY2025' : '') +
@@ -760,6 +774,7 @@ function renderHero(emp, ps, h1b, rankInfo) {
       '<div class="emp-hero-mark">' + esc(initials(emp.name)) + '</div>' +
       '<div class="emp-hero-head">' +
         '<h1 class="emp-hero-title">' + esc(emp.name) + '</h1>' +
+        aliasLine +
         '<div class="emp-hero-badges">' +
           rankBadge +
           '<span class="emp-badge">📋 PERM + H-1B profile</span>' +
@@ -1569,7 +1584,19 @@ function scrollChartsToLatest() {
                 firstFiling: '', lastFiling: '', h1bOnly: true };
       }
       if (!emp) { showError('Employer data not found.'); return; }
-      applySeo(emp.name || raw);
+      // Method-B reunification: the H-1B store resolves old/alias slugs to a
+      // canonical merged employer (e.g. advanced-micro-devices-inc-amd ->
+      // advanced-micro-devices-inc). When the requested slug was an orphan,
+      // rewrite the address bar to the canonical slug so the URL, SEO and any
+      // copied link land on the merged profile. No reload — same rendered page.
+      if (h1b && h1b.slug && h1b.slug !== slug) {
+        try {
+          var cu = new URL(window.location.href);
+          cu.searchParams.set('e', h1b.slug);
+          window.history.replaceState(null, '', cu.toString());
+        } catch (e) {}
+      }
+      applySeo((h1b && h1b.name) || emp.name || raw);
       // Rank against the SAME "PERM filings on record" total the profile
       // headlines (sum of permByYear from the multi-year disclosure backfill),
       // so the badge "#X of N" reconciles with the leaderboard row total. Falls
