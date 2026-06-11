@@ -1704,7 +1704,7 @@ function scrollChartsToLatest() {
       .then(idx => {
         const emps = (idx && Array.isArray(idx.employers)) ? idx.employers : [];
         searchIndex = emps
-          .map(e => ({ n: e.n, t: e.t, lc: String(e.n || '').toLowerCase() }))
+          .map(e => ({ n: e.n, t: e.t, lc: (String(e.n || '') + ' ' + String(e.a || '')).toLowerCase() }))
           .sort((a, b) => b.t - a.t);
         return searchIndex;
       });

@@ -347,7 +347,7 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
     maxCount = emps.length ? (emps[0].t || 1) : 1;
     // Stored order is already PERM-total desc; assign rank + precompute search key.
     rows = emps.map(function(e, i){
-      return { n: e.n, t: e.t, idx: i, rank: i+1, _l: String(e.n||'').toLowerCase() };
+      return { n: e.n, t: e.t, idx: i, rank: i+1, _l: (String(e.n||'') + ' ' + String(e.a||'')).toLowerCase() };
     });
     view = rows;
 
