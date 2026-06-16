@@ -732,7 +732,7 @@ function renderHero(emp, ps, h1b, rankInfo) {
   let rankBadge = '';
   if (rankInfo) {
     const lbHref = 'leaderboard.html?e=' + encodeURIComponent(emp.name);
-    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard by PERM (green card) filing volume — opens at this employer\'s position.">🏅 <span class="rank-label">Approx. PERM-volume rank</span> <span class="rank-val"><span class="b-num">#' + n(rankInfo.rank) + '</span> <span class="rank-of">of ' + n(rankInfo.totalEmployers) + '</span> <span class="rank-arrow">→</span></span></a>';
+    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard by total (PERM + H-1B LCA) filing volume — opens at this employer\'s position.">🏅 <span class="rank-label">Approx. rank by total filings</span> <span class="rank-val"><span class="b-num">#' + n(rankInfo.rank) + '</span> <span class="rank-of">of ' + n(rankInfo.totalEmployers) + '</span> <span class="rank-arrow">→</span></span></a>';
   }
 
   // Key stats
@@ -740,15 +740,20 @@ function renderHero(emp, ps, h1b, rankInfo) {
   const h1bMedian = (h1b && h1b.wage_median_all != null) ? h1b.wage_median_all : null;
   const abovePct = h1bAbovePct(h1b);
 
-  // H-1B LCA headline = CUMULATIVE certified positions across all disclosed
-  // fiscal years (FY2008–FY2026), to parallel the cumulative Green Card /
-  // Total PERM Filings headline. Sourced from the same on-record lcaByYear data
-  // the rest of the profile uses (sum of .cert), NOT the single-FY realtime
-  // total. FY range mirrors the PERM periodLabel wording ("FY2008 – FY2026").
+  // The three headline figures, kept consistent with the leaderboard row:
+  //   permVal  = PERM (green-card) filings  -- the live PERM-tracker total
+  //              (emp.total), the SAME number data/employer_index.json stores
+  //              as `perm` for this employer.
+  //   lcaVal   = H-1B LCA filings on record -- cumulative sum of lcaByYear[].total
+  //              across all disclosed FYs (FY2008–FY2026), the SAME number the
+  //              index stores as `lca`.
+  //   totalVal = permVal + lcaVal           -- the index `total`.
   const lcaYears = (h1b && Array.isArray(h1b.lcaByYear)) ? h1b.lcaByYear : [];
-  const h1bCertCumulative = lcaYears.length ? lcaYears.reduce((s, y) => s + (y.cert || 0), 0) : null;
+  const lcaVal = lcaYears.length ? lcaYears.reduce((s, y) => s + (y.total || 0), 0) : 0;
   const lcaFys = lcaYears.map(y => y && y.fy).filter(Boolean).sort();
   const lcaPeriodLabel = lcaFys.length ? (lcaFys[0] + ' – ' + lcaFys[lcaFys.length - 1]) : null;
+  const permVal = (emp && emp.total != null) ? emp.total : (ps.total || 0);
+  const totalVal = (permVal || 0) + (lcaVal || 0);
   const h1bMedianFy = (h1b && h1b.fy) || 'FY2025';
 
   // Method-B reunification: alternate name spellings that folded into this
@@ -762,10 +767,11 @@ function renderHero(emp, ps, h1b, rankInfo) {
       '</div>'
     : '';
 
-  const blurb = esc(emp.name) + ' has <b>' + n(ps.total) + '</b> PERM (green card) labor certification filings on record' +
-    (period !== '—' ? ' (' + esc(period) + ')' : '') +
-    (h1bTotal != null ? ' and <b>' + n(h1bTotal) + '</b> certified H-1B LCA positions in FY2025' : '') +
-    '. ' + (ps.certRate != null ? 'Its PERM certification rate is <b>' + ps.certRate.toFixed(1) + '%</b>' : 'No PERM cases have been adjudicated yet') +
+  const blurb = esc(emp.name) + ' has <b>' + n(permVal) + '</b> PERM (green card) labor certification filings and <b>' +
+    n(lcaVal) + '</b> H-1B LCA filings on record' +
+    (lcaPeriodLabel ? ' (' + esc(lcaPeriodLabel) + ')' : '') +
+    ' — <b>' + n(totalVal) + '</b> filings in total. ' +
+    (ps.certRate != null ? 'Its PERM certification rate is <b>' + ps.certRate.toFixed(1) + '%</b>' : 'No PERM cases have been adjudicated yet') +
     (h1bMedian != null ? ', with a median offered H-1B salary of <b>' + fmtUSD(h1bMedian) + '</b>' : '') + '.';
 
   return '' +
@@ -784,13 +790,11 @@ function renderHero(emp, ps, h1b, rankInfo) {
     '</div>' +
     '<p class="emp-hero-blurb">' + blurb + '</p>' +
     '<div class="emp-keystats">' +
-      keystat('H-1B LCAs' + (lcaPeriodLabel ? ' (' + lcaPeriodLabel + ')' : ''),
-              h1bCertCumulative != null ? n(h1bCertCumulative) : (h1bTotal != null ? n(h1bTotal) : '—'),
-              'Certified LCA positions', '') +
-      keystat('Green Card (PERM)', n(ps.total), 'Labor cert. filings', '') +
-      keystat('PERM Cert. Rate', ps.certRate != null ? ps.certRate.toFixed(1) + '%' : '—',
-              ps.adjudicated > 0 ? n(ps.certCount) + ' of ' + n(ps.adjudicated) + ' adjudicated' : 'None adjudicated yet',
-              ps.certClass.replace('cr-', '')) +
+      keystat('Green Card (PERM)', n(permVal), 'Labor cert. filings', '') +
+      keystat('H-1B LCA' + (lcaPeriodLabel ? ' (' + lcaPeriodLabel + ')' : ''),
+              lcaVal ? n(lcaVal) : '—',
+              'LCA filings on record', '') +
+      keystat('Total Filings', n(totalVal), 'PERM + H-1B LCA', '') +
       keystat('Median H-1B Salary', h1bMedian != null ? fmtUSD(h1bMedian) : '—',
               (abovePct != null ? abovePct + '% at/above prevailing' : 'Offered wage') + ' · ' + h1bMedianFy, '') +
     '</div>' +
@@ -1521,10 +1525,14 @@ function showError(msg) {
 }
 
 function renderAll(emp, h1b, rankInfo) {
-  // Prefer the multi-year DOL disclosure dataset (FY2020–FY2026) for the PERM
-  // headline so the total/date-range/status summary reconcile with the by-year
-  // breakdown below. Fall back to live-tracker stats for older payloads.
-  const ps = permStatsFromDisclosure(h1b) || permStats(emp);
+  // PERM stats source: prefer the multi-year DOL disclosure dataset when it
+  // actually carries filings (total > 0), so the cert/denied/withdrawn donut
+  // reconciles with the by-year breakdown. Otherwise fall back to the live
+  // PERM-tracker (emp.total + emp.statuses) — this is the number the leaderboard
+  // stores as `perm`, so the profile's Green Card (PERM) figure matches the
+  // leaderboard row (e.g. Cognizant 1,831, whose DOL disclosure rows are empty).
+  const _disc = permStatsFromDisclosure(h1b);
+  const ps = (_disc && _disc.total > 0) ? _disc : permStats(emp);
   document.getElementById('emp-body').innerHTML =
     '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
     renderHero(emp, ps, h1b, rankInfo) +
@@ -1597,14 +1605,14 @@ function scrollChartsToLatest() {
         } catch (e) {}
       }
       applySeo((h1b && h1b.name) || emp.name || raw);
-      // Rank against the SAME "PERM filings on record" total the profile
-      // headlines (sum of permByYear from the multi-year disclosure backfill),
-      // so the badge "#X of N" reconciles with the leaderboard row total. Falls
-      // back to the live-tracker total when no disclosure data exists; null
-      // (no badge) only when neither is available (pure H-1B-only employers).
-      const disc = permStatsFromDisclosure(h1b);
-      const rankTotal = (disc && disc.total != null) ? disc.total : (emp.total || null);
-      return loadRank(rankTotal ? rankTotal : null).then(rankInfo => {
+      // Rank against the SAME "total filings" the leaderboard sorts by:
+      //   PERM (emp.total, live tracker) + H-1B LCA (sum of lcaByYear[].total).
+      // So the badge "#X of N" reconciles with the leaderboard row's Total
+      // column. null (no badge) only when the employer has no filings at all.
+      const lcaTot = (h1b && Array.isArray(h1b.lcaByYear))
+        ? h1b.lcaByYear.reduce((s, y) => s + (y.total || 0), 0) : 0;
+      const rankTotal = (emp.total || 0) + lcaTot;
+      return loadRank(rankTotal > 0 ? rankTotal : null).then(rankInfo => {
         renderAll(emp, h1b, rankInfo);
         if (typeof gtag === 'function') {
           try { gtag('event', 'employer_profile_view', { employer_name: emp.name }); } catch (e) {}

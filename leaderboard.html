@@ -118,6 +118,16 @@
   .lb-table { width: 100%; border-collapse: collapse; }
   .lb-table thead th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--sep); background: var(--tab-bg); position: sticky; top: 0; z-index: 2; }
   .lb-table th.num, .lb-table td.num { text-align: right; }
+  /* Sortable column headers */
+  .lb-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; transition: color 0.15s; }
+  .lb-table th.sortable:hover { color: var(--text-secondary); }
+  .lb-table th.sortable.sort-active { color: var(--accent); }
+  .lb-sort-ind { display: inline-block; width: 10px; margin-left: 3px; font-size: 9px; opacity: 0.45; }
+  .lb-table th.sort-active .lb-sort-ind { opacity: 1; }
+  /* Numeric cell emphasis: Total is the headline, PERM/LCA lighter */
+  .lb-table td.lb-perm, .lb-table td.lb-lca { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  .lb-table td.lb-total { font-variant-numeric: tabular-nums; font-weight: 800; }
+  .lb-table th.sort-active.lb-col-perm ~ tbody td.lb-perm { color: var(--text-primary); }
   .lb-table tbody tr { border-bottom: 1px solid var(--sep); transition: background 0.12s; }
   .lb-table tbody tr:last-child { border-bottom: none; }
   .lb-table tbody tr:hover { background: var(--card-hover); }
@@ -182,8 +192,8 @@
 
   <section class="lb-hero">
     <div class="lb-eyebrow">Leaderboard</div>
-    <h1 class="lb-title">🏅 Top Employers by PERM Volume</h1>
-    <p class="lb-blurb">U.S. employers ranked by total <b>PERM (green card) labor certification</b> filing volume in the ImmiLane dataset, highest to lowest. Showing <b id="lb-total">…</b> employers across <b id="lb-cases">…</b> filings. Use the search box to jump to any employer, then click a name for its full PERM &amp; H-1B profile.</p>
+    <h1 class="lb-title">🏅 Top Employers by Filing Volume</h1>
+    <p class="lb-blurb">U.S. employers ranked by immigration filing volume in the ImmiLane dataset. Each row shows <b>PERM</b> (green&nbsp;card labor certification) and <b>H-1B&nbsp;LCA</b> (ETA-9035) filings side by side, plus the <b>Total</b>. Showing <b id="lb-total">…</b> employers across <b id="lb-cases">…</b> filings. <b>Click any column header to sort.</b> Use the search box to jump to an employer, then click a name for its full profile.</p>
   </section>
 
   <div class="lb-controls">
@@ -204,7 +214,9 @@
         <tr>
           <th class="lb-rank-head">Rank</th>
           <th>Employer</th>
-          <th class="num lb-count-head">PERM Filings</th>
+          <th class="num sortable lb-col-perm"  data-sort="perm"  title="Sort by PERM filings">PERM<span class="lb-sort-ind" data-ind="perm"></span></th>
+          <th class="num sortable lb-col-lca"   data-sort="lca"   title="Sort by H-1B LCA filings">H-1B LCA<span class="lb-sort-ind" data-ind="lca"></span></th>
+          <th class="num sortable lb-col-total sort-active" data-sort="total" title="Sort by total filings">Total<span class="lb-sort-ind" data-ind="total">▼</span></th>
           <th class="lb-barcell">Share</th>
         </tr>
       </thead>
@@ -213,7 +225,7 @@
     <div class="lb-more" id="lb-more" style="display:none"><button id="lb-more-btn" type="button">Load more</button></div>
   </div>
 
-  <p class="lb-note">Rank reflects total PERM filing volume (all statuses) from FLAG.DOL.GOV data. An employer's individual profile page shows an "approximate" rank computed against its live total, which may differ by a position or two from this static snapshot.</p>
+  <p class="lb-note"><b>PERM</b> = green-card labor certification filings (all statuses) from the ImmiLane PERM tracker. <b>H-1B&nbsp;LCA</b> = certified/total ETA-9035 Labor Condition Application filings on record (FY2008–FY2026, FLAG.DOL.GOV). <b>Total</b> = PERM + H-1B&nbsp;LCA. Default sort is Total (descending); click any column header to re-sort. An employer's profile page shows an "approximate" rank that may differ by a position or two from this snapshot.</p>
 </main>
 
 <footer>
@@ -234,17 +246,22 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 <script>
 // ═══════════════════════════════════════════════════════
 // TOP EMPLOYERS LEADERBOARD
-// Data source: data/employer_index.json — the same ~43k-employer index
-// (already sorted by PERM total `t` desc) used to compute the rank badge on
-// employer.html. We do NOT recompute anything; we render straight from it.
+// Data source: data/employer_index.json — each row carries THREE numbers:
+//   perm  = PERM (green-card labor cert) filings
+//   lca   = H-1B LCA (ETA-9035) filings
+//   total = perm + lca
+// (`t` mirrors total for backward-compat.) The table renders all three and
+// lets the user sort by any of them; default sort = Total desc.
 // ═══════════════════════════════════════════════════════
 (function () {
   var PAGE = 100;            // rows per "page" / load-more chunk
-  var rows = [];             // [{n, t, slug}] sorted desc (as stored)
-  var view = [];             // current filtered+ranked view
+  var rows = [];             // [{n, perm, lca, total, idx, rank, _l}]
+  var view = [];             // current filtered view (rank already assigned on rows)
   var shown = 0;             // how many of `view` are rendered
-  var deepTarget = -1;       // index in `view` to scroll/highlight to
-  var totalCases = 0;
+  var deepTarget = -1;       // row idx to scroll/highlight to
+  var sortKey = 'total';     // active sort column: perm | lca | total
+  var sortDir = 'desc';      // asc | desc
+  var maxBar = 1;            // max of active column, for the share bar
 
   var elBody    = document.getElementById('lb-body');
   var elTable   = document.getElementById('lb-table');
@@ -257,6 +274,7 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 
   function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
   function n(v){ return (v==null||isNaN(v))?'—':Number(v).toLocaleString(); }
+  function val(e,k){ var v = e[k]; return (v==null||isNaN(v)) ? 0 : v; }
 
   function employerSlug(name){
     if(!name) return '';
@@ -276,19 +294,19 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
     var rank = item.rank;
     var medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
     var rankCls = rank===1?'top1':rank===2?'top2':rank===3?'top3':'';
-    var pct = totalCases>0 ? Math.max(2, Math.round(item.t/maxCount*100)) : 0;
+    var pct = maxBar>0 ? Math.max(2, Math.round(val(item,sortKey)/maxBar*100)) : 0;
     var selfCls = item.idx===deepTarget ? ' lb-self' : '';
     var href = 'employer.html?e=' + encodeURIComponent(item.n);
     return '<tr data-idx="'+item.idx+'"class="'+ (selfCls?selfCls.trim():'') +'">'
       + '<td class="lb-rank '+rankCls+'">'+(medal?'<span class="lb-medal">'+medal+'</span>':'')+'#'+n(rank)+'</td>'
       + '<td><span class="lb-name"><span class="lb-mark">'+esc(initials(item.n))+'</span>'
         + '<a class="lb-namelink" href="'+href+'">'+esc(item.n)+'</a></span></td>'
-      + '<td class="num lb-count-cell">'+n(item.t)+'</td>'
+      + '<td class="num lb-perm">'+n(item.perm)+'</td>'
+      + '<td class="num lb-lca">'+n(item.lca)+'</td>'
+      + '<td class="num lb-total">'+n(item.total)+'</td>'
       + '<td class="lb-barcell"><div class="lb-bar" style="width:'+pct+'%"></div></td>'
       + '</tr>';
   }
-
-  var maxCount = 1;
 
   function renderMore(){
     var end = Math.min(view.length, shown + PAGE);
@@ -312,28 +330,63 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
       + (view.length !== rows.length ? ' matches' : ' employers');
   }
 
+  // Sort the full `rows` array by the active column, (re)assign global ranks,
+  // update the active column's bar scale, and refresh the header indicators.
+  function applySort(){
+    var dir = sortDir === 'asc' ? 1 : -1;
+    rows.sort(function(a,b){
+      var d = (val(a,sortKey) - val(b,sortKey)) * dir;
+      if (d) return d;
+      return a.n < b.n ? -1 : a.n > b.n ? 1 : 0;  // stable tiebreak: name asc
+    });
+    for (var i=0;i<rows.length;i++) rows[i].rank = i+1;
+    maxBar = rows.length ? val(rows[0], sortKey) || 1 : 1;
+    // header UI
+    var ths = document.querySelectorAll('.lb-table th.sortable');
+    for (var j=0;j<ths.length;j++){
+      var th = ths[j];
+      var key = th.getAttribute('data-sort');
+      var ind = th.querySelector('.lb-sort-ind');
+      if (key === sortKey){
+        th.classList.add('sort-active');
+        if (ind) ind.textContent = sortDir === 'asc' ? '▲' : '▼';
+      } else {
+        th.classList.remove('sort-active');
+        if (ind) ind.textContent = '';
+      }
+    }
+  }
+
+  function currentQuery(){ return (elSearch.value||'').trim().toLowerCase(); }
+
   function applyFilter(q){
     q = (q||'').trim().toLowerCase();
     elClear.classList.toggle('visible', !!q);
-    if (!q){
-      view = rows;
-    } else {
-      view = rows.filter(function(r){ return r._l.indexOf(q) !== -1; });
-    }
+    view = q ? rows.filter(function(r){ return r._l.indexOf(q) !== -1; }) : rows;
     deepTarget = -1;
     resetRender();
     if (!view.length){
-      elBody.innerHTML = '<tr><td colspan="4"><div class="lb-empty">No employers match “'+esc(q)+'”.</div></td></tr>';
+      elBody.innerHTML = '<tr><td colspan="6"><div class="lb-empty">No employers match “'+esc(q)+'”.</div></td></tr>';
       elMore.style.display = 'none';
     }
   }
 
-  // Render enough pages to include `targetIdx`, then scroll+highlight.
+  // Re-sort then re-render keeping the current search filter.
+  function sortAndRender(){
+    applySort();
+    applyFilter(currentQuery());
+  }
+
+  // Render enough pages to include the row with stable id `targetIdx`, then
+  // scroll+highlight. Works against the currently sorted+filtered view.
   function jumpTo(targetIdx){
     deepTarget = targetIdx;
-    while (shown <= targetIdx && shown < view.length) renderMore();
-    resetRender(); // re-render so the self-row class applies cleanly
-    while (shown <= targetIdx && shown < view.length) renderMore();
+    function pos(){ for (var i=0;i<view.length;i++){ if (view[i].idx===targetIdx) return i; } return -1; }
+    var p = pos();
+    if (p === -1) return;
+    while (shown <= p && shown < view.length) renderMore();
+    resetRender();
+    while (shown <= p && shown < view.length) renderMore();
     var tr = elBody.querySelector('tr[data-idx="'+targetIdx+'"]');
     if (tr){
       tr.classList.add('lb-highlight');
@@ -343,20 +396,22 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 
   function init(idx){
     var emps = (idx && Array.isArray(idx.employers)) ? idx.employers : [];
-    totalCases = idx.totalCases || 0;
-    maxCount = emps.length ? (emps[0].t || 1) : 1;
-    // Stored order is already PERM-total desc; assign rank + precompute search key.
+    // `idx` is the stable identity (used by deep-link/self highlight); rank is
+    // assigned dynamically per sort. total falls back to perm+lca / t.
     rows = emps.map(function(e, i){
-      return { n: e.n, t: e.t, idx: i, rank: i+1, _l: (String(e.n||'') + ' ' + String(e.a||'')).toLowerCase() };
+      var perm  = (e.perm  != null) ? e.perm  : 0;
+      var lca   = (e.lca   != null) ? e.lca   : 0;
+      var total = (e.total != null) ? e.total : (e.t != null ? e.t : perm + lca);
+      return { n: e.n, perm: perm, lca: lca, total: total, idx: i, rank: i+1,
+               _l: (String(e.n||'') + ' ' + String(e.a||'')).toLowerCase() };
     });
-    view = rows;
 
     document.getElementById('lb-total').textContent = n(idx.totalEmployers || rows.length);
-    document.getElementById('lb-cases').textContent = n(totalCases);
+    document.getElementById('lb-cases').textContent = n(idx.totalCases || 0);
 
     elLoading.style.display = 'none';
     elTable.style.display = '';
-    resetRender();
+    sortAndRender();   // default: total desc
 
     // Deep link: ?e=<name> → scroll to that employer's row & highlight.
     var target = getParam('e') || getParam('employer') || getParam('slug');
@@ -365,13 +420,22 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
       var nameL = target.trim().toLowerCase();
       var hit = -1;
       for (var i=0;i<rows.length;i++){
-        if (rows[i]._l === nameL || employerSlug(rows[i].n) === slug){ hit = i; break; }
+        if (rows[i]._l === nameL || employerSlug(rows[i].n) === slug){ hit = rows[i].idx; break; }
       }
-      if (hit !== -1){
-        // pre-fill search? No — keep full list so neighbors are visible.
-        jumpTo(hit);
-      }
+      if (hit !== -1) jumpTo(hit);
     }
+  }
+
+  // Wire column-header sorting. Clicking the active column toggles asc/desc;
+  // clicking a new column selects it (counts → default to desc).
+  var ths = document.querySelectorAll('.lb-table th.sortable');
+  for (var k=0;k<ths.length;k++){
+    ths[k].addEventListener('click', function(){
+      var key = this.getAttribute('data-sort');
+      if (key === sortKey){ sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+      else { sortKey = key; sortDir = 'desc'; }
+      sortAndRender();
+    });
   }
 
   // Wire controls
