@@ -106,7 +106,7 @@
   footer a:hover { color: var(--text-secondary); }
   .hero { padding: 40px 0 20px; }
   .hero h1 { font-size: 14px; font-weight: 500; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
-  .hero h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .update-time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
   .update-time .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-right: 6px; animation: pulse 2s infinite; }
   @keyframes pulse    { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
@@ -371,6 +371,53 @@
   }
   .nav-search-empty {
     padding: 18px 14px; color: var(--text-muted); font-size: 13px; text-align: center;
+  }
+
+  /* ===== Hero employer search (homepage primary/hero element) ===== */
+  .hero-search { position: relative; max-width: 640px; margin: 6px auto 22px; }
+  .hero-search-box { position: relative; display: flex; align-items: center; }
+  .hero-search-icon {
+    position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); pointer-events: none; display: flex; align-items: center;
+  }
+  .hero-search-input {
+    width: 100%; padding: 18px 50px 18px 50px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary); font-size: 18px; font-family: inherit;
+    border-radius: 16px; outline: none;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+  .hero-search-input::placeholder { color: var(--text-dim); opacity: 1; }
+  .hero-search-input:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.14), 0 8px 30px rgba(0,0,0,0.20);
+  }
+  .hero-search-clear {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px; border: none; background: var(--tab-active);
+    color: var(--text-secondary); font-size: 16px; line-height: 1; cursor: pointer;
+    border-radius: 50%; display: none; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .hero-search-clear:hover { background: var(--card-border-hover); color: var(--text-primary); }
+  .hero-search-clear.visible { display: flex; }
+  .hero-search-dropdown {
+    position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px;
+    max-height: 420px; overflow-y: auto;
+    background: var(--bg-card);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    z-index: 1000; display: none; text-align: left;
+  }
+  .hero-search-dropdown.open { display: block; }
+  @media (max-width: 768px) {
+    .hero-search { max-width: 100%; margin: 4px auto 16px; }
+    .hero-search-input { font-size: 16px; padding: 15px 46px 15px 46px; border-radius: 14px; }
+    .hero-search-icon { left: 15px; }
   }
 
   /* ── EMPLOYER MODAL ── */
@@ -669,6 +716,16 @@
 
 <div class="container">
   <div class="hero">
+    <div class="hero-search" id="hero-search">
+      <div class="hero-search-box">
+        <div class="hero-search-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <input type="text" class="hero-search-input" id="hero-search-input" placeholder="Search your employer" autocomplete="off" spellcheck="false" aria-label="Search your employer">
+        <button type="button" class="hero-search-clear" id="hero-search-clear" aria-label="Clear search">&times;</button>
+      </div>
+      <div class="hero-search-dropdown" id="hero-search-dropdown"></div>
+    </div>
     <h1>PERM Processing Dashboard</h1>
     <h2>Real-time DOL Labor Certification Tracking</h2>
     <p class="update-time"><span class="dot"></span><span id="updated-text">Loading…</span></p>
@@ -2358,40 +2415,7 @@ function employerSlug(name) {
 }
 
 (function initEmployerSearch() {
-  const navSearch     = document.getElementById('nav-search');
-  const searchInput   = document.getElementById('nav-search-input');
-  const clearBtn      = document.getElementById('nav-search-clear');
-  const dropdown      = document.getElementById('nav-search-dropdown');
-
-  // Employer profile is now a dedicated page (employer.html); the search only
-  // needs the typeahead — selecting a result navigates to that page.
-  if (!navSearch || !searchInput || !dropdown) return;
-
-  function toggleClearBtn() {
-    if (clearBtn) clearBtn.classList.toggle('visible', searchInput.value.length > 0);
-  }
-  if (clearBtn) {
-    clearBtn.addEventListener('click', function() {
-      searchInput.value = '';
-      toggleClearBtn();
-      closeDropdown();
-      searchInput.focus();
-    });
-  }
-
-  let activeIdx     = -1;
-  let lastMatches   = [];
-  let debounceTimer = null;
-  let searchSeq     = 0;
-
-  // On-record totals come from the static employer index (data/employer_index.json
-  // field `t`) — the SAME source the leaderboard and employer profile use — NOT
-  // the worker's realtime `total`, which predates the FY2008–2019 PERM backfill
-  // (e.g. Microsoft realtime 1,569 vs on-record 39,529). Driving the dropdown
-  // from this pre-sorted index keeps the search number identical to the
-  // leaderboard/profile and ranks employers by on-record total ("Micro" →
-  // Microsoft 39,529 above Micron / AMD). The worker API is only a degraded
-  // fallback if the static index can't load.
+  // ---- Shared on-record employer index (same source as leaderboard/profile) ----
   let employerIndex = null;            // [{ n, t, lc }] sorted by t desc
   let indexPromise  = null;
   function loadEmployerIndex() {
@@ -2409,139 +2433,274 @@ function employerSlug(name) {
   }
   loadEmployerIndex();
 
-  function closeDropdown() {
-    dropdown.classList.remove('open');
-    dropdown.innerHTML = '';
-    activeIdx = -1;
-    lastMatches = [];
-  }
-
-  document.addEventListener('click', (e) => {
-    if (!navSearch.contains(e.target) && !dropdown.contains(e.target)) {
-      closeDropdown();
-    }
-  });
-
-  searchInput.addEventListener('input', () => {
-    toggleClearBtn();
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runSearch, 200);
-  });
-
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeDropdown();
-      searchInput.blur();
-      return;
-    }
-    if (!lastMatches.length) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      activeIdx = Math.min(activeIdx + 1, lastMatches.length - 1);
-      updateActive();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      activeIdx = Math.max(activeIdx - 1, 0);
-      updateActive();
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      const pick = activeIdx >= 0 ? lastMatches[activeIdx] : lastMatches[0];
-      if (pick) selectEmployer(pick.n);
-    }
-  });
-
-  function updateActive() {
-    const items = dropdown.querySelectorAll('.nav-search-item');
-    items.forEach((el, i) => {
-      el.classList.toggle('active', i === activeIdx);
-      if (i === activeIdx) el.scrollIntoView({ block: 'nearest' });
-    });
-  }
-
-  function runSearch() {
-    const q = searchInput.value.trim();
-    if (!q) {
-      closeDropdown();
-      return;
-    }
-    const seq = ++searchSeq;
-    dropdown.innerHTML = '<div class="nav-search-empty">Searching…</div>';
-    dropdown.classList.add('open');
-    loadEmployerIndex().then(idx => {
-      if (seq !== searchSeq) return;   // user kept typing — drop stale render
-      const needle = q.toLowerCase();
-      const matches = [];
-      // idx is sorted by on-record total desc, so the first LIMIT substring
-      // matches are the highest-volume employers (e.g. "Micro" → Microsoft first).
-      for (let i = 0; i < idx.length && matches.length < EMPLOYER_API_LIMIT; i++) {
-        if (idx[i].lc.indexOf(needle) !== -1) matches.push({ n: idx[i].n, t: idx[i].t });
-      }
-      lastMatches = matches;
-      activeIdx = lastMatches.length > 0 ? 0 : -1;
-      renderDropdown();
-      if (typeof gtag === 'function') {
-        try { gtag('event', 'employer_search', { search_term: q, results_count: matches.length }); } catch(e){}
-      }
-    }).catch(() => {
-      if (seq !== searchSeq) return;
-      // Degraded fallback: static index unavailable → use the worker API so
-      // search still functions (totals are realtime in this path only).
-      runSearchApiFallback(seq, q);
-    });
-  }
-
-  function runSearchApiFallback(seq, q) {
-    const url = EMPLOYER_API_BASE + '/api/employers'
-      + '?q=' + encodeURIComponent(q)
-      + '&limit=' + EMPLOYER_API_LIMIT;
-    fetch(url)
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(payload => {
-        if (seq !== searchSeq) return;
-        const results = (payload && Array.isArray(payload.results)) ? payload.results : [];
-        lastMatches = results.map(r => ({ n: r.name, t: r.total }));
-        activeIdx = lastMatches.length > 0 ? 0 : -1;
-        renderDropdown();
-      })
-      .catch(() => {
-        if (seq !== searchSeq) return;
-        lastMatches = [];
-        activeIdx = -1;
-        dropdown.innerHTML = '<div class="nav-search-empty">Search unavailable. Try again.</div>';
-        dropdown.classList.add('open');
-      });
-  }
-
-  function renderDropdown() {
-    if (!lastMatches.length) {
-      dropdown.innerHTML = '<div class="nav-search-empty">No employers found.</div>';
-    } else {
-      dropdown.innerHTML = lastMatches.map((m, i) =>
-        '<div class="nav-search-item' + (i === activeIdx ? ' active' : '') + '" data-idx="' + i + '">' +
-          '<span class="nav-search-item-name">' + esc(m.n) + '</span>' +
-          '<span class="nav-search-item-count">' + n(m.t) + '</span>' +
-        '</div>'
-      ).join('');
-      dropdown.querySelectorAll('.nav-search-item').forEach((el) => {
-        el.addEventListener('mousedown', (ev) => { ev.preventDefault(); });
-        el.addEventListener('click', () => {
-          const idx = parseInt(el.dataset.idx, 10);
-          if (!isNaN(idx) && lastMatches[idx]) selectEmployer(lastMatches[idx].n);
-        });
-      });
-    }
-    dropdown.classList.add('open');
-  }
-
   function selectEmployer(name) {
     if (typeof gtag === 'function') {
       try { gtag('event', 'employer_selected', { employer_name: name }); } catch (e) {}
     }
-    // Navigate to the dedicated, deep-linkable employer profile page
-    // (replaces the former in-page modal overlay).
+    // Navigate to the dedicated, deep-linkable employer profile page.
     window.location.href = 'employer.html?e=' + encodeURIComponent(name.trim());
   }
+
+  // ---- One typeahead widget. Nav search + hero search both run this. ----
+  function setupSearchWidget(refs) {
+    const root        = refs.root;
+    const searchInput = refs.input;
+    const clearBtn    = refs.clearBtn;
+    const dropdown    = refs.dropdown;
+    if (!root || !searchInput || !dropdown) return null;
+
+    let activeIdx     = -1;
+    let lastMatches   = [];
+    let debounceTimer = null;
+    let searchSeq     = 0;
+
+    function toggleClearBtn() {
+      if (clearBtn) clearBtn.classList.toggle('visible', searchInput.value.length > 0);
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        toggleClearBtn();
+        closeDropdown();
+        searchInput.focus();
+      });
+    }
+
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      dropdown.innerHTML = '';
+      activeIdx = -1;
+      lastMatches = [];
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!root.contains(e.target) && !dropdown.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      toggleClearBtn();
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(runSearch, 200);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDropdown();
+        searchInput.blur();
+        return;
+      }
+      if (!lastMatches.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIdx = Math.min(activeIdx + 1, lastMatches.length - 1);
+        updateActive();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = Math.max(activeIdx - 1, 0);
+        updateActive();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const pick = activeIdx >= 0 ? lastMatches[activeIdx] : lastMatches[0];
+        if (pick) selectEmployer(pick.n);
+      }
+    });
+
+    function updateActive() {
+      const items = dropdown.querySelectorAll('.nav-search-item');
+      items.forEach((el, i) => {
+        el.classList.toggle('active', i === activeIdx);
+        if (i === activeIdx) el.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
+    function runSearch() {
+      const q = searchInput.value.trim();
+      if (!q) {
+        closeDropdown();
+        return;
+      }
+      const seq = ++searchSeq;
+      dropdown.innerHTML = '<div class="nav-search-empty">Searching…</div>';
+      dropdown.classList.add('open');
+      loadEmployerIndex().then(idx => {
+        if (seq !== searchSeq) return;   // user kept typing — drop stale render
+        const needle = q.toLowerCase();
+        const matches = [];
+        for (let i = 0; i < idx.length && matches.length < EMPLOYER_API_LIMIT; i++) {
+          if (idx[i].lc.indexOf(needle) !== -1) matches.push({ n: idx[i].n, t: idx[i].t });
+        }
+        lastMatches = matches;
+        activeIdx = lastMatches.length > 0 ? 0 : -1;
+        renderDropdown();
+        if (typeof gtag === 'function') {
+          try { gtag('event', 'employer_search', { search_term: q, results_count: matches.length }); } catch(e){}
+        }
+      }).catch(() => {
+        if (seq !== searchSeq) return;
+        runSearchApiFallback(seq, q);
+      });
+    }
+
+    function runSearchApiFallback(seq, q) {
+      const url = EMPLOYER_API_BASE + '/api/employers'
+        + '?q=' + encodeURIComponent(q)
+        + '&limit=' + EMPLOYER_API_LIMIT;
+      fetch(url)
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(payload => {
+          if (seq !== searchSeq) return;
+          const results = (payload && Array.isArray(payload.results)) ? payload.results : [];
+          lastMatches = results.map(r => ({ n: r.name, t: r.total }));
+          activeIdx = lastMatches.length > 0 ? 0 : -1;
+          renderDropdown();
+        })
+        .catch(() => {
+          if (seq !== searchSeq) return;
+          lastMatches = [];
+          activeIdx = -1;
+          dropdown.innerHTML = '<div class="nav-search-empty">Search unavailable. Try again.</div>';
+          dropdown.classList.add('open');
+        });
+    }
+
+    function renderDropdown() {
+      if (!lastMatches.length) {
+        dropdown.innerHTML = '<div class="nav-search-empty">No employers found.</div>';
+      } else {
+        dropdown.innerHTML = lastMatches.map((m, i) =>
+          '<div class="nav-search-item' + (i === activeIdx ? ' active' : '') + '" data-idx="' + i + '">' +
+            '<span class="nav-search-item-name">' + esc(m.n) + '</span>' +
+            '<span class="nav-search-item-count">' + n(m.t) + '</span>' +
+          '</div>'
+        ).join('');
+        dropdown.querySelectorAll('.nav-search-item').forEach((el) => {
+          el.addEventListener('mousedown', (ev) => { ev.preventDefault(); });
+          el.addEventListener('click', () => {
+            const idx = parseInt(el.dataset.idx, 10);
+            if (!isNaN(idx) && lastMatches[idx]) selectEmployer(lastMatches[idx].n);
+          });
+        });
+      }
+      dropdown.classList.add('open');
+    }
+
+    return { input: searchInput };
+  }
+
+  // Wire the existing nav search.
+  setupSearchWidget({
+    root:     document.getElementById('nav-search'),
+    input:    document.getElementById('nav-search-input'),
+    clearBtn: document.getElementById('nav-search-clear'),
+    dropdown: document.getElementById('nav-search-dropdown'),
+  });
+
+  // Wire the new hero search (homepage primary element).
+  const heroWidget = setupSearchWidget({
+    root:     document.getElementById('hero-search'),
+    input:    document.getElementById('hero-search-input'),
+    clearBtn: document.getElementById('hero-search-clear'),
+    dropdown: document.getElementById('hero-search-dropdown'),
+  });
+
+  // ---- Animated typed-placeholder on the hero search ----
+  // Cycles: "Search your employer" -> delete -> a real top employer -> delete ->
+  // back to the prompt -> a DIFFERENT random employer -> ... indefinitely.
+  // Example names come from the real on-record employer index. Animation stops
+  // the moment the user engages the input and resumes only if left empty/unfocused.
+  function initHeroTypingPlaceholder(input, loadIndex) {
+    if (!input) return;
+    const BASE = 'Search your employer';
+    let examples = [
+      'MICROSOFT CORPORATION', 'AMAZON.COM SERVICES LLC', 'GOOGLE LLC',
+      'COGNIZANT TECHNOLOGY SOLUTIONS US CORPORATION',
+      'TATA CONSULTANCY SERVICES LIMITED', 'META PLATFORMS INC', 'APPLE INC'
+    ];
+    if (typeof loadIndex === 'function') {
+      loadIndex().then(idx => {
+        const top = (idx || []).slice(0, 40).map(e => e.n).filter(Boolean);
+        if (top.length) examples = top;
+      }).catch(() => {});
+    }
+
+    let stopped = false;
+    let timer = null;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function setPH(text) { input.setAttribute('placeholder', text + '▌'); }
+    function clearTimer() { if (timer) { clearTimeout(timer); timer = null; } }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+
+    // Pre-built queue of phrases, alternating BASE with a random real employer.
+    // Re-shuffles each time it drains so the order is randomized every cycle.
+    let queue = [];
+    function nextPhrase() {
+      if (!queue.length) {
+        const pool = shuffle(examples);
+        for (let i = 0; i < pool.length; i++) { queue.push(BASE); queue.push(pool[i]); }
+      }
+      return queue.shift();
+    }
+
+    function typePhrase(text, done) {
+      let i = 0;
+      (function step() {
+        if (stopped) return;
+        setPH(text.slice(0, i));
+        i++;
+        if (i <= text.length) timer = setTimeout(step, 55 + Math.random() * 45);
+        else timer = setTimeout(done, 1200);   // pause on the full string
+      })();
+    }
+    function deletePhrase(text, done) {
+      let i = text.length;
+      (function step() {
+        if (stopped) return;
+        setPH(text.slice(0, i));
+        i--;
+        if (i >= 0) timer = setTimeout(step, 28 + Math.random() * 22);
+        else timer = setTimeout(done, 260);
+      })();
+    }
+    function loop() {
+      if (stopped) return;
+      const text = nextPhrase();
+      typePhrase(text, () => deletePhrase(text, loop));
+    }
+
+    function start() {
+      if (input.value) return;   // user already typed something — leave it alone
+      stopped = false;
+      clearTimer();
+      queue = [];
+      loop();
+    }
+    function stop() {
+      stopped = true;
+      clearTimer();
+      input.setAttribute('placeholder', BASE);   // restore the plain placeholder
+    }
+
+    // Any engagement with the input kills the animation immediately.
+    input.addEventListener('focus', stop);
+    input.addEventListener('mousedown', stop);
+    input.addEventListener('blur', () => { if (!input.value) start(); });
+
+    if (reduce) { input.setAttribute('placeholder', BASE); return; }
+    start();
+  }
+  initHeroTypingPlaceholder(heroWidget && heroWidget.input, loadEmployerIndex);
 
 })();
 </script>
