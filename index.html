@@ -2615,10 +2615,13 @@ function employerSlug(name) {
   function initHeroTypingPlaceholder(input, loadIndex) {
     if (!input) return;
     const BASE = 'Search your employer';
+    // Fallback only — used if the employer index fails to load. Names MUST match
+    // entries that exist in data/employer_index.json (exact spelling) so the
+    // ghost-typed text never advertises an employer the search can't find.
     let examples = [
-      'MICROSOFT CORPORATION', 'AMAZON.COM SERVICES LLC', 'GOOGLE LLC',
-      'COGNIZANT TECHNOLOGY SOLUTIONS US CORPORATION',
-      'TATA CONSULTANCY SERVICES LIMITED', 'META PLATFORMS INC', 'APPLE INC'
+      'Microsoft Corporation', 'Amazon.com Services LLC', 'GOOGLE INC.',
+      'Cognizant Technology Solutions US Corporation',
+      'TATA CONSULTANCY SERVICES LIMITED', 'INFOSYS LIMITED', 'APPLE INC.'
     ];
     if (typeof loadIndex === 'function') {
       loadIndex().then(idx => {
