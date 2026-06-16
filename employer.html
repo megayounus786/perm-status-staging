@@ -607,12 +607,16 @@ function loadH1b(slug) {
 }
 
 // Approximate PERM-volume rank, computed from the deployed static employer
-// index (same origin). Rank = 1 + (# of employers whose total exceeds this
-// employer's live PERM total), so it stays coherent with the live total shown.
-// Clearly labelled "approximate" in the UI. Cached after first fetch.
+// index (same origin). Rank = 1 + (# of employers whose PERM filings exceed this
+// employer's PERM total), matching the leaderboard's DEFAULT sort (PERM, desc)
+// so the badge number == the employer's position when the deep-link opens the
+// leaderboard. Both read employer_index.json `perm`, the same historical
+// disclosure sum the headline shows. Clearly labelled "approximate". The rank
+// pool is employers WITH PERM filings (totalPermEmployers); H-1B-only employers
+// (PERM = 0) get no badge. Cached after first fetch.
 let _indexPromise = null;
-function loadRank(liveTotal) {
-  if (liveTotal == null || isNaN(liveTotal)) return Promise.resolve(null);
+function loadRank(permTotal) {
+  if (permTotal == null || isNaN(permTotal) || permTotal <= 0) return Promise.resolve(null);
   if (!_indexPromise) {
     _indexPromise = fetch('data/employer_index.json')
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -621,7 +625,10 @@ function loadRank(liveTotal) {
   return _indexPromise.then(idx => {
     if (!idx || !Array.isArray(idx.employers)) return null;
     let above = 0;
-    for (const e of idx.employers) { if (e && e.t > liveTotal) above++; }
+    for (const e of idx.employers) {
+      const p = (e && e.perm != null) ? e.perm : 0;
+      if (p > permTotal) above++;
+    }
     return { rank: above + 1, totalEmployers: idx.totalEmployers || idx.employers.length };
   });
 }
@@ -669,14 +676,18 @@ function livePendingStats(emp) {
 }
 
 // PERM headline stats sourced from the multi-year DOL disclosure dataset
-// (h1b.permByYear, FY2020–FY2026) so the headline TOTAL reconciles exactly with
-// the by-year PERM breakdown rendered below it. "Total PERM Filings" = the sum
-// of certified + denied + withdrawn across all fiscal years (all disclosed,
-// adjudicated filings). Returns null when no disclosure data is available, in
-// which case the caller falls back to the live-tracker permStats(emp).
+// (h1b.permByYear, FY2008–FY2026) so the headline TOTAL reconciles exactly with
+// the by-year PERM breakdown rendered below it AND with the leaderboard's `perm`
+// column + the approximate rank (all three read this same disclosure sum).
+// "Total PERM Filings" = the sum of certified + denied + withdrawn across all
+// fiscal years (all disclosed filings). When the employer IS in the H-1B/PERM
+// store (h1b present) but has no PERM rows, returns a zeroed disclosure object
+// (total 0) — NOT the live-tracker number — so the headline stays consistent
+// with the historical leaderboard. Returns null ONLY when there is no store
+// record at all (h1b falsy), in which case the caller may fall back to live.
 function permStatsFromDisclosure(h1b) {
-  const perm = (h1b && Array.isArray(h1b.permByYear)) ? h1b.permByYear : [];
-  if (!perm.length) return null;
+  if (!h1b) return null;
+  const perm = Array.isArray(h1b.permByYear) ? h1b.permByYear : [];
   let certCount = 0, deniedCount = 0, withdrawnCount = 0;
   perm.forEach(y => {
     certCount += (y.cert || 0);
@@ -732,7 +743,7 @@ function renderHero(emp, ps, h1b, rankInfo) {
   let rankBadge = '';
   if (rankInfo) {
     const lbHref = 'leaderboard.html?e=' + encodeURIComponent(emp.name);
-    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard by total (PERM + H-1B LCA) filing volume — opens at this employer\'s position.">🏅 <span class="rank-label">Approx. rank by total filings</span> <span class="rank-val"><span class="b-num">#' + n(rankInfo.rank) + '</span> <span class="rank-of">of ' + n(rankInfo.totalEmployers) + '</span> <span class="rank-arrow">→</span></span></a>';
+    rankBadge = '<a class="emp-badge rank" href="' + lbHref + '" title="View the full Top Employers leaderboard, ranked by PERM (green-card labor certification) filing volume — opens at this employer\'s position.">🏅 <span class="rank-label">Approx. rank by PERM filings</span> <span class="rank-val"><span class="b-num">#' + n(rankInfo.rank) + '</span> <span class="rank-of">of ' + n(rankInfo.totalEmployers) + '</span> <span class="rank-arrow">→</span></span></a>';
   }
 
   // Key stats
@@ -741,10 +752,10 @@ function renderHero(emp, ps, h1b, rankInfo) {
   const abovePct = h1bAbovePct(h1b);
 
   // The three headline figures, kept consistent with the leaderboard row:
-  //   permVal  = PERM (green-card) filings  -- the chosen PERM stat (ps.total):
-  //              DOL disclosure cert+denied+withdrawn when present (e.g.
-  //              Cognizant 27,788), else the live-tracker total. This is the
-  //              SAME number data/employer_index.json stores as `perm`.
+  //   permVal  = PERM (green-card) filings  -- ps.total = the DOL-disclosure
+  //              cert+denied+withdrawn sum (FY2008–FY2026, e.g. Cognizant 27,788),
+  //              the SAME number data/employer_index.json stores as `perm` and the
+  //              rank is computed from. (Live scanner activity is shown separately.)
   //   lcaVal   = H-1B LCA filings on record -- cumulative sum of lcaByYear[].total
   //              across all disclosed FYs (FY2008–FY2026), the SAME number the
   //              index stores as `lca`.
@@ -1526,14 +1537,14 @@ function showError(msg) {
 }
 
 function renderAll(emp, h1b, rankInfo) {
-  // PERM stats source: prefer the multi-year DOL disclosure dataset when it
-  // actually carries filings (total > 0), so the cert/denied/withdrawn donut
-  // reconciles with the by-year breakdown. Otherwise fall back to the live
-  // PERM-tracker (emp.total + emp.statuses) — this is the number the leaderboard
-  // stores as `perm`, so the profile's Green Card (PERM) figure matches the
-  // leaderboard row (e.g. Cognizant 1,831, whose DOL disclosure rows are empty).
-  const _disc = permStatsFromDisclosure(h1b);
-  const ps = (_disc && _disc.total > 0) ? _disc : permStats(emp);
+  // PERM stats source: ALWAYS the multi-year DOL disclosure dataset when the
+  // employer is in the store (h1b present) — even if its PERM total is 0 — so the
+  // headline Green Card (PERM) figure equals the leaderboard's `perm` column and
+  // the approximate rank (one consistent historical universe). The realtime
+  // case-status scanner number is never used as the headline; it surfaces only
+  // as the separate "in process" (AR) segment via livePendingStats(emp). We fall
+  // back to the live tracker ONLY when there is no store record at all (h1b null).
+  const ps = permStatsFromDisclosure(h1b) || permStats(emp);
   document.getElementById('emp-body').innerHTML =
     '<div class="emp-breadcrumb"><a href="./">← Dashboard</a> · Employer Profile</div>' +
     renderHero(emp, ps, h1b, rankInfo) +
@@ -1606,16 +1617,14 @@ function scrollChartsToLatest() {
         } catch (e) {}
       }
       applySeo((h1b && h1b.name) || emp.name || raw);
-      // Rank against the SAME "total filings" the leaderboard sorts by:
-      //   PERM (emp.total, live tracker) + H-1B LCA (sum of lcaByYear[].total).
-      // So the badge "#X of N" reconciles with the leaderboard row's Total
-      // column. null (no badge) only when the employer has no filings at all.
-      const lcaTot = (h1b && Array.isArray(h1b.lcaByYear))
-        ? h1b.lcaByYear.reduce((s, y) => s + (y.total || 0), 0) : 0;
+      // Rank against the SAME number the leaderboard's DEFAULT sort uses: PERM
+      // (the historical DOL-disclosure sum). So the badge "#X of N" reconciles
+      // with the employer's row position when the deep-link opens the leaderboard
+      // (default PERM-desc). null (no badge) when the employer has no PERM
+      // filings — an H-1B-only employer has no meaningful PERM rank.
       const _dRank = permStatsFromDisclosure(h1b);
-      const permForRank = (_dRank && _dRank.total > 0) ? _dRank.total : (emp.total || 0);
-      const rankTotal = permForRank + lcaTot;
-      return loadRank(rankTotal > 0 ? rankTotal : null).then(rankInfo => {
+      const permForRank = (_dRank && _dRank.total > 0) ? _dRank.total : 0;
+      return loadRank(permForRank > 0 ? permForRank : null).then(rankInfo => {
         renderAll(emp, h1b, rankInfo);
         if (typeof gtag === 'function') {
           try { gtag('event', 'employer_profile_view', { employer_name: emp.name }); } catch (e) {}

@@ -124,10 +124,26 @@
   .lb-table th.sortable.sort-active { color: var(--accent); }
   .lb-sort-ind { display: inline-block; width: 10px; margin-left: 3px; font-size: 9px; opacity: 0.45; }
   .lb-table th.sort-active .lb-sort-ind { opacity: 1; }
-  /* Numeric cell emphasis: Total is the headline, PERM/LCA lighter */
-  .lb-table td.lb-perm, .lb-table td.lb-lca { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
-  .lb-table td.lb-total { font-variant-numeric: tabular-nums; font-weight: 800; }
-  .lb-table th.sort-active.lb-col-perm ~ tbody td.lb-perm { color: var(--text-primary); }
+  /* Live tracker module — visually distinct from the historical columns. Fed by
+     the 3h realtime scanner (data/dashboard_data.json), NOT the historical data. */
+  .lb-livebar { display: none; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin: 0 0 18px; padding: 12px 16px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(34,197,94,0.10), rgba(16,185,129,0.06));
+    border: 1px solid rgba(34,197,94,0.30); }
+  .lb-livebar.show { display: flex; }
+  .lb-live-dot { width: 9px; height: 9px; border-radius: 50%; background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.55); animation: lbpulse 2s infinite; flex: 0 0 auto; }
+  @keyframes lbpulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.5);} 70%{box-shadow:0 0 0 7px rgba(34,197,94,0);} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0);} }
+  @media (prefers-reduced-motion: reduce){ .lb-live-dot { animation: none; } }
+  .lb-live-tag { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #22c55e; }
+  .lb-live-txt { font-size: 13.5px; color: var(--text-primary); }
+  .lb-live-txt b { font-weight: 800; }
+  .lb-live-link { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .lb-live-link:hover { text-decoration: underline; }
+  .lb-live-sub { font-size: 11.5px; color: var(--text-dim); width: 100%; }
+  /* Numeric cell emphasis: PERM is the headline (default sort), LCA/Total lighter */
+  .lb-table td.lb-lca, .lb-table td.lb-total { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+  .lb-table td.lb-perm { font-variant-numeric: tabular-nums; font-weight: 800; }
   .lb-table tbody tr { border-bottom: 1px solid var(--sep); transition: background 0.12s; }
   .lb-table tbody tr:last-child { border-bottom: none; }
   .lb-table tbody tr:hover { background: var(--card-hover); }
@@ -192,9 +208,19 @@
 
   <section class="lb-hero">
     <div class="lb-eyebrow">Leaderboard</div>
-    <h1 class="lb-title">🏅 Top Employers by Filing Volume</h1>
-    <p class="lb-blurb">U.S. employers ranked by immigration filing volume in the ImmiLane dataset. Each row shows <b>PERM</b> (green&nbsp;card labor certification) and <b>H-1B&nbsp;LCA</b> (ETA-9035) filings side by side, plus the <b>Total</b>. Showing <b id="lb-total">…</b> employers across <b id="lb-cases">…</b> filings. <b>Click any column header to sort.</b> Use the search box to jump to an employer, then click a name for its full profile.</p>
+    <h1 class="lb-title">🏅 Top Employers by PERM Filing Volume</h1>
+    <p class="lb-blurb">U.S. employers ranked by <b>PERM</b> (green&nbsp;card labor certification) filing volume from DOL OFLC disclosure data, <b>FY2008–FY2026</b> (FY2026 year-to-date). Each row also shows <b>H-1B&nbsp;LCA</b> (ETA-9035) filings and the combined <b>Total</b>. Showing <b id="lb-total">…</b> employers across <b id="lb-cases">…</b> historical filings. <b>Sorted by PERM by default — click any column header to re-sort.</b> Click a name for its full profile.</p>
   </section>
+
+  <!-- Live tracker module: real-time PERM case-status scanner, kept visually
+       distinct from the historical disclosure columns below. -->
+  <div class="lb-livebar" id="lb-livebar">
+    <span class="lb-live-dot"></span>
+    <span class="lb-live-tag">Live tracker</span>
+    <span class="lb-live-txt" id="lb-live-txt">…</span>
+    <a class="lb-live-link" href="./">View live dashboard →</a>
+    <span class="lb-live-sub" id="lb-live-sub"></span>
+  </div>
 
   <div class="lb-controls">
     <div class="lb-search">
@@ -214,9 +240,9 @@
         <tr>
           <th class="lb-rank-head">Rank</th>
           <th>Employer</th>
-          <th class="num sortable lb-col-perm"  data-sort="perm"  title="Sort by PERM filings">PERM<span class="lb-sort-ind" data-ind="perm"></span></th>
-          <th class="num sortable lb-col-lca"   data-sort="lca"   title="Sort by H-1B LCA filings">H-1B LCA<span class="lb-sort-ind" data-ind="lca"></span></th>
-          <th class="num sortable lb-col-total sort-active" data-sort="total" title="Sort by total filings">Total<span class="lb-sort-ind" data-ind="total">▼</span></th>
+          <th class="num sortable lb-col-perm sort-active" data-sort="perm" title="Sort by PERM (green-card labor certification) filings">PERM<span class="lb-sort-ind" data-ind="perm">▼</span></th>
+          <th class="num sortable lb-col-lca"   data-sort="lca"   title="Sort by H-1B LCA (ETA-9035) filings">H-1B&nbsp;LCA<span class="lb-sort-ind" data-ind="lca"></span></th>
+          <th class="num sortable lb-col-total" data-sort="total" title="Sort by total (PERM + H-1B LCA) filings">Total<span class="lb-sort-ind" data-ind="total"></span></th>
           <th class="lb-barcell">Share</th>
         </tr>
       </thead>
@@ -225,11 +251,11 @@
     <div class="lb-more" id="lb-more" style="display:none"><button id="lb-more-btn" type="button">Load more</button></div>
   </div>
 
-  <p class="lb-note"><b>PERM</b> = green-card labor certification filings (all statuses) from the ImmiLane PERM tracker. <b>H-1B&nbsp;LCA</b> = certified/total ETA-9035 Labor Condition Application filings on record (FY2008–FY2026, FLAG.DOL.GOV). <b>Total</b> = PERM + H-1B&nbsp;LCA. Default sort is Total (descending); click any column header to re-sort. An employer's profile page shows an "approximate" rank that may differ by a position or two from this snapshot.</p>
+  <p class="lb-note"><b>PERM</b> = green-card labor certifications filed FY2008–FY2026 (FY2026 year-to-date), all dispositions — certified, denied &amp; withdrawn — as published in U.S. DOL OFLC disclosure data. <b>H-1B&nbsp;LCA</b> = ETA-9035 Labor Condition Application filings on record, FY2008–FY2026 (FLAG.DOL.GOV / OFLC disclosure). <b>Total</b> = PERM + H-1B&nbsp;LCA. Default sort is <b>PERM</b> (descending); click any column header to re-sort. These are historical disclosure totals, not the live case-status scanner — the green "Live tracker" bar above shows recent real-time activity. An employer's profile page shows an "approximate" rank that may differ by a position or two from this snapshot.</p>
 </main>
 
 <footer>
-  Data sourced from <a href="https://flag.dol.gov/programs/lca" target="_blank" rel="noopener">FLAG.DOL.GOV</a> &middot; Updated daily &middot; <a href="guides.html">Guides</a> &middot; <a href="about-us.html">About</a> &middot; <a href="support.html">Contact</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="disclaimer.html">Disclaimer</a> &middot; &copy; 2026 ImmiLane
+  Data sourced from <a href="https://flag.dol.gov/programs/lca" target="_blank" rel="noopener">FLAG.DOL.GOV</a> (OFLC disclosure) &middot; <a href="guides.html">Guides</a> &middot; <a href="about-us.html">About</a> &middot; <a href="support.html">Contact</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="disclaimer.html">Disclaimer</a> &middot; &copy; 2026 ImmiLane
 </footer>
 
 <script>
@@ -250,8 +276,11 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 //   perm  = PERM (green-card labor cert) filings
 //   lca   = H-1B LCA (ETA-9035) filings
 //   total = perm + lca
-// (`t` mirrors total for backward-compat.) The table renders all three and
-// lets the user sort by any of them; default sort = Total desc.
+// (`t` mirrors total for backward-compat.) Universe = the full DOL OFLC
+// disclosure store (FY2008–FY2026, ~97K employers), the SAME source the profile
+// /h1b endpoint reads, so leaderboard row = profile headline = rank. The table
+// renders all three numbers and lets the user sort by any of them;
+// default sort = PERM desc.
 // ═══════════════════════════════════════════════════════
 (function () {
   var PAGE = 100;            // rows per "page" / load-more chunk
@@ -259,7 +288,7 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
   var view = [];             // current filtered view (rank already assigned on rows)
   var shown = 0;             // how many of `view` are rendered
   var deepTarget = -1;       // row idx to scroll/highlight to
-  var sortKey = 'total';     // active sort column: perm | lca | total
+  var sortKey = 'perm';      // active sort column: perm | lca | total (default PERM)
   var sortDir = 'desc';      // asc | desc
   var maxBar = 1;            // max of active column, for the share bar
 
@@ -411,7 +440,7 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 
     elLoading.style.display = 'none';
     elTable.style.display = '';
-    sortAndRender();   // default: total desc
+    sortAndRender();   // default: PERM desc
 
     // Deep link: ?e=<name> → scroll to that employer's row & highlight.
     var target = getParam('e') || getParam('employer') || getParam('slug');
@@ -456,6 +485,32 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
     .catch(function(){
       elLoading.innerHTML = '<div class="lb-empty">Couldn’t load the leaderboard data. Please try again later.</div>';
     });
+
+  // ── Live tracker (separate from the historical columns) ──────────────────
+  // Fed by the 3h realtime PERM case-status scanner (data/dashboard_data.json,
+  // refreshed every few hours). Summed over the last 30 calendar days from
+  // rateDays[]. This is recent ACTIVITY, NOT the historical disclosure totals
+  // in the table — kept in its own green bar to preserve the real-time promise.
+  (function loadLiveTracker(){
+    fetch('data/dashboard_data.json')
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){
+        var days = Array.isArray(d.rateDays) ? d.rateDays : [];
+        if (!days.length) return;
+        var window = days.slice(-30);
+        var sum = 0; for (var i=0;i<window.length;i++){ sum += (window[i].total||0); }
+        if (sum <= 0) return;
+        var first = window[0].date, last = window[window.length-1].date;
+        var spanDays = window.length;
+        var txt = document.getElementById('lb-live-txt');
+        var sub = document.getElementById('lb-live-sub');
+        txt.innerHTML = '<b>'+n(sum)+'</b> PERM case-status updates in the last '+spanDays+' days';
+        var upd = (d.updatedAt||'').slice(0,10);
+        sub.textContent = 'Real-time scanner · '+ (first||'') +' → '+ (last||'') + (upd ? ' · updated '+upd : '');
+        document.getElementById('lb-livebar').classList.add('show');
+      })
+      .catch(function(){ /* live bar stays hidden on failure — historical table is unaffected */ });
+  })();
 })();
 </script>
 
