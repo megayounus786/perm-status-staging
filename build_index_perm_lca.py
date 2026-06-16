@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """
 Rebuild data/employer_index.json so every employer row carries THREE numbers:
-  perm  -- PERM (green-card labor cert) filings, from the PERM store
-           (data/employer_data.json), merged by canonical slug EXACTLY the way
-           immilane-api/scripts/seed-kv.js merges them (so the index canonical
-           names/slugs line up 1:1 with the already-seeded emp:<slug> detail KV
-           -- this is what fixes the click-through 404).
-  lca   -- H-1B LCA (ETA-9035) filings, from the H-1B store
-           (h1b-build/multi/out/store_multi.json, sum of lcaByYear[].total),
-           joined onto the PERM employer via the H-1B canonical/member slugs
-           (same reunify keying the live /h1b endpoint uses).
+  perm  -- PERM (green-card labor cert) filings. Primary source is the H-1B
+           store's DOL-disclosure PERM series (store_multi.json permByYear, sum
+           of cert+denied+withdrawn) -- the SAME number the profile page's PERM
+           section and the live /h1b endpoint show (e.g. Cognizant 27,788). When
+           an employer has no disclosure PERM, fall back to the live PERM-tracker
+           total (data/employer_data.json) so it still has a number.
+  lca   -- H-1B LCA (ETA-9035) filings, from the same H-1B store
+           (sum of lcaByYear[].total).
   total -- perm + lca.
+
+Universe + canonical names come from data/employer_data.json, merged by slug
+EXACTLY the way immilane-api/scripts/seed-kv.js merges them, so the index
+canonical names/slugs line up 1:1 with the already-seeded emp:<slug> detail KV
+-- this is what fixes the click-through 404. perm/lca are joined on from the
+H-1B store via its canonical + member slugs (same reunify keying /h1b uses).
 
 Output keeps backward-compat: `t` is set to `total` so any reader still keying
 off `t` keeps working; `perm`, `lca`, `total` and `a` (search alias) are added.
@@ -69,21 +74,25 @@ def merge_employers(employers_full):
         merged.append({'slug': slug, 'name': g['name'], 'perm': g['perm']})
     return merged
 
-# ---- LCA lookup from the H-1B store --------------------------------------
-def build_lca_lookup(store_path):
+# ---- PERM+LCA lookup from the H-1B store ---------------------------------
+def build_h1b_lookup(store_path):
+    """slug -> {'perm': <cert+denied+withdrawn over permByYear>,
+               'lca':  <sum lcaByYear.total>}, keyed by canonical AND member
+    slugs so a PERM employer's slug resolves the way the live /h1b endpoint
+    does (which folds member/alias slugs onto the canonical record)."""
     d = json.load(open(store_path))
     emps = d['employers']
     lookup = {}
     for canon_slug, rec in emps.items():
         lca = sum((y.get('total') or 0) for y in (rec.get('lcaByYear') or []))
-        if lca <= 0:
+        perm = sum(((y.get('cert') or 0) + (y.get('denied') or 0) + (y.get('withdrawn') or 0))
+                   for y in (rec.get('permByYear') or []))
+        if lca <= 0 and perm <= 0:
             continue
-        # key on the canonical slug AND every member slug variant, so a PERM
-        # employer's slug resolves the same way the live /h1b endpoint does.
-        lookup[canon_slug] = lca
+        entry = {'perm': perm, 'lca': lca}
+        lookup[canon_slug] = entry
         for ms in (rec.get('memberSlugs') or []):
-            # canonical wins on collision (its lca already covers the members)
-            lookup.setdefault(ms, lca)
+            lookup.setdefault(ms, entry)  # canonical wins on collision
     return lookup
 
 def main():
@@ -91,21 +100,31 @@ def main():
     perm_json = json.load(open(PERM_DATA))
     full = perm_json.get('employers') or []
     print(f'[build] H-1B   <- {H1B_STORE}')
-    lca_lookup = build_lca_lookup(H1B_STORE)
-    print(f'[build] LCA slugs indexed: {len(lca_lookup)}')
+    h1b_lookup = build_h1b_lookup(H1B_STORE)
+    print(f'[build] H-1B slugs indexed: {len(h1b_lookup)}')
 
     merged = merge_employers(full)
     print(f'[build] PERM employers: {len(full)} raw -> {len(merged)} merged')
 
-    matched = 0
+    matched = 0          # rows that joined to an H-1B record (perm or lca)
+    perm_from_dol = 0     # rows whose PERM came from DOL disclosure
     total_perm = 0
     total_lca = 0
     rows = []
     for m in merged:
-        perm = m['perm']
-        lca = lca_lookup.get(m['slug'], 0)
-        if lca:
+        h = h1b_lookup.get(m['slug'])
+        if h:
             matched += 1
+        # PERM: prefer DOL disclosure (cert+denied+withdrawn) when present,
+        # else fall back to the live PERM-tracker total. This mirrors
+        # employer.html's permStatsFromDisclosure() || permStats() so the
+        # leaderboard `perm` always equals the profile's Green Card (PERM) figure.
+        if h and h['perm'] > 0:
+            perm = h['perm']
+            perm_from_dol += 1
+        else:
+            perm = m['perm']
+        lca = h['lca'] if h else 0
         total = perm + lca
         total_perm += perm
         total_lca += lca
@@ -132,7 +151,7 @@ def main():
     }
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
     print(f'[build] wrote {OUT}')
-    print(f'[build] employers={len(rows)} matched_lca={matched} '
+    print(f'[build] employers={len(rows)} joined_h1b={matched} perm_from_dol_disclosure={perm_from_dol} '
           f'totalPerm={total_perm} totalLca={total_lca} totalCases={total_perm+total_lca}')
     # spot checks
     byslug = {normalize_slug(r['n']): r for r in rows}

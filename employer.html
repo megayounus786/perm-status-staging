@@ -741,9 +741,10 @@ function renderHero(emp, ps, h1b, rankInfo) {
   const abovePct = h1bAbovePct(h1b);
 
   // The three headline figures, kept consistent with the leaderboard row:
-  //   permVal  = PERM (green-card) filings  -- the live PERM-tracker total
-  //              (emp.total), the SAME number data/employer_index.json stores
-  //              as `perm` for this employer.
+  //   permVal  = PERM (green-card) filings  -- the chosen PERM stat (ps.total):
+  //              DOL disclosure cert+denied+withdrawn when present (e.g.
+  //              Cognizant 27,788), else the live-tracker total. This is the
+  //              SAME number data/employer_index.json stores as `perm`.
   //   lcaVal   = H-1B LCA filings on record -- cumulative sum of lcaByYear[].total
   //              across all disclosed FYs (FY2008–FY2026), the SAME number the
   //              index stores as `lca`.
@@ -752,7 +753,7 @@ function renderHero(emp, ps, h1b, rankInfo) {
   const lcaVal = lcaYears.length ? lcaYears.reduce((s, y) => s + (y.total || 0), 0) : 0;
   const lcaFys = lcaYears.map(y => y && y.fy).filter(Boolean).sort();
   const lcaPeriodLabel = lcaFys.length ? (lcaFys[0] + ' – ' + lcaFys[lcaFys.length - 1]) : null;
-  const permVal = (emp && emp.total != null) ? emp.total : (ps.total || 0);
+  const permVal = (ps && ps.total != null) ? ps.total : ((emp && emp.total) || 0);
   const totalVal = (permVal || 0) + (lcaVal || 0);
   const h1bMedianFy = (h1b && h1b.fy) || 'FY2025';
 
@@ -1611,7 +1612,9 @@ function scrollChartsToLatest() {
       // column. null (no badge) only when the employer has no filings at all.
       const lcaTot = (h1b && Array.isArray(h1b.lcaByYear))
         ? h1b.lcaByYear.reduce((s, y) => s + (y.total || 0), 0) : 0;
-      const rankTotal = (emp.total || 0) + lcaTot;
+      const _dRank = permStatsFromDisclosure(h1b);
+      const permForRank = (_dRank && _dRank.total > 0) ? _dRank.total : (emp.total || 0);
+      const rankTotal = permForRank + lcaTot;
       return loadRank(rankTotal > 0 ? rankTotal : null).then(rankInfo => {
         renderAll(emp, h1b, rankInfo);
         if (typeof gtag === 'function') {
