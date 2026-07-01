@@ -234,6 +234,18 @@
 
   /* ── EMPLOYERS ── */
   .employer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+  /* Most Searched Employers rail (navigation / content-discovery widget) */
+  .dashboard-with-rail { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
+  .employer-rail { padding: 20px; }
+  .employer-rail .rail-list { list-style: none; margin: 14px 0 0; padding: 0; counter-reset: rail; }
+  .employer-rail .rail-list li { counter-increment: rail; display: flex; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--sep); }
+  .employer-rail .rail-list li:last-child { border-bottom: none; }
+  .employer-rail .rail-list li::before { content: counter(rail); flex: 0 0 20px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-dim); text-align: right; }
+  .employer-rail .rail-list a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; line-height: 1.35; transition: color 0.15s; overflow: hidden; text-overflow: ellipsis; }
+  .employer-rail .rail-list a:hover { color: var(--text-primary); }
+  .employer-rail .rail-note { margin: 14px 0 0; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+  .employer-rail .rail-note a { color: var(--text-muted); }
+  @media (max-width: 900px) { .dashboard-with-rail { grid-template-columns: 1fr; } }
   .employer-row { display: grid; grid-template-columns: 24px 1fr 60px 80px; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--sep); }
   .employer-rank  { font-size: 12px; font-weight: 700; color: var(--text-dim); text-align: center; }
   .employer-name  { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -864,12 +876,34 @@
   </div>
 
   <div style="margin: 16px 0 40px;">
-    <div class="card">
-      <div class="card-header">
-        <div><span class="card-title">Top Employers by PERM Filings</span><div class="card-subtitle" id="employer-subtitle"></div></div>
-        <div class="card-tabs" id="employer-tabs"></div>
+    <div class="dashboard-with-rail">
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-title">Top Employers by PERM Filings</span><div class="card-subtitle" id="employer-subtitle"></div></div>
+          <div class="card-tabs" id="employer-tabs"></div>
+        </div>
+        <div class="employer-grid" id="employer-list"></div>
       </div>
-      <div class="employer-grid" id="employer-list"></div>
+      <aside class="card employer-rail" aria-label="Most searched employers">
+        <div class="card-header">
+          <div><span class="card-title">Most Searched Employers</span><div class="card-subtitle">Explore the most-viewed PERM sponsors</div></div>
+        </div>
+        <ol class="rail-list">
+          <li><a href="employer.html?e=Microsoft%20Corporation">Microsoft Corporation</a></li>
+          <li><a href="employer.html?e=Amazon.com%20Services%20LLC">Amazon.com Services LLC</a></li>
+          <li><a href="employer.html?e=GOOGLE%20INC.">Google Inc.</a></li>
+          <li><a href="employer.html?e=Cognizant%20Technology%20Solutions%20US%20Corporation">Cognizant Technology Solutions</a></li>
+          <li><a href="employer.html?e=Intel%20Corporation">Intel Corporation</a></li>
+          <li><a href="employer.html?e=APPLE%20INC.">Apple Inc.</a></li>
+          <li><a href="employer.html?e=FACEBOOK%2C%20INC.">Meta Platforms (Facebook, Inc.)</a></li>
+          <li><a href="employer.html?e=TATA%20CONSULTANCY%20SERVICES%20LIMITED">Tata Consultancy Services</a></li>
+          <li><a href="employer.html?e=INFOSYS%20LIMITED">Infosys Limited</a></li>
+          <li><a href="employer.html?e=Oracle%20America%2C%20Inc.">Oracle America, Inc.</a></li>
+          <li><a href="employer.html?e=Deloitte%20Consulting%20LLP">Deloitte Consulting LLP</a></li>
+          <li><a href="employer.html?e=Cisco%20Systems%2C%20Inc.%20(acquired%20Splunk%20Inc.)">Cisco Systems, Inc.</a></li>
+        </ol>
+        <p class="rail-note">Ranked by all-time PERM filing volume. <a href="leaderboard.html">View full leaderboard &rarr;</a></p>
+      </aside>
     </div>
   </div>
 </div>
