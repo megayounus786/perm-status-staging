@@ -1,0 +1,41 @@
+name: pages-deploy-watchdog
+
+# GitHub Pages deploys intermittently fail with "Deployment failed, try again
+# later" (backend flakiness; began around the 2026-07-02 Pages incident) and can
+# leave the site stale. This hourly check re-requests the build when the last
+# Pages build errored or is stuck, without touching site content.
+on:
+  schedule:
+    - cron: "25 * * * *"
+  workflow_dispatch:
+
+permissions:
+  pages: write
+
+jobs:
+  heal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rebuild Pages if last build errored or is stuck
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          b=$(gh api "repos/${{ github.repository }}/pages/builds/latest")
+          status=$(jq -r .status <<<"$b")
+          updated=$(jq -r .updated_at <<<"$b")
+          echo "latest Pages build: $status (updated $updated)"
+          if [ "$status" = "built" ]; then
+            echo "healthy - nothing to do"
+            exit 0
+          fi
+          if [ "$status" = "building" ] || [ "$status" = "queued" ]; then
+            age=$(( $(date +%s) - $(date -u -d "$updated" +%s) ))
+            echo "in progress for ${age}s"
+            if [ "$age" -lt 900 ]; then
+              exit 0
+            fi
+            echo "stuck for over 15 min - requesting rebuild"
+          else
+            echo "status=$status - requesting rebuild"
+          fi
+          gh api -X POST "repos/${{ github.repository }}/pages/builds"
