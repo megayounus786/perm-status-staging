@@ -110,6 +110,8 @@
   .hero h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .update-time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
   .update-time .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-right: 6px; animation: pulse 2s infinite; }
+  @keyframes updated-flash { 0% { color: #22c55e; } 100% { color: inherit; } }
+  .update-time .updated-flash { animation: updated-flash 2s ease-out; }
   @keyframes pulse    { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
   @keyframes dotpulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.6),0 0 12px rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0),0 0 20px rgba(245,158,11,0.6)} }
   @keyframes spin     { to { transform: rotate(360deg); } }
@@ -1731,7 +1733,12 @@ window.DASHBOARD_DATA = {
 // ═══════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════
-const D = window.DASHBOARD_DATA;
+let D = window.DASHBOARD_DATA;
+
+// Render state preserved across in-place refreshes (see renderDashboard below)
+let rateRange = 'day';        // active tab on the Processing Rate card
+let statusTabKey = null;      // active tab on the Status Distribution card
+let employerTabKey = null;    // active tab on the Top Employers card
 
 function esc(s) { var d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
 function n(v)  { return v.toLocaleString(); }
@@ -1821,12 +1828,14 @@ function setupTabs(id, cb) {
 // ═══════════════════════════════════════════════════════
 // UPDATED-AT
 // ═══════════════════════════════════════════════════════
-document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdatedAt(D.updatedAt);
+function renderUpdatedAt() {
+  document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdatedAt(D.updatedAt);
+}
 
 // ═══════════════════════════════════════════════════════
 // STAT CARDS
 // ═══════════════════════════════════════════════════════
-(function renderStatCards() {
+function renderStatCards() {
   const { backlog, avgDays, today, dol } = D;
   const dolMonth = D.timeline.find(m => m.status === 'active');
   const netThis = backlog.thisMonth.processed - backlog.thisMonth.intake; // positive = backlog reduced
@@ -1910,12 +1919,12 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
         <div class="stat-detail-row"><span class="stat-detail-label">Cases remaining</span><span class="stat-detail-value" style="color:#f59e0b;">~${n(dol.casesRemaining)}</span></div>
       </div>
     </div>`;
-})();
+}
 
 // ═══════════════════════════════════════════════════════
 // TIMELINE + BACKLOG
 // ═══════════════════════════════════════════════════════
-(function renderCombo() {
+function renderCombo() {
   const el = document.getElementById('combo-chart');
   // Show only 2 most recent completed months + active + pending
   const allMonths = D.timeline;
@@ -2080,12 +2089,13 @@ document.getElementById('updated-text').textContent = 'Last updated ' + fmtUpdat
       mk.style.transform = 'translateX(-50%)';
     });
   });
-})();
+}
 
 // ═══════════════════════════════════════════════════════
 // PROCESSING RATE
 // ═══════════════════════════════════════════════════════
 function renderRate(range) {
+  rateRange = range;
   const wrap = document.getElementById('rate-chart');
   const bars  = range === 'day' ? D.rateDays  : D.rateWeeks;
   const isTodayUpdating = range === 'day' && D.today.stillUpdating;
@@ -2156,7 +2166,6 @@ function renderRate(range) {
     });
   });
 }
-renderRate('day');
 setupTabs('rate-tabs', t => renderRate(t.dataset.range));
 
 // ═══════════════════════════════════════════════════════
@@ -2164,16 +2173,17 @@ setupTabs('rate-tabs', t => renderRate(t.dataset.range));
 // ═══════════════════════════════════════════════════════
 // Build tabs dynamically from D.statusDistribution
 // Default to the currently-processing month (tabKey "next") instead of first tab
-const statusDefaultIdx = Math.max(0, D.statusDistribution.findIndex(s => s.tabKey === 'next'));
-(function() {
+function renderStatusTabs(activeIdx) {
   const tabsEl = document.getElementById('status-tabs');
   tabsEl.innerHTML = D.statusDistribution.map((s,i) =>
-    '<button class="card-tab'+(i===statusDefaultIdx?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
+    '<button class="card-tab'+(i===activeIdx?' active':'')+'" data-si="'+i+'">'+s.tabLabel+'</button>'
   ).join('');
-})();
+  setupTabs('status-tabs', t => renderDonut(parseInt(t.dataset.si)));
+}
 
 function renderDonut(idx) {
   const s = D.statusDistribution[idx]; if (!s) return;
+  statusTabKey = s.tabKey;
   const items = [
     { color:'#22c55e', label:'Certified',      value: s.certified },
     { color:'#f59e0b', label:'Analyst Review',  value: s.review    },
@@ -2222,22 +2232,20 @@ function renderDonut(idx) {
     });
   });
 }
-renderDonut(statusDefaultIdx);
-setupTabs('status-tabs', t => renderDonut(parseInt(t.dataset.si)));
-
 // ═══════════════════════════════════════════════════════
 // TOP EMPLOYERS
 // ═══════════════════════════════════════════════════════
-const employerDefaultIdx = Math.max(0, D.employers.findIndex(e => e.tabKey === 'next'));
-(function() {
+function renderEmployerTabs(activeIdx) {
   const tabsEl = document.getElementById('employer-tabs');
   tabsEl.innerHTML = D.employers.map((e,i) =>
-    '<button class="card-tab'+(i===employerDefaultIdx?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
+    '<button class="card-tab'+(i===activeIdx?' active':'')+'" data-ei="'+i+'">'+e.tabLabel+'</button>'
   ).join('');
-})();
+  setupTabs('employer-tabs', t => renderEmployers(parseInt(t.dataset.ei)));
+}
 
 function renderEmployers(idx) {
   const emp = D.employers[idx]; if (!emp) return;
+  employerTabKey = emp.tabKey;
   if (!emp.list.length) return;
   const max = emp.list[0].count;
   const empSubtitle = emp.tabKey === '1y' ? 'Last 12 months: '+last12MonthsRange(D.updatedAt) : emp.subtitle;
@@ -2251,8 +2259,115 @@ function renderEmployers(idx) {
     '</div>'
   ).join('');
 }
-renderEmployers(employerDefaultIdx);
-setupTabs('employer-tabs', t => renderEmployers(parseInt(t.dataset.ei)));
+
+// ═══════════════════════════════════════════════════════
+// RENDER DASHBOARD (initial paint + in-place refresh)
+// ═══════════════════════════════════════════════════════
+// Re-renders every data-driven section from `data` without a page reload.
+// Preserves the active tab on each card (matched by tabKey), the rate
+// range, theme, and scroll position.
+function tabIdxByKey(arr, key) {
+  let i = key ? arr.findIndex(x => x.tabKey === key) : -1;
+  if (i === -1) i = arr.findIndex(x => x.tabKey === 'next');
+  return Math.max(0, i);
+}
+
+function renderDashboard(data) {
+  D = data;
+  window.DASHBOARD_DATA = data;
+  renderUpdatedAt();
+  renderStatCards();
+  renderCombo();
+  renderRate(rateRange);
+  const si = tabIdxByKey(D.statusDistribution, statusTabKey);
+  renderStatusTabs(si);
+  renderDonut(si);
+  const ei = tabIdxByKey(D.employers, employerTabKey);
+  renderEmployerTabs(ei);
+  renderEmployers(ei);
+}
+
+renderDashboard(window.DASHBOARD_DATA);
+
+// ═══════════════════════════════════════════════════════
+// AUTO-REFRESH ON TAB RETURN (Page Visibility API)
+// ═══════════════════════════════════════════════════════
+// GA-style: if the tab was hidden for >= REFRESH_HIDDEN_THRESHOLD_MS,
+// fetch data/dashboard_data.json (published alongside index.html on every
+// scanner deploy, same content as the baked DASHBOARD_DATA) and re-render
+// in place — but only when its updatedAt is newer than what's on screen.
+(function initAutoRefresh() {
+  const REFRESH_HIDDEN_THRESHOLD_MS = 120 * 1000;
+  const REFRESH_FETCH_TIMEOUT_MS = 10 * 1000;
+  const DEFERRED_RETRY_MS = 3 * 1000;
+  const DATA_URL = 'data/dashboard_data.json';
+
+  let hiddenAt = null;
+  let inFlight = false;
+  let deferredTimer = null;
+
+  // Don't yank the UI out from under the user mid-interaction.
+  function uiBusy() {
+    const empModal = document.getElementById('emp-modal');
+    const fbModal  = document.getElementById('fb-modal');
+    const searchDd = document.getElementById('nav-search-dropdown');
+    return (empModal && empModal.classList.contains('open'))
+        || (fbModal  && fbModal.classList.contains('open'))
+        || (searchDd && searchDd.classList.contains('open'));
+  }
+
+  function flashUpdatedText() {
+    const el = document.getElementById('updated-text');
+    if (!el) return;
+    el.classList.remove('updated-flash');
+    void el.offsetWidth; // restart animation
+    el.classList.add('updated-flash');
+  }
+
+  // If a refresh was skipped because a modal/dropdown was open, retry
+  // quietly until the UI is free (or the tab is hidden again).
+  function deferRefresh() {
+    if (deferredTimer) return;
+    deferredTimer = setInterval(() => {
+      if (document.hidden) { clearInterval(deferredTimer); deferredTimer = null; return; }
+      if (!uiBusy()) {
+        clearInterval(deferredTimer); deferredTimer = null;
+        refreshDashboardData();
+      }
+    }, DEFERRED_RETRY_MS);
+  }
+
+  function refreshDashboardData() {
+    if (inFlight) return;
+    if (uiBusy()) { deferRefresh(); return; }
+    inFlight = true;
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), REFRESH_FETCH_TIMEOUT_MS);
+    fetch(DATA_URL + '?ts=' + Date.now(), { cache: 'no-store', signal: ctrl.signal })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(fresh => {
+        if (!fresh || !fresh.updatedAt) return;
+        if (new Date(fresh.updatedAt) <= new Date(D.updatedAt)) return; // already current
+        if (uiBusy()) { deferRefresh(); return; } // UI opened while fetching
+        renderDashboard(fresh);
+        flashUpdatedText();
+      })
+      .catch(() => {}) // fail silently; keep showing existing data
+      .finally(() => { clearTimeout(timeout); inFlight = false; });
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hiddenAt = Date.now(); return; }
+    const awayMs = hiddenAt ? Date.now() - hiddenAt : 0;
+    hiddenAt = null;
+    // Keep the relative "Last updated X ago" label honest on every return.
+    renderUpdatedAt();
+    if (awayMs >= REFRESH_HIDDEN_THRESHOLD_MS) refreshDashboardData();
+  });
+
+  // Test hook (staging): allows manual refresh from the console.
+  window.__immilaneRefresh = refreshDashboardData;
+})();
 
 </script>
 
