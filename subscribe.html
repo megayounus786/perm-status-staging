@@ -129,22 +129,11 @@
   .pricing-fineprint { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 22px; }
 
   /* ── Sections / forms ────────────────────────────────────────────────── */
-  .section-title { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; margin: 44px 0 6px; }
-  .section-sub { color: var(--text-secondary); font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; max-width: 640px; }
-  .form-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; }
-  .form-card label { display: block; font-size: 13px; font-weight: 600; margin: 18px 0 6px; }
-  .form-card label:first-child { margin-top: 0; }
-  .form-card input[type=email], .form-card input[type=text],
+  .register-card input[type=email], .register-card input[type=text],
   .trial-card input[type=email], .trial-card input[type=text],
   .manage-card input[type=email] { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: var(--text-primary); font-family: inherit; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-  .form-card input:focus, .trial-card input:focus, .manage-card input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
+  .register-card input:focus, .trial-card input:focus, .manage-card input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
   .hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.6; }
-  .selected-plan-pill { display: inline-flex; align-items: center; gap: 8px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 999px; padding: 6px 14px; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 18px; }
-  .selected-plan-pill strong { color: var(--text-primary); }
-  .selected-plan-pill a { color: #60a5fa; font-size: 12px; text-decoration: none; }
-  .submit-btn { display: block; width: 100%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 700; padding: 14px; margin-top: 24px; transition: transform 0.2s, box-shadow 0.2s; }
-  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(59,130,246,0.4); }
-  .submit-btn:disabled { opacity: 0.6; cursor: wait; transform: none; box-shadow: none; }
   /* ── Button system (primary = gradient, secondary = accent outline) ──── */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 11px; font-family: inherit; font-size: 14px; font-weight: 600; padding: 12px 24px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s, background 0.2s; }
   .btn:disabled { opacity: 0.6; cursor: wait; transform: none !important; box-shadow: none !important; }
@@ -157,6 +146,25 @@
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Registration feature card ───────────────────────────────────────── */
+  .register-card { position: relative; overflow: hidden; background: var(--plan-featured-bg), var(--plan-bg); border: 1px solid rgba(59,130,246,0.4); border-radius: 18px; padding: 32px 30px 28px; margin-top: 44px; box-shadow: var(--plan-shadow); scroll-margin-top: 84px; }
+  .register-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+  .selected-plan-pill { display: flex; align-items: center; gap: 10px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.28); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: var(--text-secondary); margin-bottom: 22px; }
+  html.light .selected-plan-pill { background: rgba(37,99,235,0.05); }
+  .selected-plan-pill .pill-check { flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%; background: rgba(59,130,246,0.15); color: var(--check); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .selected-plan-pill strong { color: var(--text-primary); font-weight: 600; }
+  .selected-plan-pill .pill-change { margin-left: auto; flex-shrink: 0; font-size: 12px; font-weight: 600; color: #60a5fa; text-decoration: none; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.35); border-radius: 999px; padding: 4px 12px; transition: background 0.2s, border-color 0.2s; }
+  .selected-plan-pill .pill-change:hover { background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.6); }
+  html.light .selected-plan-pill .pill-change { color: #2563eb; background: rgba(37,99,235,0.05); }
+  .register-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .register-form .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .register-card .hint { margin-top: 12px; line-height: 1.65; max-width: 640px; }
+  .register-cta { width: 100%; font-size: 15px; font-weight: 700; padding: 14px; border-radius: 12px; margin-top: 22px; }
+  @media (max-width: 640px) {
+    .register-card { padding: 26px 20px 24px; }
+    .register-form { grid-template-columns: 1fr; }
+  }
 
   /* ── Free-sample (trial) feature card ────────────────────────────────── */
   .trial-card { position: relative; overflow: hidden; background: var(--plan-featured-bg), var(--plan-bg); border: 1px solid rgba(59,130,246,0.4); border-radius: 18px; padding: 32px 30px 28px; margin-top: 48px; box-shadow: var(--plan-shadow); }
@@ -171,9 +179,10 @@
   .trial-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .trial-form .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
   .trial-actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 20px; }
-  .trial-points { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--text-muted); }
-  .trial-points li { position: relative; padding-left: 22px; line-height: 1.6; }
-  .trial-points li::before { content: '✓'; position: absolute; left: 0; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: rgba(59,130,246,0.12); color: var(--check); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .trial-points, .register-points { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--text-muted); }
+  .trial-points li, .register-points li { position: relative; padding-left: 22px; line-height: 1.6; }
+  .trial-points li::before, .register-points li::before { content: '✓'; position: absolute; left: 0; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: rgba(59,130,246,0.12); color: var(--check); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .register-points { margin-top: 16px; justify-content: center; }
   @media (max-width: 640px) {
     .trial-card { padding: 26px 20px 24px; }
     .trial-form { grid-template-columns: 1fr; }
@@ -295,24 +304,47 @@
   </section>
 
   <!-- ── Registration ─────────────────────────────────────────────────── -->
-  <h3 class="section-title" id="register">Start watching your case</h3>
-  <p class="section-sub">One subscription covers one PERM case. Watching more than one case?
-  Register each one separately — same email is fine.</p>
-  <div class="form-card">
-    <div class="selected-plan-pill">Selected plan:&nbsp;<strong id="selected-plan-label">Daily Digest — $4.95/mo</strong>&nbsp;<a href="#pricing">change</a></div>
+  <section class="register-card" id="register">
+    <div class="feature-head">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div>
+        <span class="feature-eyebrow">Get started</span>
+        <h3 class="feature-title">Start watching your case</h3>
+        <p class="feature-sub">One subscription covers one PERM case. Watching more than one case?
+        Register each one separately — same email is fine.</p>
+      </div>
+    </div>
 
-    <label for="email">Email address</label>
-    <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+    <div class="selected-plan-pill">
+      <span class="pill-check" aria-hidden="true">✓</span>
+      <span>Selected plan:&nbsp;<strong id="selected-plan-label">Daily Digest — $4.95/mo</strong></span>
+      <a href="#pricing" class="pill-change">Change</a>
+    </div>
 
-    <label for="case-number">PERM case number</label>
-    <input type="text" id="case-number" class="case-input" placeholder="G-100-24123-456789" autocomplete="off">
+    <div class="register-form">
+      <div class="field">
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="case-number">PERM case number</label>
+        <input type="text" id="case-number" class="case-input" placeholder="G-100-24123-456789" autocomplete="off">
+      </div>
+    </div>
     <p class="hint">Your case number is on your PERM filing receipt (format
     <strong>G-100/G-200/G-300-XXXXX-XXXXXX</strong>). If we can't find the case in DOL's public data
     yet, we'll say so and keep checking automatically — we never guess a status.</p>
 
-    <button type="button" class="submit-btn" id="submit">Start my email updates</button>
+    <button type="button" class="btn btn-primary register-cta" id="submit">Start my email updates</button>
+    <ul class="register-points">
+      <li>Instant status-change alerts included</li>
+      <li>Cancel anytime</li>
+      <li>Verification email before anything sends</li>
+    </ul>
     <div class="result" id="result"></div>
-  </div>
+  </section>
 
   <!-- ── Free sample ──────────────────────────────────────────────────── -->
   <section class="trial-card" id="trial">
