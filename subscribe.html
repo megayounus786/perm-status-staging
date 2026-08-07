@@ -134,8 +134,10 @@
   .form-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; }
   .form-card label { display: block; font-size: 13px; font-weight: 600; margin: 18px 0 6px; }
   .form-card label:first-child { margin-top: 0; }
-  .form-card input[type=email], .form-card input[type=text] { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: var(--text-primary); font-family: inherit; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s; }
-  .form-card input:focus { border-color: rgba(59,130,246,0.5); }
+  .form-card input[type=email], .form-card input[type=text],
+  .trial-card input[type=email], .trial-card input[type=text],
+  .manage-card input[type=email] { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; color: var(--text-primary); font-family: inherit; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .form-card input:focus, .trial-card input:focus, .manage-card input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
   .hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.6; }
   .selected-plan-pill { display: inline-flex; align-items: center; gap: 8px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 999px; padding: 6px 14px; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 18px; }
   .selected-plan-pill strong { color: var(--text-primary); }
@@ -143,12 +145,57 @@
   .submit-btn { display: block; width: 100%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: #fff; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 700; padding: 14px; margin-top: 24px; transition: transform 0.2s, box-shadow 0.2s; }
   .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(59,130,246,0.4); }
   .submit-btn:disabled { opacity: 0.6; cursor: wait; transform: none; box-shadow: none; }
-  .ghost-btn { display: inline-block; background: none; border: 1px solid var(--input-border); border-radius: 10px; color: var(--text-primary); cursor: pointer; font-family: inherit; font-size: 13.5px; font-weight: 600; padding: 11px 18px; margin-top: 16px; transition: border-color 0.2s, color 0.2s; }
-  .ghost-btn:hover { border-color: #3b82f6; color: #60a5fa; }
-  .ghost-btn:disabled { opacity: 0.6; cursor: wait; }
+  /* ── Button system (primary = gradient, secondary = accent outline) ──── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 11px; font-family: inherit; font-size: 14px; font-weight: 600; padding: 12px 24px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s, background 0.2s; }
+  .btn:disabled { opacity: 0.6; cursor: wait; transform: none !important; box-shadow: none !important; }
+  .btn-primary { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; color: #fff; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(59,130,246,0.4); }
+  .btn-secondary { background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.35); color: #60a5fa; }
+  .btn-secondary:hover { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.6); }
+  html.light .btn-secondary { color: #2563eb; background: rgba(37,99,235,0.05); }
+  html.light .btn-secondary:hover { background: rgba(37,99,235,0.1); }
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Free-sample (trial) feature card ────────────────────────────────── */
+  .trial-card { position: relative; overflow: hidden; background: var(--plan-featured-bg), var(--plan-bg); border: 1px solid rgba(59,130,246,0.4); border-radius: 18px; padding: 32px 30px 28px; margin-top: 48px; box-shadow: var(--plan-shadow); }
+  .trial-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+  .feature-head { display: flex; gap: 18px; align-items: flex-start; margin-bottom: 24px; }
+  .feature-icon { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 13px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(59,130,246,0.35); }
+  .feature-icon svg { width: 24px; height: 24px; }
+  .feature-eyebrow { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #60a5fa; margin-bottom: 6px; }
+  html.light .feature-eyebrow { color: #2563eb; }
+  .feature-title { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.35; }
+  .feature-sub { color: var(--text-secondary); font-size: 13.5px; line-height: 1.65; margin-top: 8px; max-width: 620px; }
+  .trial-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .trial-form .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .trial-actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 20px; }
+  .trial-points { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--text-muted); }
+  .trial-points li { position: relative; padding-left: 22px; line-height: 1.6; }
+  .trial-points li::before { content: '✓'; position: absolute; left: 0; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: rgba(59,130,246,0.12); color: var(--check); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  @media (max-width: 640px) {
+    .trial-card { padding: 26px 20px 24px; }
+    .trial-form { grid-template-columns: 1fr; }
+    .trial-actions .btn { width: 100%; }
+  }
+
+  /* ── Manage (secondary) card ─────────────────────────────────────────── */
+  .manage-card { display: flex; gap: 18px; align-items: flex-start; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 26px 28px; margin-top: 28px; }
+  .manage-icon { flex: 0 0 42px; width: 42px; height: 42px; border-radius: 12px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; display: flex; align-items: center; justify-content: center; }
+  html.light .manage-icon { color: #7c3aed; background: rgba(124,58,237,0.08); }
+  .manage-icon svg { width: 21px; height: 21px; }
+  .manage-body { flex: 1; min-width: 0; }
+  .manage-title { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+  .manage-sub { color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin: 6px 0 16px; max-width: 560px; }
+  .manage-form { display: flex; gap: 12px; }
+  .manage-form input { flex: 1; min-width: 0; }
+  .manage-form .btn { flex-shrink: 0; white-space: nowrap; }
+  @media (max-width: 640px) {
+    .manage-card { flex-direction: column; padding: 22px 20px; }
+    .manage-form { flex-direction: column; }
+    .manage-form .btn { width: 100%; }
+  }
 
   .result { display: none; border-radius: 12px; padding: 16px 18px; margin-top: 20px; font-size: 13.5px; line-height: 1.7; }
   .result.ok { display: block; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3); }
@@ -268,35 +315,57 @@
   </div>
 
   <!-- ── Free sample ──────────────────────────────────────────────────── -->
-  <h3 class="section-title" id="trial">Not sure yet? See a sample email for <em>your</em> case — free</h3>
-  <p class="section-sub">Enter your case number and we'll look it up <strong>live in DOL's
-  case-status system</strong>, then email you one real Case Watch digest built from your
-  actual case data. One sample per email address per month. No subscription, no follow-up emails.</p>
-  <div class="form-card">
-    <div class="two-col">
+  <section class="trial-card" id="trial">
+    <div class="feature-head">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m2.5 7.5 9.5 6 9.5-6"/></svg>
+      </div>
       <div>
+        <span class="feature-eyebrow">Try before you subscribe</span>
+        <h3 class="feature-title">Not sure yet? See a sample email for <em>your</em> case — free</h3>
+        <p class="feature-sub">Enter your case number and we'll look it up <strong>live in DOL's
+        case-status system</strong>, then email you one real Case Watch digest built from your
+        actual case data.</p>
+      </div>
+    </div>
+    <div class="trial-form">
+      <div class="field">
         <label for="trial-email">Email address</label>
         <input type="email" id="trial-email" placeholder="you@example.com" autocomplete="email">
       </div>
-      <div>
+      <div class="field">
         <label for="trial-case">PERM case number</label>
         <input type="text" id="trial-case" placeholder="G-100-24123-456789" autocomplete="off">
       </div>
     </div>
-    <button type="button" class="ghost-btn" id="trial-submit">Send me my free sample</button>
+    <div class="trial-actions">
+      <button type="button" class="btn btn-primary" id="trial-submit">Send me my free sample</button>
+      <ul class="trial-points">
+        <li>One sample per email per month</li>
+        <li>No subscription</li>
+        <li>No follow-up emails</li>
+      </ul>
+    </div>
     <div class="result" id="trial-result"></div>
-  </div>
+  </section>
 
   <!-- ── Manage ───────────────────────────────────────────────────────── -->
-  <h3 class="section-title" id="manage">Already subscribed? Manage your subscriptions</h3>
-  <p class="section-sub">Enter the email you subscribed with and we'll send you a secure
-  sign-in link — from there you can change plans or unsubscribe per case.</p>
-  <div class="form-card">
-    <label for="manage-email">Email address</label>
-    <input type="email" id="manage-email" placeholder="you@example.com" autocomplete="email">
-    <button type="button" class="ghost-btn" id="manage-submit">Email me a sign-in link</button>
-    <div class="result" id="manage-result"></div>
-  </div>
+  <section class="manage-card" id="manage">
+    <div class="manage-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none"/></svg>
+    </div>
+    <div class="manage-body">
+      <h3 class="manage-title">Already subscribed? Manage your subscriptions</h3>
+      <p class="manage-sub">Enter the email you subscribed with and we'll send you a secure
+      sign-in link — from there you can change plans or unsubscribe per case. No password needed.</p>
+      <label for="manage-email" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Email address</label>
+      <div class="manage-form">
+        <input type="email" id="manage-email" placeholder="you@example.com" autocomplete="email">
+        <button type="button" class="btn btn-secondary" id="manage-submit">Email me a sign-in link</button>
+      </div>
+      <div class="result" id="manage-result"></div>
+    </div>
+  </section>
 
   <p class="fineprint">Emails are informational summaries built from
   <a href="https://flag.dol.gov/" target="_blank" rel="noopener">DOL public case-status data</a>
