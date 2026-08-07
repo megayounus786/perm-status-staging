@@ -343,6 +343,9 @@
     you can add separate subscriptions for additional cases anytime.</p>
   </section>
 
+  <!-- ── Checkout return banner (shown after Stripe redirects back) ───── -->
+  <div class="result" id="checkout-banner" style="margin:0 0 18px"></div>
+
   <!-- ── Registration ─────────────────────────────────────────────────── -->
   <section class="register-card" id="register">
     <div class="feature-head">
@@ -378,7 +381,7 @@
     yet, we'll say so and keep checking automatically — we never guess a status.</p>
 
     <button type="button" class="btn btn-primary register-cta" id="submit">Start my email updates</button>
-    <ul class="register-points">
+    <ul class="register-points" id="register-points">
       <li>Instant status-change alerts included</li>
       <li>Cancel anytime</li>
       <li>Verification email before anything sends</li>
@@ -467,12 +470,69 @@ const PLAN_LABELS = {
   alerts: 'Change Alerts Only — $1.59/mo'
 };
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const PLAN_PRICES = {daily: '$4.95', weekly: '$2.59', alerts: '$1.59'};
+
+// ── Billing mode (Stripe) ─────────────────────────────────────────────────
+// BILLING_ENABLED comes from the backend flag; while it's off the beta keeps
+// free registration. ?billing_preview=1 forces the checkout UI (staging QA).
+let BILLING_ENABLED = false;
+
+function applyBillingUI() {
+  const sel = document.querySelector('input[name=cadence]:checked');
+  const btn = document.getElementById('submit');
+  btn.textContent = BILLING_ENABLED
+    ? 'Continue to secure checkout — ' + PLAN_PRICES[sel.value] + '/mo'
+    : 'Start my email updates';
+  let pay = document.getElementById('pay-point');
+  if (BILLING_ENABLED && !pay) {
+    pay = document.createElement('li');
+    pay.id = 'pay-point';
+    pay.textContent = 'Secure card payment via Stripe';
+    document.getElementById('register-points').prepend(pay);
+  } else if (!BILLING_ENABLED && pay) {
+    pay.remove();
+  }
+}
+
+(async function loadBillingConfig() {
+  if (new URLSearchParams(location.search).get('billing_preview') === '1') {
+    BILLING_ENABLED = true;
+    applyBillingUI();
+    return;
+  }
+  try {
+    const r = await fetch(API_BASE + '/subs/billing/config');
+    const d = await r.json();
+    BILLING_ENABLED = !!d.billing_enabled;
+  } catch (e) { /* keep free-beta UI if the config call fails */ }
+  applyBillingUI();
+})();
+
+// Banner after Stripe redirects back (?checkout=success|cancelled)
+(function checkoutReturn() {
+  const state = new URLSearchParams(location.search).get('checkout');
+  if (!state) return;
+  const b = document.getElementById('checkout-banner');
+  if (state === 'success') {
+    b.className = 'result ok';
+    b.innerHTML = '<strong>Payment received — your Case Watch subscription is active!</strong><br>' +
+      'One last step: open the verification email we just sent and confirm your address. ' +
+      'Emails for your case start right after that. You can change plans or cancel anytime from ' +
+      '<a href="subscribe.html#manage">Manage subscriptions</a>.';
+  } else {
+    b.className = 'result err';
+    b.innerHTML = '<strong>Checkout was cancelled — you have not been charged.</strong><br>' +
+      'Pick a plan whenever you’re ready. Not sure yet? Try the free sample email below first.';
+  }
+  b.scrollIntoView({behavior: 'smooth', block: 'center'});
+})();
 
 function refreshPlanUI() {
   document.querySelectorAll('.plan-card').forEach(c =>
     c.classList.toggle('selected', c.querySelector('input').checked));
   const sel = document.querySelector('input[name=cadence]:checked');
   document.getElementById('selected-plan-label').textContent = PLAN_LABELS[sel.value];
+  applyBillingUI();
 }
 document.getElementById('plan-grid').addEventListener('change', refreshPlanUI);
 document.querySelectorAll('.plan-cta').forEach(btn => {
@@ -508,6 +568,30 @@ document.getElementById('submit').addEventListener('click', async function() {
       ' — expected format G-100/G-200/G-300-XXXXX-XXXXXX.');
 
   btn.disabled = true;
+
+  // Billing on → Stripe Checkout is the only path to a live subscription.
+  if (BILLING_ENABLED) {
+    btn.textContent = 'Preparing secure checkout…';
+    try {
+      const r = await fetch(API_BASE + '/subs/checkout', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, case_number: caseNumber, cadence})
+      });
+      const data = await r.json();
+      if (!r.ok || !data.ok)
+        throw new Error(data.message || (data.errors || ['checkout failed']).join(', '));
+      btn.textContent = 'Redirecting to Stripe…';
+      location.href = data.checkout_url;
+      return; // leaving the page — keep the button locked
+    } catch (e) {
+      showResult(result, 'err', 'Couldn’t start checkout: ' + e.message + ' — please try again.');
+      btn.disabled = false;
+      applyBillingUI();
+      return;
+    }
+  }
+
   btn.textContent = 'Registering…';
   try {
     const r = await fetch(API_BASE + '/subs/register', {
@@ -516,6 +600,14 @@ document.getElementById('submit').addEventListener('click', async function() {
       body: JSON.stringify({email, case_number: caseNumber, cadence})
     });
     const data = await r.json();
+    if (r.status === 402) {
+      // Billing was switched on after this page loaded — flip to checkout.
+      BILLING_ENABLED = true;
+      applyBillingUI();
+      btn.disabled = false;
+      return showResult(result, 'err',
+        'Case Watch now requires a paid plan — hit the button again to go to secure checkout.');
+    }
     if (!r.ok || !data.ok) throw new Error((data.errors || ['registration failed']).join(', '));
 
     const planLabel = data.cadence === 'alerts' ? 'change-alerts-only plan'
@@ -540,7 +632,7 @@ document.getElementById('submit').addEventListener('click', async function() {
     showResult(result, 'err', 'Something went wrong: ' + e.message + ' — please try again.');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Start my email updates';
+    applyBillingUI();
   }
 });
 

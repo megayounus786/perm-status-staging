@@ -112,6 +112,21 @@ const PLAN_LABELS = {
 };
 const panel = document.getElementById('panel');
 const subsEl = document.getElementById('subs');
+let BILLING_ENABLED = false;
+
+// billing_status → footer line under each case (staging: 'beta' = free)
+function billingLine(s) {
+  const bs = s.billing_status || 'beta';
+  if (bs === 'beta') return 'Free beta subscription';
+  if (bs === 'active') {
+    const renews = (s.current_period_end || '').slice(0, 10);
+    return 'Paid via Stripe' + (renews ? ' · renews ' + renews : '');
+  }
+  if (bs === 'checkout_pending') return '⚠ Payment not completed — emails start after checkout';
+  if (bs === 'past_due') return '⚠ Payment issue — we’ll keep emailing during a short grace period';
+  if (bs === 'canceled') return 'Paid plan ended';
+  return bs;
+}
 
 function fail(msg) {
   panel.className = 'panel err';
@@ -133,7 +148,7 @@ function renderSub(s) {
     '<div class="sub-head"><div><div class="case-no">' + esc(s.case_number) + '</div>' +
     '<div class="sub-meta">Subscribed ' + esc((s.created_at || '').slice(0, 10)) +
     (s.verified ? ' · verified' : ' · <span style="color:#fbbf24">email not verified yet</span>') +
-    '</div></div>' + statusPill + '</div>';
+    '</div><div class="sub-meta">' + billingLine(s) + '</div></div>' + statusPill + '</div>';
 
   if (s.active) {
     const controls = document.createElement('div');
@@ -163,7 +178,9 @@ function renderSub(s) {
         const data = await r.json();
         if (!r.ok || !data.ok) throw new Error((data.errors || ['update failed']).join(', '));
         msg.className = 'row-msg ok';
-        msg.textContent = 'Plan updated to ' + PLAN_LABELS[sel.value] + '.';
+        msg.textContent = 'Plan updated to ' + PLAN_LABELS[sel.value] + '.' +
+          (BILLING_ENABLED && (s.billing_status === 'active' || s.billing_status === 'past_due')
+            ? ' The new rate applies from your next renewal — no mid-cycle charges.' : '');
       } catch (e) {
         msg.className = 'row-msg err';
         msg.textContent = 'Could not update: ' + e.message;
@@ -171,7 +188,8 @@ function renderSub(s) {
     });
 
     unsub.addEventListener('click', async () => {
-      if (!confirm('Stop watching ' + s.case_number + '? You can re-subscribe anytime.')) return;
+      if (!confirm('Stop watching ' + s.case_number + '? Emails stop immediately, any paid plan '
+                   + 'simply won’t renew (no further charges), and you can re-subscribe anytime.')) return;
       unsub.disabled = true;
       try {
         const r = await fetch(API_BASE + '/subs/manage/unsubscribe', {
@@ -198,6 +216,7 @@ async function load() {
     const data = await r.json();
     if (r.status === 401) return fail('This sign-in link is invalid or has expired (links last 30 minutes).');
     if (!r.ok || !data.ok) throw new Error((data.errors || ['load failed']).join(', '));
+    BILLING_ENABLED = !!data.billing_enabled;
     document.getElementById('who').innerHTML =
       'Signed in as <strong>' + esc(data.email) + '</strong>. Each subscription watches one PERM case.';
     subsEl.innerHTML = '';
