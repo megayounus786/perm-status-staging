@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-<title>PERM Case Update Emails | ImmiLane</title>
+<title>Case Watch — PERM Case Update Emails | ImmiLane</title>
 <meta name="description" content="Get AI-generated PERM case-summary emails: daily or weekly digests with your case status, position vs the DOL frontier, estimated decision date, and instant status-change alerts.">
 <meta name="robots" content="noindex"><!-- STAGING: remove before prod -->
 <script>if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');</script>
@@ -75,8 +75,10 @@
   .beta-banner { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.12)); border: 1px solid rgba(139,92,246,0.35); border-radius: 12px; padding: 12px 18px; margin: 20px 0 0; font-size: 13.5px; color: var(--text-secondary); }
   .beta-banner strong { color: var(--text-primary); }
 
-  .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
-  @media (max-width: 640px) { .plan-grid { grid-template-columns: 1fr; } }
+  .plan-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 24px 0; }
+  @media (max-width: 760px) { .plan-grid { grid-template-columns: 1fr; } }
+  .prefill-note { display: none; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 12px 18px; margin: 20px 0 0; font-size: 13.5px; color: var(--text-secondary); }
+  .prefill-note strong { color: var(--text-primary); }
   .plan-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
   .plan-card:hover { transform: translateY(-2px); }
   .plan-card.selected { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
@@ -124,7 +126,7 @@
       <li><a href="leaderboard.html">Top Employers</a></li>
       <li><a href="visa-bulletin.html">Visa Bulletin</a></li>
       <li><a href="guides.html">Guides</a></li>
-      <li><a href="subscribe.html" class="active">Email Updates</a></li>
+      <li><a href="subscribe.html" class="active">Case Watch</a></li>
     </ul>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode"><span class="theme-toggle-icon moon">&#127769;</span><span class="theme-toggle-icon sun">&#9728;&#65039;</span></button>
   </div>
@@ -132,7 +134,7 @@
 
 <div class="container">
   <div class="hero">
-    <h1>ImmiLane Email Updates</h1>
+    <h1>ImmiLane Case Watch</h1>
     <h2>Your PERM case status, delivered to your inbox</h2>
     <p class="lede">Register your PERM case number and we'll email you an AI-generated
     summary — your current status, where you sit versus the cases DOL is certifying
@@ -140,6 +142,7 @@
     Every plan includes <strong>instant alerts</strong> the moment your DOL status changes.</p>
     <div class="beta-banner"><strong>Staging beta preview.</strong> Payments aren't live yet —
     registration is free while we test. Pricing below is what the plans will cost at launch.</div>
+    <div class="prefill-note" id="prefill-note"></div>
   </div>
 
   <div class="plan-grid" id="plan-grid">
@@ -159,6 +162,13 @@
       <div class="plan-desc">A week-in-review summary every Monday — your case, DOL's
       pace versus last week, and your updated estimate. Plus instant
       status-change alerts.</div>
+    </label>
+    <label class="plan-card" data-cadence="alerts">
+      <input type="radio" name="cadence" value="alerts">
+      <div class="plan-name">&#9889; Change Alerts Only</div>
+      <div class="plan-price">Free <span>during beta</span></div>
+      <div class="plan-desc">No digests — just one email the moment DOL changes
+      your case status. Nothing else, ever. Quiet until it matters.</div>
     </label>
   </div>
 
@@ -206,6 +216,7 @@ document.getElementById('plan-grid').addEventListener('change', function() {
   document.querySelectorAll('.plan-card').forEach(c =>
     c.classList.toggle('selected', c.querySelector('input').checked));
 });
+
 
 document.getElementById('add-case').addEventListener('click', function() {
   const rows = document.querySelectorAll('.case-row');
@@ -257,7 +268,9 @@ document.getElementById('submit').addEventListener('click', async function() {
     const data = await r.json();
     if (!r.ok || !data.ok) throw new Error((data.errors || ['registration failed']).join(', '));
 
-    let html = '<strong>You’re registered for the ' + data.cadence + ' digest!</strong><ul>';
+    const planLabel = data.cadence === 'alerts' ? 'change-alerts-only plan'
+                    : data.cadence + ' digest';
+    let html = '<strong>You’re registered for the ' + planLabel + '!</strong><ul>';
     for (const c of data.cases) {
       if (c.found) {
         html += '<li class="case-ok">' + c.case_number + ' — ' + c.employer +
@@ -274,6 +287,7 @@ document.getElementById('submit').addEventListener('click', async function() {
     }
     result.className = 'result ok';
     result.innerHTML = html;
+    result.scrollIntoView({behavior: 'smooth', block: 'nearest'});
   } catch (e) {
     result.className = 'result err';
     result.textContent = 'Something went wrong: ' + e.message + ' — please try again.';
@@ -282,6 +296,43 @@ document.getElementById('submit').addEventListener('click', async function() {
     btn.textContent = 'Start my email updates';
   }
 });
+
+// Prefill from query params (used by the Estimate page CTA). Runs last so the
+// add-case button's click handler is already attached:
+//   ?case=G-100-...&case=G-100-...  (also accepts comma-separated)
+//   &cadence=daily|weekly|alerts
+//   &src=estimate  → shows a "carried over from your estimate" note
+(function prefillFromQuery() {
+  const params = new URLSearchParams(location.search);
+  const cases = params.getAll('case')
+    .flatMap(v => v.split(','))
+    .map(v => v.trim().toUpperCase())
+    .filter(v => /^G-\d{3}-\d{5}-\d{6}$/.test(v))
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .slice(0, MAX_CASES);
+  if (cases.length) {
+    const addBtn = document.getElementById('add-case');
+    document.querySelector('.case-input').value = cases[0];
+    for (let i = 1; i < cases.length; i++) {
+      addBtn.click();
+      const inputs = document.querySelectorAll('.case-input');
+      inputs[inputs.length - 1].value = cases[i];
+    }
+  }
+  const cadence = (params.get('cadence') || '').toLowerCase();
+  const radio = document.querySelector('input[name=cadence][value="' + cadence + '"]');
+  if (radio) {
+    radio.checked = true;
+    document.querySelectorAll('.plan-card').forEach(c =>
+      c.classList.toggle('selected', c.querySelector('input').checked));
+  }
+  if (params.get('src') === 'estimate' && cases.length) {
+    const note = document.getElementById('prefill-note');
+    note.innerHTML = '&#10003; Case <strong>' + cases.join('</strong>, <strong>') +
+      '</strong> carried over from your estimate — pick a plan and enter your email below to start watching it.';
+    note.style.display = 'block';
+  }
+})();
 </script>
 </body>
 </html>

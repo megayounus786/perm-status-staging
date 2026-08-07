@@ -133,6 +133,11 @@
 
   /* ── ESTIMATE DISCLAIMER ── */
   .est-disclaimer { margin-top: 18px; padding: 12px 14px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; font-size: 11.5px; line-height: 1.6; color: var(--text-muted); }
+  .est-watch-cta { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 18px; padding: 16px 18px; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.06)); border: 1px solid rgba(59,130,246,0.25); border-radius: 12px; }
+  .est-watch-cta-text { flex: 1 1 260px; font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
+  .est-watch-cta-text strong { color: var(--text-primary); }
+  .est-watch-cta-btn { flex: none; display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 10px; color: #fff; text-decoration: none; font-size: 13.5px; font-weight: 700; padding: 10px 18px; transition: transform 0.2s, box-shadow 0.2s; }
+  .est-watch-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
 
   .est-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .est-stat { background: var(--card-bg); border-radius: 10px; padding: 14px 16px; }
@@ -287,6 +292,7 @@
       <li><a href="leaderboard.html">Top Employers</a></li>
       <li><a href="visa-bulletin.html">Visa Bulletin</a></li>
       <li><a href="guides.html">Guides</a></li>
+      <li><a href="subscribe.html">Case Watch</a></li>
       <li><a href="about-perm.html">About PERM</a></li>
       <li><a href="faq.html">FAQ</a></li>
     </ul>
@@ -528,6 +534,23 @@ const API_VERSION = '3';
     });
   }
 
+  // Case Watch cross-sell shown under every non-terminal estimate result.
+  // Links into subscribe.html, pre-filling the case number when we have one.
+  function watchCtaHtml(caseNumber, imminent) {
+    var href = 'subscribe.html?src=estimate' +
+      (caseNumber ? '&case=' + encodeURIComponent(caseNumber) : '');
+    var pitch = imminent
+      ? '<strong>Your decision could land any day.</strong> Want an email the moment DOL moves your case?'
+      : '<strong>Estimates change as DOL moves.</strong> Want ImmiLane to watch ' +
+        (caseNumber ? 'this case' : 'your case') +
+        ' and email you the moment DOL updates it?';
+    return '<div class="est-watch-cta"><div class="est-watch-cta-text">' + pitch +
+      ' Daily or weekly digests with your updated estimate, plus instant status-change alerts.</div>' +
+      '<a class="est-watch-cta-btn" href="' + href + '" ' +
+      'onclick="if(typeof gtag===\'function\')gtag(\'event\',\'case_watch_cta_click\',{source:\'estimate\'})">' +
+      'Watch this case &rarr;</a></div>';
+  }
+
   function renderEstResult(data, isLookup) {
     clearEstResult();
     let html = '';
@@ -561,6 +584,7 @@ const API_VERSION = '3';
       html += '<div class="est-stat"><div class="est-stat-label">DOL Position</div><div class="est-stat-value warning">' + esc(est.dol_current) + '</div></div>';
       html += '<div class="est-stat"><div class="est-stat-label">Filing Month</div><div class="est-stat-value">' + esc(est.filing_month) + '</div></div>';
       html += '</div></div>';
+      html += watchCtaHtml(isLookup ? data.case_number : null, true);
       resultEl.innerHTML = html;
       resultEl.style.display = '';
       if (isLookup) upgradeEmployerLink();
@@ -569,6 +593,7 @@ const API_VERSION = '3';
 
     if (!est.estimated_date) {
       html += '<div style="text-align:center;padding:20px 0;color:#94a3b8;font-size:14px;">Unable to calculate estimate — insufficient processing data.</div>';
+      if (isLookup) html += watchCtaHtml(data.case_number, false);
       resultEl.innerHTML = html;
       resultEl.style.display = '';
       if (isLookup) upgradeEmployerLink();
@@ -612,6 +637,8 @@ const API_VERSION = '3';
     html += '</div>';
 
     // Plain-English disclaimer so users understand what the estimate/range mean
+    html += watchCtaHtml(isLookup ? data.case_number : null, false);
+
     html += '<div class="est-disclaimer">This is a projection based on DOL&#39;s recent processing pace — not a guarantee. The estimated date assumes DOL keeps clearing cases at its pace over the last 6 weeks. The range reflects DOL&#39;s faster vs. slower recent weekly pace (based on the last ~10 weeks of actual processing). It does not account for case-specific factors such as audits/RFIs, your employer&#39;s first-letter processing cohort, or policy and seasonal changes. Estimates update automatically as new DOL data comes in.</div>';
 
     resultEl.innerHTML = html;
