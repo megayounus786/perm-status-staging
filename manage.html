@@ -53,6 +53,10 @@
   .case-no { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 15px; font-weight: 700; color: #60a5fa; }
   html.light .case-no { color: #2563eb; }
   .sub-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+  .case-details { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--sep); display: grid; grid-template-columns: auto 1fr; gap: 7px 16px; font-size: 13px; line-height: 1.55; }
+  .cd-label { color: var(--text-muted); white-space: nowrap; }
+  .cd-value { color: var(--text-primary); font-weight: 500; overflow-wrap: anywhere; }
+  .cd-note { grid-column: 1 / -1; color: var(--text-muted); font-weight: 400; }
   .status-pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; background: rgba(59,130,246,0.12); color: #60a5fa; }
   html.light .status-pill { color: #2563eb; }
   .status-pill.inactive { background: rgba(148,163,184,0.15); color: var(--text-muted); }
@@ -138,17 +142,56 @@ function esc(s) {
   return d.innerHTML;
 }
 
+function fmtDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso.slice(0, 10) + 'T00:00:00');
+  return isNaN(d) ? iso : d.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+}
+
+// Case details come from our local scanner data (no live DOL lookup here).
+function caseDetailsHTML(s) {
+  const c = s.case || {};
+  const rows = [];
+  if (c.found) {
+    rows.push(['Employer', esc(c.employer) || '—']);
+    rows.push(['Filed', esc(fmtDate(c.filed_date)) || '—']);
+    const est = c.estimate;
+    if (est && est.already_in_range) {
+      rows.push(['Queue', 'Your filing date is inside the range DOL is already certifying — a decision could come any scan now']);
+    } else if (est && est.cases_ahead != null) {
+      rows.push(['Queue', '~' + Number(est.cases_ahead).toLocaleString() + ' pending cases ahead' +
+        (est.dol_current ? ' · DOL now certifying ' + esc(est.dol_current) + ' filings' : '')]);
+      if (est.estimated_date) {
+        let v = 'Around ' + esc(fmtDate(est.estimated_date));
+        if (est.confidence_low && est.confidence_high) {
+          v += ' (likely ' + esc(fmtDate(est.confidence_low)) + ' – ' + esc(fmtDate(est.confidence_high)) + ')';
+        }
+        rows.push(['Est. decision', v]);
+      }
+    }
+  } else {
+    rows.push(['Employer', '—']);
+    rows.push(['Filed', '—']);
+    rows.push(['', '<span class="cd-note">Case details aren’t in our scan data yet — they’ll appear here automatically once this case shows up in DOL’s public records.</span>']);
+  }
+  return '<div class="case-details">' + rows.map(([k, v]) =>
+    k ? '<span class="cd-label">' + k + '</span><span class="cd-value">' + v + '</span>' : v
+  ).join('') + '</div>';
+}
+
 function renderSub(s) {
   const card = document.createElement('div');
   card.className = 'sub-card';
+  const liveStatus = (s.case && s.case.found && s.case.status) || s.status;
   const statusPill = s.active
-    ? '<span class="status-pill">' + esc(s.status || 'watching') + '</span>'
+    ? '<span class="status-pill">' + esc(liveStatus || 'watching') + '</span>'
     : '<span class="status-pill inactive">unsubscribed</span>';
   card.innerHTML =
     '<div class="sub-head"><div><div class="case-no">' + esc(s.case_number) + '</div>' +
     '<div class="sub-meta">Subscribed ' + esc((s.created_at || '').slice(0, 10)) +
     (s.verified ? ' · verified' : ' · <span style="color:#fbbf24">email not verified yet</span>') +
-    '</div><div class="sub-meta">' + billingLine(s) + '</div></div>' + statusPill + '</div>';
+    '</div><div class="sub-meta">' + billingLine(s) + '</div></div>' + statusPill + '</div>' +
+    caseDetailsHTML(s);
 
   if (s.active) {
     const controls = document.createElement('div');
