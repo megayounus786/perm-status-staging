@@ -298,7 +298,7 @@
         <input type="radio" name="cadence" value="weekly">
         <div class="plan-name">Weekly Digest</div>
         <div class="plan-tagline">The Monday check-in</div>
-        <div class="plan-price"><span class="amount">$2.59</span><span class="period">/ month</span></div>
+        <div class="plan-price"><span class="amount">$4.99</span><span class="period">/ month</span></div>
         <div class="plan-sub">Billed monthly · cancel anytime</div>
         <ul class="plan-features">
           <li><strong>Week-in-review digest</strong> every Monday morning</li>
@@ -314,7 +314,7 @@
         <span class="plan-badge">Most Popular</span>
         <div class="plan-name">Daily Digest</div>
         <div class="plan-tagline">Wake up already knowing</div>
-        <div class="plan-price"><span class="amount">$4.95</span><span class="period">/ month</span></div>
+        <div class="plan-price"><span class="amount">$8.99</span><span class="period">/ month</span></div>
         <div class="plan-sub">Billed monthly · cancel anytime</div>
         <ul class="plan-features">
           <li><strong>Fresh summary every morning</strong>, right after our early-morning scan of DOL's system</li>
@@ -329,7 +329,7 @@
         <input type="radio" name="cadence" value="alerts">
         <div class="plan-name">Change Alerts Only</div>
         <div class="plan-tagline">Quiet until it matters</div>
-        <div class="plan-price"><span class="amount">$1.59</span><span class="period">/ month</span></div>
+        <div class="plan-price"><span class="amount">$2.99</span><span class="period">/ month</span></div>
         <div class="plan-sub">Billed monthly · cancel anytime</div>
         <ul class="plan-features">
           <li><strong>No digests</strong> — just an instant email the moment DOL changes your case status</li>
@@ -362,7 +362,7 @@
 
     <div class="selected-plan-pill">
       <span class="pill-check" aria-hidden="true">✓</span>
-      <span>Selected plan:&nbsp;<strong id="selected-plan-label">Daily Digest — $4.95/mo</strong></span>
+      <span>Selected plan:&nbsp;<strong id="selected-plan-label">Daily Digest — $8.99/mo</strong></span>
       <a href="#pricing" class="pill-change">Change</a>
     </div>
 
@@ -465,12 +465,12 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 const API_BASE = 'https://api.immilane.com';
 const CASE_RE = /^G-(100|200|300)-\d{5}-\d{6}$/;
 const PLAN_LABELS = {
-  daily: 'Daily Digest — $4.95/mo',
-  weekly: 'Weekly Digest — $2.59/mo',
-  alerts: 'Change Alerts Only — $1.59/mo'
+  daily: 'Daily Digest — $8.99/mo',
+  weekly: 'Weekly Digest — $4.99/mo',
+  alerts: 'Change Alerts Only — $2.99/mo'
 };
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-const PLAN_PRICES = {daily: '$4.95', weekly: '$2.59', alerts: '$1.59'};
+const PLAN_PRICES = {daily: '$8.99', weekly: '$4.99', alerts: '$2.99'};
 
 // ── Billing mode (Stripe) ─────────────────────────────────────────────────
 // BILLING_ENABLED comes from the backend flag; while it's off the beta keeps
