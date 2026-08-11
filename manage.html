@@ -119,12 +119,19 @@ const subsEl = document.getElementById('subs');
 let BILLING_ENABLED = false;
 
 // billing_status → footer line under each case (staging: 'beta' = free)
+function planPrice(cadence) {
+  const lab = PLAN_LABELS[cadence] || '';
+  return lab.includes('— ') ? lab.split('— ')[1] : '';
+}
+
 function billingLine(s) {
   const bs = s.billing_status || 'beta';
   if (bs === 'beta') return 'Free beta subscription';
   if (bs === 'active') {
-    const renews = (s.current_period_end || '').slice(0, 10);
-    return 'Paid via Stripe' + (renews ? ' · renews ' + renews : '');
+    const renews = fmtDate(s.current_period_end);
+    const price = planPrice(s.cadence);
+    if (renews) return 'Renews ' + renews + (price ? ' · ' + price : '');
+    return 'Paid via Stripe' + (price ? ' · ' + price : '');
   }
   if (bs === 'checkout_pending') return '⚠ Payment not completed — emails start after checkout';
   if (bs === 'past_due') return '⚠ Payment issue — we’ll keep emailing during a short grace period';
