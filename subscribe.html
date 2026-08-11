@@ -757,11 +757,10 @@ document.getElementById('trial-submit').addEventListener('click', async function
       throw new Error(data.message || (data.errors || ['request failed']).join(', '));
     }
 
-    // Async job: the live DOL lookup + AI writing can take a few minutes —
+    // Async job: the live DOL lookup can take a few minutes —
     // poll the job until the sample is ready.
     const STAGE_LABEL = {
       lookup: 'Checking DOL live — this can take a minute…',
-      curate: 'Writing your sample with AI…',
       render: 'Putting your email together…'
     };
     const deadline = Date.now() + 6 * 60 * 1000;
