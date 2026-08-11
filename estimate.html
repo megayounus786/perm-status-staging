@@ -540,12 +540,12 @@ const API_VERSION = '3';
     var href = 'subscribe.html?src=estimate' +
       (caseNumber ? '&case=' + encodeURIComponent(caseNumber) : '');
     var pitch = imminent
-      ? '<strong>Your decision could land any day.</strong> Want an email the moment DOL moves your case?'
+      ? '<strong>Your decision could land any day.</strong> Want an email when DOL moves your case?'
       : '<strong>Estimates change as DOL moves.</strong> Want ImmiLane to watch ' +
         (caseNumber ? 'this case' : 'your case') +
-        ' and email you the moment DOL updates it?';
+        ' and email you when DOL updates it?';
     return '<div class="est-watch-cta"><div class="est-watch-cta-text">' + pitch +
-      ' Daily or weekly digests with your updated estimate, plus instant status-change alerts.</div>' +
+      ' Daily or weekly digests with your updated estimate, plus status-change alerts within hours of a change.</div>' +
       '<a class="est-watch-cta-btn" href="' + href + '" ' +
       'onclick="if(typeof gtag===\'function\')gtag(\'event\',\'case_watch_cta_click\',{source:\'estimate\'})">' +
       'Watch this case &rarr;</a></div>';
