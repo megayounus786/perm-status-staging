@@ -234,6 +234,7 @@
   .result { display: none; border-radius: 12px; padding: 16px 18px; margin-top: 20px; font-size: 13.5px; line-height: 1.7; }
   .result.ok { display: block; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3); }
   .result.err { display: block; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); }
+  .result.info { display: block; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); }
   .result .case-ok { color: #4ade80; }
   .result .case-warn { color: #fbbf24; }
   .result a { color: #60a5fa; word-break: break-all; }
@@ -550,6 +551,84 @@ function showResult(el, cls, html) {
   el.scrollIntoView({behavior: 'smooth', block: 'nearest'});
 }
 
+// ── Already-subscribed guard ──────────────────────────────────────────────
+// The backend blocks a duplicate checkout with 409 + {state, cadence}:
+//   already_subscribed → manage / change plan (existing subscription — a plan
+//   change swaps the Stripe price, never a second checkout)
+//   pending_confirm    → the sub exists but the email isn't verified yet
+const CADENCE_NAMES = {daily: 'Daily', weekly: 'Weekly', alerts: 'Alerts-only'};
+
+function showDuplicateState(result, data, email, caseNumber) {
+  const plan = CADENCE_NAMES[data.cadence] || data.cadence;
+
+  if (data.state === 'pending_confirm') {
+    showResult(result, 'info',
+      '<strong>Almost there — this case is already registered.</strong><br>' +
+      caseNumber + ' is on the ' + plan + ' plan for ' + email + ', but that email ' +
+      'address hasn’t been verified yet. Open the verification email we sent and ' +
+      'click the link — updates start right after that.' +
+      '<br><button type="button" class="btn btn-secondary" id="resend-verify" ' +
+      'style="margin-top:10px">Resend verification email</button>');
+    document.getElementById('resend-verify').addEventListener('click', async function() {
+      this.disabled = true;
+      this.textContent = 'Sending…';
+      try {
+        await fetch(API_BASE + '/subs/verify/resend', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email, case_number: caseNumber})
+        });
+        this.textContent = 'Verification email sent ✓';
+      } catch (e) {
+        this.disabled = false;
+        this.textContent = 'Resend verification email';
+      }
+    });
+    return;
+  }
+
+  showResult(result, 'info',
+    '<strong>You’re already watching case ' + caseNumber + ' on the ' + plan +
+    ' plan.</strong><br>' +
+    'One subscription covers this case, so there’s nothing to buy again. Want a ' +
+    'different cadence? Changing plans updates your existing subscription — no new checkout.' +
+    '<br><span style="display:inline-flex;gap:10px;margin-top:10px;flex-wrap:wrap">' +
+    '<button type="button" class="btn btn-primary" id="dup-manage">Manage subscription</button>' +
+    '<button type="button" class="btn btn-secondary" id="dup-change">Change plan</button></span>' +
+    '<span id="dup-note" style="display:block;margin-top:8px"></span>');
+
+  // Both routes go through the existing magic-link manage flow: the manage
+  // page is where plan changes swap the Stripe price on the current sub.
+  async function toManage(btnEl, label) {
+    btnEl.disabled = true;
+    btnEl.textContent = 'Sending sign-in link…';
+    try {
+      const r = await fetch(API_BASE + '/subs/manage/request', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email})
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error('link request failed');
+      if (d.staging_magic_link) {  // staging shortcut — production emails it
+        location.href = d.staging_magic_link;
+        return;
+      }
+      document.getElementById('dup-note').innerHTML =
+        'We’ve emailed <strong>' + email + '</strong> a secure sign-in link (valid ' +
+        '30 minutes). Open it to ' + (label === 'change' ? 'switch plans' : 'manage this subscription') + '.';
+      btnEl.textContent = 'Sign-in link sent ✓';
+    } catch (e) {
+      btnEl.disabled = false;
+      btnEl.textContent = label === 'change' ? 'Change plan' : 'Manage subscription';
+      document.getElementById('dup-note').textContent =
+        'Couldn’t send the sign-in link — please try again.';
+    }
+  }
+  document.getElementById('dup-manage').addEventListener('click', function() { toManage(this, 'manage'); });
+  document.getElementById('dup-change').addEventListener('click', function() { toManage(this, 'change'); });
+}
+
 // ── Register (one email + ONE case per subscription) ──────────────────────
 document.getElementById('submit').addEventListener('click', async function() {
   const btn = this;
@@ -579,6 +658,12 @@ document.getElementById('submit').addEventListener('click', async function() {
         body: JSON.stringify({email, case_number: caseNumber, cadence})
       });
       const data = await r.json();
+      if (r.status === 409 && data.state) {
+        showDuplicateState(result, data, email, caseNumber);
+        btn.disabled = false;
+        applyBillingUI();
+        return;
+      }
       if (!r.ok || !data.ok)
         throw new Error(data.message || (data.errors || ['checkout failed']).join(', '));
       btn.textContent = 'Redirecting to Stripe…';
@@ -600,6 +685,12 @@ document.getElementById('submit').addEventListener('click', async function() {
       body: JSON.stringify({email, case_number: caseNumber, cadence})
     });
     const data = await r.json();
+    if (r.status === 409 && data.state) {
+      showDuplicateState(result, data, email, caseNumber);
+      btn.disabled = false;
+      applyBillingUI();
+      return;
+    }
     if (r.status === 402) {
       // Billing was switched on after this page loaded — flip to checkout.
       BILLING_ENABLED = true;
