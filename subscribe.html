@@ -662,8 +662,10 @@ document.getElementById('submit').addEventListener('click', async function() {
 
   btn.disabled = true;
 
-  // Billing on → VERIFY-FIRST: submitting emails a 30-minute confirmation
-  // link; Stripe Checkout is only created after the case is confirmed there.
+  // Billing on → VERIFY-FIRST: the case number is first validated against
+  // DOL's LIVE records (a short async job when we don't already know it);
+  // only a real case gets the 30-minute confirmation email. Stripe Checkout
+  // is only created after the case is confirmed there.
   if (BILLING_ENABLED) {
     btn.textContent = 'Sending verification email…';
     try {
@@ -672,15 +674,32 @@ document.getElementById('submit').addEventListener('click', async function() {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({email, case_number: caseNumber, cadence})
       });
-      const data = await r.json();
+      let data = await r.json();
       if (r.status === 409 && data.state) {
         showDuplicateState(result, data, email, caseNumber);
         btn.disabled = false;
         applyBillingUI();
         return;
       }
+      const serverErr = msg => Object.assign(new Error(msg), {fromServer: true});
+      if (r.status === 202 && data.state === 'validating' && data.job_id) {
+        // Live DOL check in progress — poll until it accepts or rejects.
+        btn.textContent = 'Checking your case with DOL live — this can take a minute…';
+        const deadline = Date.now() + 6 * 60 * 1000;
+        for (;;) {
+          if (Date.now() > deadline)
+            throw serverErr('DOL is taking longer than expected to answer — ' +
+              'please try again in a few minutes. No email was sent and nothing was charged.');
+          await new Promise(res => setTimeout(res, 3000));
+          const sr = await fetch(API_BASE + '/subs/checkout/status/' + data.job_id);
+          const s = await sr.json();
+          if (s.status === 'done') { data = s; break; }
+          if (sr.status === 404 || s.status === 'failed' || s.ok === false)
+            throw serverErr(s.message || (s.errors || ['case validation failed']).join(', '));
+        }
+      }
       if (!r.ok || !data.ok)
-        throw new Error(data.message || (data.errors || ['request failed']).join(', '));
+        throw serverErr(data.message || (data.errors || ['request failed']).join(', '));
       showResult(result, 'ok',
         '<strong>Check your email — we’ve sent a verification link (valid 30 minutes).' +
         '</strong><br>Confirm your case there to continue to payment. The email goes to ' +
@@ -692,7 +711,10 @@ document.getElementById('submit').addEventListener('click', async function() {
       applyBillingUI();
       return;
     } catch (e) {
-      showResult(result, 'err', 'Couldn’t start the subscription: ' + e.message + ' — please try again.');
+      // Server-worded outcomes (e.g. "This case number isn't in DOL's system
+      // yet — double-check it or try again tomorrow.") show as-is.
+      showResult(result, 'err', e.fromServer ? e.message
+        : 'Couldn’t start the subscription: ' + e.message + ' — please try again.');
       btn.disabled = false;
       applyBillingUI();
       return;
