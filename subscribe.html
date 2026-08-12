@@ -487,7 +487,7 @@ function applyBillingUI() {
   const sel = document.querySelector('input[name=cadence]:checked');
   const btn = document.getElementById('submit');
   btn.textContent = BILLING_ENABLED
-    ? 'Continue to secure checkout — ' + PLAN_PRICES[sel.value] + '/mo'
+    ? 'Continue — ' + PLAN_PRICES[sel.value] + '/mo (verify email first)'
     : 'Start my email updates';
   let pay = document.getElementById('pay-point');
   if (BILLING_ENABLED && !pay) {
@@ -527,8 +527,8 @@ function applyBillingUI() {
   if (state === 'success') {
     b.className = 'result ok';
     b.innerHTML = '<strong>Payment received — your Case Watch subscription is active!</strong><br>' +
-      'One last step: open the verification email we just sent and confirm your address. ' +
-      'Emails for your case start right after that. You can change plans or cancel anytime from ' +
+      'Your email and case were already verified before checkout, so there’s nothing else to do — ' +
+      'updates for your case start with the next scan. You can change plans or cancel anytime from ' +
       '<a href="subscribe.html#manage">Manage subscriptions</a>.';
   } else {
     b.className = 'result err';
@@ -662,9 +662,10 @@ document.getElementById('submit').addEventListener('click', async function() {
 
   btn.disabled = true;
 
-  // Billing on → Stripe Checkout is the only path to a live subscription.
+  // Billing on → VERIFY-FIRST: submitting emails a 30-minute confirmation
+  // link; Stripe Checkout is only created after the case is confirmed there.
   if (BILLING_ENABLED) {
-    btn.textContent = 'Preparing secure checkout…';
+    btn.textContent = 'Sending verification email…';
     try {
       const r = await fetch(API_BASE + '/subs/checkout', {
         method: 'POST',
@@ -679,12 +680,19 @@ document.getElementById('submit').addEventListener('click', async function() {
         return;
       }
       if (!r.ok || !data.ok)
-        throw new Error(data.message || (data.errors || ['checkout failed']).join(', '));
-      btn.textContent = 'Redirecting to Stripe…';
-      location.href = data.checkout_url;
-      return; // leaving the page — keep the button locked
+        throw new Error(data.message || (data.errors || ['request failed']).join(', '));
+      showResult(result, 'ok',
+        '<strong>Check your email — we’ve sent a verification link (valid 30 minutes).' +
+        '</strong><br>Confirm your case there to continue to payment. The email goes to ' +
+        '<strong>' + email + '</strong>; you’ll review the case details for ' + caseNumber +
+        ' before anything is charged.' +
+        '<br><span style="color:var(--text-muted)">Link expired or no email? Just submit ' +
+        'this form again for a fresh one.</span>');
+      btn.disabled = false;
+      applyBillingUI();
+      return;
     } catch (e) {
-      showResult(result, 'err', 'Couldn’t start checkout: ' + e.message + ' — please try again.');
+      showResult(result, 'err', 'Couldn’t start the subscription: ' + e.message + ' — please try again.');
       btn.disabled = false;
       applyBillingUI();
       return;
