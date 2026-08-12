@@ -620,6 +620,14 @@ function showDuplicateState(result, data, email, caseNumber) {
       });
       const d = await r.json();
       if (!r.ok || !d.ok) throw new Error('link request failed');
+      if (d.link_sent === false) {
+        // Registered but no longer live (e.g. since unsubscribed) — no email went out.
+        btnEl.disabled = false;
+        btnEl.textContent = label === 'change' ? 'Change plan' : 'Manage subscription';
+        document.getElementById('dup-note').textContent =
+          'No active subscriptions found for this email.';
+        return;
+      }
       document.getElementById('dup-note').innerHTML =
         'We’ve emailed <strong>' + email + '</strong> a secure sign-in link (valid ' +
         '30 minutes). Open it to ' + (label === 'change' ? 'switch plans' : 'manage this subscription') + '.';
@@ -810,7 +818,13 @@ document.getElementById('manage-submit').addEventListener('click', async functio
     });
     const data = await r.json();
     if (!r.ok || !data.ok) throw new Error((data.errors || ['request failed']).join(', '));
-    showResult(result, 'ok', data.message);
+    if (data.link_sent === false) {
+      // No live subscriptions for this address — nothing was emailed.
+      showResult(result, 'info', data.message ||
+        'No active subscriptions found for this email.');
+    } else {
+      showResult(result, 'ok', data.message);
+    }
   } catch (e) {
     showResult(result, 'err', 'Something went wrong: ' + e.message + ' — please try again.');
   } finally {
