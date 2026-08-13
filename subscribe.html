@@ -821,6 +821,9 @@ document.getElementById('trial-submit').addEventListener('click', async function
     if (data.preview_url) {
       html += ' You can also <a href="' + data.preview_url + '" target="_blank" rel="noopener">view it in your browser</a>.';
     }
+    html += '<br><a class="btn btn-primary" style="display:inline-block;margin-top:12px" ' +
+      'href="subscribe.html?src=sample&case=' + encodeURIComponent(data.case.case_number) +
+      '&email=' + encodeURIComponent(email) + '#register">Start watching this case &rarr;</a>';
     showResult(result, 'ok', html);
   } catch (e) {
     showResult(result, 'err', e.message);
@@ -863,10 +866,12 @@ document.getElementById('manage-submit').addEventListener('click', async functio
   }
 });
 
-// Prefill from query params (used by the Estimate page CTA):
+// Prefill from query params (used by the Estimate page CTA, the free-sample
+// success message and the "Start watching" links in sample emails):
 //   ?case=G-100-...   (first valid case only — one case per subscription)
+//   &email=you@example.com   (fills the register + sample forms)
 //   &cadence=daily|weekly|alerts
-//   &src=estimate  → shows a "carried over from your estimate" note
+//   &src=estimate|sample  → shows a "carried over" note
 (function prefillFromQuery() {
   const params = new URLSearchParams(location.search);
   const cases = params.getAll('case')
@@ -877,13 +882,36 @@ document.getElementById('manage-submit').addEventListener('click', async functio
     document.getElementById('case-number').value = cases[0];
     document.getElementById('trial-case').value = cases[0];
   }
+  const emailParam = (params.get('email') || '').trim();
+  const emailOk = EMAIL_RE.test(emailParam);
+  if (emailOk) {
+    document.getElementById('email').value = emailParam;
+    document.getElementById('trial-email').value = emailParam;
+  }
   const cadence = (params.get('cadence') || '').toLowerCase();
   const radio = document.querySelector('input[name=cadence][value="' + cadence + '"]');
   if (radio) { radio.checked = true; refreshPlanUI(); }
-  if (params.get('src') === 'estimate' && cases.length) {
+  const src = params.get('src');
+  if ((src === 'estimate' || src === 'sample') && (cases.length || emailOk)) {
+    const from = src === 'sample' ? 'your sample' : 'your estimate';
+    const emailSafe = emailParam.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    let msg;
+    if (cases.length && emailOk) {
+      msg = '&#10003; Case <strong>' + cases[0] + '</strong> and email <strong>' +
+        emailSafe + '</strong> carried over from ' + from +
+        ' — pick a plan below to start watching it.';
+    } else if (cases.length) {
+      msg = '&#10003; Case <strong>' + cases[0] +
+        '</strong> carried over from ' + from +
+        ' — pick a plan and enter your email below to start watching it.';
+    } else {
+      msg = '&#10003; Email <strong>' + emailSafe +
+        '</strong> carried over from ' + from +
+        ' — enter your case number and pick a plan below to start watching it.';
+    }
     const note = document.getElementById('prefill-note');
-    note.innerHTML = '&#10003; Case <strong>' + cases[0] +
-      '</strong> carried over from your estimate — pick a plan and enter your email below to start watching it.';
+    note.innerHTML = msg;
     note.style.display = 'block';
   }
 })();
