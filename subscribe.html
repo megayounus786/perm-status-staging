@@ -605,7 +605,7 @@ function showDuplicateState(result, data, email, caseNumber) {
     'One subscription covers this case, so there’s nothing to buy again. Want a ' +
     'different cadence? Changing plans updates your existing subscription — no new checkout.' +
     '<br><span style="display:inline-flex;gap:10px;margin-top:10px;flex-wrap:wrap">' +
-    '<button type="button" class="btn btn-primary" id="dup-manage">Manage subscription</button>' +
+    '<button type="button" class="btn btn-primary" id="dup-manage">Manage subscriptions</button>' +
     '<button type="button" class="btn btn-secondary" id="dup-change">Change plan</button></span>' +
     '<span id="dup-note" style="display:block;margin-top:8px"></span>');
 
@@ -625,7 +625,7 @@ function showDuplicateState(result, data, email, caseNumber) {
       if (d.link_sent === false) {
         // Registered but no longer live (e.g. since unsubscribed) — no email went out.
         btnEl.disabled = false;
-        btnEl.textContent = label === 'change' ? 'Change plan' : 'Manage subscription';
+        btnEl.textContent = label === 'change' ? 'Change plan' : 'Manage subscriptions';
         document.getElementById('dup-note').textContent =
           'No active subscriptions found for this email.';
         return;
@@ -636,7 +636,7 @@ function showDuplicateState(result, data, email, caseNumber) {
       btnEl.textContent = 'Sign-in link sent ✓';
     } catch (e) {
       btnEl.disabled = false;
-      btnEl.textContent = label === 'change' ? 'Change plan' : 'Manage subscription';
+      btnEl.textContent = label === 'change' ? 'Change plan' : 'Manage subscriptions';
       document.getElementById('dup-note').textContent =
         'Couldn’t send the sign-in link — please try again.';
     }
