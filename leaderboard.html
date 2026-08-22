@@ -781,5 +781,109 @@ document.getElementById('nav-toggle').addEventListener('click', function() {
 })();
 </script>
 <!-- /il-session-check -->
+<!-- il-fresh-banner START -->
+<style id="il-fresh-banner-css">
+  .il-fresh { position: relative; z-index: 90; display: none; background: var(--card-bg); border-bottom: 1px solid var(--card-border); backdrop-filter: blur(12px); }
+  .il-fresh-inner { max-width: 1200px; margin: 0 auto; padding: 8px 44px 8px 24px; position: relative; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+  .il-fresh-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+  .il-fresh strong { color: var(--text-primary); font-weight: 600; }
+  .il-fresh-sep { color: var(--text-dim); }
+  .il-fresh-close { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: 1px solid transparent; border-radius: 8px; color: var(--text-muted); font-size: 16px; line-height: 1; padding: 4px 8px; cursor: pointer; }
+  .il-fresh-close:hover { color: var(--text-primary); background: var(--tab-bg); }
+  .il-fresh-close:focus-visible { outline: 2px solid var(--input-focus); outline-offset: 1px; }
+  @media (max-width: 768px) {
+    .il-fresh-inner { font-size: 12px; gap: 6px; padding: 7px 40px 7px 16px; }
+    .il-fresh-sep { display: none; }
+    .il-fresh-item { flex: none; }
+    .il-fresh-item + .il-fresh-item::before { content: '·'; color: var(--text-dim); margin-right: 6px; }
+  }
+</style>
+<script id="il-fresh-banner-js">
+/* Data-freshness banner. Reads data/dashboard_data.json (already published by
+   the 3h scanner cron). Renders nothing at all if the file is missing,
+   malformed, or lacks the fields it needs. Dismissal persists in localStorage,
+   keyed to updatedAt so the banner returns when the data actually changes. */
+(function () {
+  'use strict';
+  var LS_KEY = 'il-fresh-dismissed';
+  function fmtNum(n) { return n.toLocaleString('en-US'); }
+  function whenLabel(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return null;
+    var now = new Date();
+    var opts = { month: 'short', day: 'numeric' };
+    var sameDay = d.toDateString() === now.toDateString();
+    var yest = new Date(now); yest.setDate(now.getDate() - 1);
+    if (sameDay) {
+      var t = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return 'today at ' + t;
+    }
+    if (d.toDateString() === yest.toDateString()) return 'yesterday';
+    return 'on ' + d.toLocaleDateString('en-US', opts);
+  }
+  function build(data) {
+    if (!data || typeof data !== 'object') return null;
+    var when = data.updatedAt && whenLabel(data.updatedAt);
+    if (!when) return null;
+    var parts = [];
+    parts.push('<strong>Data updated ' + when + '</strong>');
+    var t = data.today, y = t && t.yesterday;
+    if (t && typeof t.total === 'number' && t.total > 0) {
+      parts.push('<strong>' + fmtNum(t.total) + '</strong> decision' + (t.total === 1 ? '' : 's') + ' posted by DOL so far today' + (typeof t.certified === 'number' ? ' (' + fmtNum(t.certified) + ' approved)' : ''));
+    } else if (y && typeof y.total === 'number' && y.total > 0) {
+      parts.push('<strong>' + fmtNum(y.total) + '</strong> decisions posted yesterday' + (typeof y.certified === 'number' ? ' (' + fmtNum(y.certified) + ' approved)' : ''));
+    }
+    var total = 0;
+    if (Array.isArray(data.timeline)) {
+      for (var i = 0; i < data.timeline.length; i++) {
+        var mt = data.timeline[i] && data.timeline[i].total;
+        if (typeof mt === 'number') total += mt;
+      }
+    }
+    if (total > 0) parts.push('tracking <strong>' + fmtNum(total) + '</strong> PERM cases straight from DOL');
+    if (parts.length < 2) return null;
+    return parts;
+  }
+  function insert(parts, stamp) {
+    var nav = document.querySelector('nav');
+    if (!nav || !nav.parentNode) return;
+    var el = document.createElement('div');
+    el.className = 'il-fresh';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    var html = '<div class="il-fresh-inner"><span class="il-fresh-dot" aria-hidden="true"></span>';
+    for (var i = 0; i < parts.length; i++) {
+      if (i > 0) html += '<span class="il-fresh-sep" aria-hidden="true">·</span>';
+      html += '<span class="il-fresh-item">' + parts[i] + '</span>';
+    }
+    html += '<button type="button" class="il-fresh-close" aria-label="Dismiss data update notice">&#10005;</button></div>';
+    el.innerHTML = html;
+    el.querySelector('.il-fresh-close').addEventListener('click', function () {
+      try { localStorage.setItem(LS_KEY, stamp); } catch (e) {}
+      el.remove();
+    });
+    el.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') { try { localStorage.setItem(LS_KEY, stamp); } catch (e) {} el.remove(); }
+    });
+    nav.insertAdjacentElement('afterend', el);
+    el.style.display = 'block';
+  }
+  function start() {
+    fetch('data/dashboard_data.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+      .then(function (data) {
+        var parts = build(data);
+        if (!parts) return;
+        var stamp = String(data.updatedAt);
+        try { if (localStorage.getItem(LS_KEY) === stamp) return; } catch (e) {}
+        insert(parts, stamp);
+      })
+      .catch(function () { /* stay silent: no banner is the failure mode */ });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+</script>
+<!-- il-fresh-banner END -->
 </body>
 </html>
