@@ -123,15 +123,13 @@
   body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, var(--gradient-start) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, var(--gradient-end) 0%, transparent 50%); z-index: 0; pointer-events: none; }
   .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
   nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; backdrop-filter: blur(20px); background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); position: sticky; top: 0; z-index: 100; }
-  .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; white-space: nowrap; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
   .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .nav-links { display: flex; gap: clamp(12px, 1.4vw, 24px); list-style: none; min-width: 0; }
-  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
   .nav-links a.active, .nav-links a:hover { color: var(--text-primary); }
   .nav-toggle { display: none; background: none; border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-primary); font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1; }
-  .nav-utils { display: flex; align-items: center; gap: 12px; padding-left: 16px; border-left: 1px solid var(--nav-border); flex-shrink: 0; }
-  @media (max-width: 1140px) { .nav-utils { border-left: none; padding-left: 0; gap: 10px; } }
-  @media (max-width: 1140px) {
+  @media (max-width: 768px) {
     .nav-toggle { display: flex; align-items: center; justify-content: center; order: -1; }
     nav .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: #0f172a; border-bottom: 1px solid rgba(59, 130, 246, 0.2); padding: 8px 0; z-index: 1000; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
     nav .nav-links li { width: 100%; }
@@ -139,8 +137,6 @@
     nav .nav-links a:hover, nav .nav-links a.active { background: rgba(59,130,246,0.1); }
     nav.nav-open .nav-links { display: flex; }
     .light nav .nav-links { background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  }
-  @media (max-width: 768px) {
     .hero h1 { font-size: 12px; letter-spacing: 1px; }
     .hero h2 { font-size: 20px; }
   }
@@ -357,14 +353,14 @@
   }
 
   /* ── NAV SEARCH ── */
-  .nav-right { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .nav-right { display: flex; align-items: center; gap: 24px; }
   .nav-search { display: flex; align-items: center; position: relative; }
   .nav-search-icon {
     position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
     color: var(--text-dim); pointer-events: none; display: flex; align-items: center;
   }
   .nav-search-input {
-    width: clamp(150px, calc(33vw - 218px), 260px); padding: 8px 32px 8px 34px;
+    width: 260px; padding: 8px 32px 8px 34px;
     border: 1px solid var(--input-border);
     background: var(--input-bg);
     color: var(--text-primary); font-size: 13px; font-family: inherit;
@@ -822,14 +818,14 @@
       <li><a href="about-perm.html">About PERM</a></li>
       <li><a href="faq.html">FAQ</a></li>
     </ul>
-    <div class="nav-utils"><button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode"><span class="theme-toggle-icon moon">🌙</span><span class="theme-toggle-icon sun">☀️</span></button>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode"><span class="theme-toggle-icon moon">🌙</span><span class="theme-toggle-icon sun">☀️</span></button>
     <div class="nav-search" id="nav-search">
       <div class="nav-search-icon">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </div>
       <input type="text" class="nav-search-input" id="nav-search-input" placeholder="Search your employer" autocomplete="off" spellcheck="false" aria-label="Search your employer">
       <button type="button" class="nav-search-clear" id="nav-search-clear" aria-label="Clear search">&times;</button>
-    </div></div>
+    </div>
   </div>
   <div class="nav-search-dropdown" id="nav-search-dropdown"></div>
 </nav>
@@ -932,13 +928,13 @@
 <script>
 /* ===== DASHBOARD_DATA START ===== */
 window.DASHBOARD_DATA = {
-  "updatedAt": "2026-08-22T15:06:23-04:00",
+  "updatedAt": "2026-08-22T12:06:37-04:00",
   "backlog": {
-    "total": 99759,
+    "total": 99814,
     "startOfMonth": 109034,
     "thisMonth": {
       "name": "Aug 2026",
-      "processed": 15296,
+      "processed": 15241,
       "intake": 6021
     },
     "lastMonth": {
@@ -956,8 +952,8 @@ window.DASHBOARD_DATA = {
     "trend90Day": 0
   },
   "today": {
-    "total": 244,
-    "certified": 221,
+    "total": 189,
+    "certified": 166,
     "rfi": 12,
     "denied": 3,
     "withdrawn": 8,
@@ -1084,26 +1080,26 @@ window.DASHBOARD_DATA = {
     {
       "label": "Aug '25",
       "total": 9946,
-      "certified": 8389,
-      "review": 619,
+      "certified": 8355,
+      "review": 653,
       "withdrawn": 468,
       "denied": 151,
       "rfi": 297,
       "status": "done",
-      "processedPct": 88.8,
-      "todayProcessed": 65
+      "processedPct": 88.5,
+      "todayProcessed": 31
     },
     {
       "label": "Sep '25",
       "total": 13643,
-      "certified": 8848,
-      "review": 3885,
+      "certified": 8827,
+      "review": 3906,
       "withdrawn": 525,
       "denied": 71,
       "rfi": 291,
       "status": "processing",
-      "processedPct": 67.5,
-      "todayProcessed": 100
+      "processedPct": 67.4,
+      "todayProcessed": 79
     },
     {
       "label": "Oct '25",
@@ -1465,8 +1461,8 @@ window.DASHBOARD_DATA = {
     },
     {
       "date": "2026-08-22",
-      "total": 244,
-      "certified": 221,
+      "total": 189,
+      "certified": 166,
       "rfi": 12,
       "denied": 3,
       "withdrawn": 8
@@ -1563,8 +1559,8 @@ window.DASHBOARD_DATA = {
     },
     {
       "weekStart": "2026-08-17",
-      "total": 4586,
-      "certified": 4176,
+      "total": 4531,
+      "certified": 4121,
       "rfi": 225,
       "denied": 173,
       "withdrawn": 12,
@@ -1576,8 +1572,8 @@ window.DASHBOARD_DATA = {
       "tabKey": "active",
       "tabLabel": "Sep",
       "subtitle": "September 2025 filings \u00b7 13,620 total",
-      "certified": 8848,
-      "review": 3885,
+      "certified": 8827,
+      "review": 3906,
       "withdrawn": 525,
       "rfi": 291,
       "denied": 71
@@ -3138,8 +3134,8 @@ function employerSlug(name) {
 <!-- il-fresh-banner END -->
 <!-- il-cw-announce START -->
 <style id="il-cw-announce-css">
-  .il-cw { position: relative; z-index: 91; display: none; background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(139,92,246,0.14)); border-bottom: 1px solid rgba(139,92,246,0.36); backdrop-filter: blur(12px); }
-  .il-cw-inner { max-width: 1200px; margin: 0 auto; padding: 11px 44px 11px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); text-decoration: none; cursor: pointer; }
+  .il-cw { position: relative; z-index: 91; display: none; background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(139,92,246,0.14)); border-bottom: 1px solid rgba(139,92,246,0.28); backdrop-filter: blur(12px); }
+  .il-cw-inner { max-width: 1200px; margin: 0 auto; padding: 9px 44px 9px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); text-decoration: none; cursor: pointer; }
   .il-cw-badge { flex: none; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #fff; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 999px; padding: 2px 9px; }
   .il-cw-text strong { color: var(--text-primary); font-weight: 600; }
   .il-cw-cta { flex: none; font-weight: 600; color: #8b5cf6; white-space: nowrap; }
@@ -3149,7 +3145,7 @@ function employerSlug(name) {
   .il-cw-close:hover { color: var(--text-primary); background: var(--tab-bg); }
   .il-cw-close:focus-visible { outline: 2px solid var(--input-focus); outline-offset: 1px; }
   @media (max-width: 768px) {
-    .il-cw-inner { font-size: 12.5px; gap: 8px; padding: 9px 40px 9px 16px; }
+    .il-cw-inner { font-size: 12.5px; gap: 8px; padding: 8px 40px 8px 16px; }
   }
 </style>
 <script id="il-cw-announce-js">
