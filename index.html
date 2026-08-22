@@ -2,6 +2,45 @@
 <html lang="en">
 <head>
 <script type="text/javascript" src="//monu.delivery/site/6/7/24ec8e-ce2f-4a85-ba1a-e1a4ecaea496.js" data-cfasync="false"></script>
+<!-- ImmiLane: collapse EMPTY Monumetric ad slots until a real ad fills them (added 2026-06-24). Removes blank reserved gaps while ads are unfilled; reveals each slot at its reserved size the moment a creative loads. Does not touch the loader or ad-unit ids. -->
+<style id="mmt-empty-collapse-css">div[id^="mmt-"]:not([data-mmt-filled]){min-height:0}</style>
+<script id="mmt-empty-collapse">
+(function(){
+  var SEL='div[id^="mmt-"][id$="_zone"], div[id^="mmt-"][id$="_placeholder"]';
+  function realAd(z){
+    var f=z.getElementsByTagName('iframe');
+    for(var i=0;i<f.length;i++){var r=f[i].getBoundingClientRect();if(r.height>1&&r.width>1)return true;}
+    return false;
+  }
+  function sweep(){
+    var z=document.querySelectorAll(SEL);
+    for(var i=0;i<z.length;i++){
+      var el=z[i];
+      if(el.getAttribute('data-mmt-filled')==='1')continue;
+      if(realAd(el)){
+        el.setAttribute('data-mmt-filled','1');
+        var o=el.getAttribute('data-mmt-orig-mh');
+        if(o)el.style.setProperty('min-height',o,'important');
+        else el.style.removeProperty('min-height');
+        continue;
+      }
+      if(el.getAttribute('data-mmt-collapsed')!=='1'){
+        el.setAttribute('data-mmt-orig-mh',el.style.getPropertyValue('min-height'));
+        el.setAttribute('data-mmt-collapsed','1');
+      }
+      var cur=el.style.getPropertyValue('min-height');
+      if(cur!=='0px'&&cur!=='0')el.style.setProperty('min-height','0','important');
+    }
+  }
+  function start(){
+    sweep();
+    try{new MutationObserver(sweep).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['style','id']});}catch(e){}
+    var n=0,iv=setInterval(function(){sweep();if(++n>120)clearInterval(iv);},1000);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
+  else start();
+})();
+</script>
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -754,8 +793,6 @@
 <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || []; $MMT.cmd.push(function(){ $MMT.display.slots.push(["2ebba6a6-83c2-44c0-9ad4-9c1ded6e4511"]); })</script>
 <div id="mmt-d33dabc7-369a-4126-8a86-ff0f346c42ea"></div>
 <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || []; $MMT.cmd.push(function(){ $MMT.display.slots.push(["d33dabc7-369a-4126-8a86-ff0f346c42ea"]); })</script>
-<div id="mmt-4b3cdef0-e13a-48ab-bff9-b996ba62c869"></div>
-<script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || []; $MMT.cmd.push(function(){ $MMT.display.slots.push(["4b3cdef0-e13a-48ab-bff9-b996ba62c869"]); })</script>
 <!-- Monumetric anchored ad units — END -->
 
 <noscript>
@@ -871,6 +908,11 @@
     </div>
   </div>
 
+
+  <!-- Monumetric In-Content Repeatable ad unit — BEGIN -->
+  <div id="mmt-a0e6cd6c-321d-4e87-97a2-f2eb855508e5"></div>
+  <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || []; $MMT.cmd.push(function(){ $MMT.display.slots.push(["a0e6cd6c-321d-4e87-97a2-f2eb855508e5"]); })</script>
+  <!-- Monumetric In-Content Repeatable ad unit — END -->
 
   <div style="margin: 16px 0 40px;">
     <div class="card">
@@ -2432,6 +2474,10 @@ renderDashboard(window.DASHBOARD_DATA);
 
   <p style="margin-top:1.5rem;font-size:13px;color:#64748b;"><em>Disclaimer: ImmiLane is an independent data tool for informational purposes only and is not affiliated with or endorsed by the U.S. Department of Labor. Nothing here is legal advice. Figures are estimates derived from observed DOL data and will not match every individual case. Consult a qualified immigration attorney for guidance on your specific PERM application.</em></p>
 </section>
+
+<!-- Monumetric Bottom Leaderboard — relocated above the footer (moved from the top-of-body anchored block per Jeff, 2026-07-01). Same unit id/loader; move only. -->
+<div id="mmt-4b3cdef0-e13a-48ab-bff9-b996ba62c869"></div>
+<script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || []; $MMT.cmd.push(function(){ $MMT.display.slots.push(["4b3cdef0-e13a-48ab-bff9-b996ba62c869"]); })</script>
 
 
 <footer>
