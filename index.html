@@ -1962,7 +1962,6 @@ function renderStatCards() {
           <div class="tt-row"><span class="tt-label">RFI</span><span class="tt-val" style="color:#f59e0b;">${n(today.rfi)}</span></div>
           <div class="tt-row"><span class="tt-label">Denied</span><span class="tt-val" style="color:#ef4444;">${n(today.denied)}</span></div>
           <div class="tt-row"><span class="tt-label">Withdrawn</span><span class="tt-val" style="color:#64748b;">${n(today.withdrawn)}</span></div>
-          ${(today.other||0) > 0 ? `<div class="tt-row"><span class="tt-label">Other statuses</span><span class="tt-val" style="color:#94a3b8;">${n(today.other)}</span></div>` : ''}
         </span></span>
       </div>
       <div class="stat-value" style="color:#22c55e;">${n(today.total)}</div>
@@ -1972,7 +1971,6 @@ function renderStatCards() {
         <div class="stat-detail-row"><span class="stat-detail-label">Yesterday denied</span><span class="stat-detail-value" style="color:#ef4444;">${n(today.yesterday.denied)}</span></div>
         <div class="stat-detail-row"><span class="stat-detail-label">Yesterday RFI</span><span class="stat-detail-value" style="color:#f59e0b;">${n(today.yesterday.rfi)}</span></div>
         <div class="stat-detail-row"><span class="stat-detail-label">Yesterday withdrawn</span><span class="stat-detail-value">${n(today.yesterday.withdrawn)}</span></div>
-        ${(today.yesterday.other||0) > 0 ? `<div class="stat-detail-row"><span class="stat-detail-label">Yesterday other statuses</span><span class="stat-detail-value" style="color:#94a3b8;">${n(today.yesterday.other)}</span></div>` : ''}
       </div>
     </div>
 
@@ -2089,7 +2087,7 @@ function renderCombo() {
       html += '<div style="font-size:8px;color:'+pctColor+';font-weight:600;">'+pctTxt+'</div>';
     }
     if (m.todayProcessed > 0) {
-      html += '<div style="font-size:9px;color:#86efac;font-weight:600;margin-top:2px;" title="Case status updates detected today (all statuses)">+'+m.todayProcessed+' today</div>';
+      html += '<div style="font-size:9px;color:#86efac;font-weight:600;margin-top:2px;" title="Processed today">+'+m.todayProcessed+' today</div>';
     }
     html += '</div>';
   });
